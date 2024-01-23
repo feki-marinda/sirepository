@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <header id="header" class="header fixed-top">
+    <div class="container-fluid container-xl d-flex align-items-center justify-content-between">
+
+      <a href="index.php" class="logo d-flex align-items-center">
+        <img src="assets/img/smk.png" alt="">
+        <span>SiRepository</span>
+      </a>
+
+      <!-- .navbar -->
+      <nav id="navbar" class="navbar">
+        <ul>
+          <li><a class="nav-link scrollto active" href="index.php" onclick="setActiveMenu(this)">Home</a></li>
+          <li class="dropdown"><a href="#"><span>Profil</span> <i class="bi bi-chevron-down"></i></a>
+            <ul>
+              <li><a href="sejarah.php">Sejarah</a></li>
+              <li><a href="visi.php">Visi Misi Tujuan</a></li>
+              <li><a href="Struktur.php">Struktur Organisasi</a></li>
+            </ul>
+          </li>
+          <li class="dropdown"><a href="#"><span>Repository</span> <i class="bi bi-chevron-down"></i></a>
+            <ul>
+              <li><a href="repository.php">Repo Laporan PKL <i class="fa-solid fa-cloud-arrow-up"></i></a></li>
+              <li><a href="unggahrepo.php">Unggah Laporan <i class="fa-solid fa-upload"></i></a></li>
+              </ul>
+              </li>
+          <li><a class="nav-link scrollto" href="logbook.php">Logbook</a></li>
+          <li><a class="nav-link scrollto" href="mitra.php">Mitra</a></li>
+          <li><a class="nav-link scrollto" href="dokumen.php">Dokumen</a></li>
+          <li class="dropdown"><a href="#"><span>Profil</span> <i class="bi bi-chevron-down"></i></a>
+            <ul>
+              <li><a href="datadiri.php">Data Diri<i class="fa-solid fa-user"></i></a></li>
+              <li><a href="unggahrepo.php">Keluar<i class="fa-solid fa-right-from-bracket"></i></a></li>
+              </ul>
+              </li>
+        </ul>
+        <i class="bi bi-list mobile-nav-toggle"></i>
+      </nav>
+    </div>
+  </header>
+  <!-- Letakkan di bagian head atau sebelum penutup tag body -->
+  <script>
+    // Fungsi untuk menangani perubahan menu aktif
+    function setActiveMenu(link) {
+      // Menghapus kelas "active" dari semua menu
+      var allLinks = document.querySelectorAll('.nav-link');
+      allLinks.forEach(function (el) {
+        el.classList.remove('active');
+      });
+
+      // Menambahkan kelas "active" pada menu yang diklik
+      link.classList.add('active');
+    }
+  </script>
+
+</body>
+
+</html>
