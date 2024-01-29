@@ -64,18 +64,14 @@ if (isset($_POST['EditDokumen'])) {
             unlink($old_file['Dokumen']);
         }
     } else {
-        // Jika tidak ada dokumen baru diunggah, gunakan link lama
         $link = 'Dokumen/' . $_POST['Dokumen'];
     }
 
-    // Query untuk mengedit dokumen
     $queryEdit = "UPDATE dokumen SET judul_dokumen='$judul_dokumen', Dokumen='$file_name' WHERE id_dokumen='$id_dokumen'";
     if ($koneksi->query($queryEdit) === TRUE) {
-        // Redirect ke halaman datadokumen.php setelah mengedit
         header("location: datadokumen.php");
         exit;
     } else {
-        // Jika terjadi kesalahan, arahkan pengguna ke halaman error atau tampilkan pesan error
         echo 'Error: ' . $koneksi->error;
     }
 }

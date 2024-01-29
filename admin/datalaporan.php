@@ -1,16 +1,20 @@
 <?php
 include 'conn.php';
 
-$query = "SELECT * FROM laporan_pkl";
+$query = "SELECT laporan_pkl.*, pkl.*
+FROM laporan_pkl
+INNER JOIN pkl ON laporan_pkl.id_pkl = pkl.id_pkl;
+";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
     die("Error in query: " . mysqli_error($koneksi));
 }
 
-if (isset($_POST['TambahLaporan'])) {
+if (isset($_POST['EditLaporan'])) {
+    $id_laporan = $_POST['id_laporan'];
+    $id_pkl = $_POST['nama_siswa'];
     $tanggal_kumpul = $_POST['tanggal_kumpul'];
-    $nama_penulis = $_POST['nama_penulis'];
 
     // Tangani file yang diunggah
     $file_name = $_FILES['berkas']['name'];
@@ -24,44 +28,6 @@ if (isset($_POST['TambahLaporan'])) {
         $file_destination = 'Laporan PKL/' . $file_name;
         move_uploaded_file($file_tmp, $file_destination);
 
-        // Jalankan query untuk menyimpan data ke database
-        $query = "INSERT INTO laporan_pkl (tanggal_kumpul, nama_penulis, berkas) 
-                  VALUES ('$tanggal_kumpul', '$nama_penulis', '$file_destination')";
-
-        // Eksekusi query
-        if ($koneksi->query($query) === TRUE) {
-            // Jika berhasil, arahkan pengguna ke halaman sukses atau halaman lain
-            header('Location: datalaporan.php');
-            exit;
-        } else {
-            // Jika terjadi kesalahan, arahkan pengguna ke halaman error atau tampilkan pesan error
-            echo 'Error: ' . $koneksi->error;
-        }
-    } else {
-        // Handle error file, bisa ditambahkan pesan kesalahan sesuai kebutuhan
-        echo 'Error uploading file.';
-    }
-
-    $koneksi->close();
-}
-
-if (isset($_POST['EditLaporan'])) {
-    $id_laporan = $_POST['id_laporan'];
-    $tanggal_kumpul = $_POST['tanggal_kumpul'];
-    $nama_penulis = $_POST['nama_penulis'];
-
-    // Tangani file yang diunggah
-    $file_name = $_FILES['berkas']['name'];
-    $file_tmp = $_FILES['berkas']['tmp_name'];
-    $file_size = $_FILES['berkas']['size'];
-    $file_error = $_FILES['berkas']['error'];
-
-    // Periksa apakah file sudah diunggah
-    if ($file_error === 0) {
-        // Pindahkan file ke lokasi yang diinginkan
-        $file_destination = $nama_penulis . 'Laporan PKL/' . $file_name;
-        move_uploaded_file($file_tmp, $file_destination);
-
         // Hapus file lama jika ada
         $old_file = mysqli_fetch_array(mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'"));
         if (is_file($old_file['berkas'])) {
@@ -69,7 +35,11 @@ if (isset($_POST['EditLaporan'])) {
         }
 
         // Jalankan query untuk menyimpan data ke database
-        mysqli_query($koneksi, "UPDATE laporan_pkl SET nama_penulis='$nama_penulis', tanggal_kumpul='$tanggal_kumpul', berkas='$file_destination' WHERE id_laporan='$id_laporan'");
+        mysqli_query($koneksi, "UPDATE laporan_pkl 
+                   SET id_pkl='$id_pkl', 
+                       tanggal_kumpul='$tanggal_kumpul', 
+                       berkas='$file_destination' 
+                   WHERE id_laporan='$id_laporan'");
 
         // Arahkan pengguna ke halaman data setelah berhasil menyimpan
         header("location:datalaporan.php");
@@ -108,10 +78,7 @@ if (isset($_GET['id_laporan'])) {
                     <div class="card mb-4">
                         <div class="button-container">
                             <div class="spacer"></div>
-                            <div class="buttons-right">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
-                                    Tambah Data Laporan PKL</button>
+                            <div class="buttons-right">                                
                                 <button id="printButton">
                                     <i class="fas fa-print"></i> Cetak
                                 </button>
@@ -144,14 +111,18 @@ if (isset($_GET['id_laporan'])) {
                                 </tfoot>
                                 <tbody>
                                     <?php
+                                    include 'conn.php';
+                                    $row = mysqli_query($koneksi, "SELECT laporan_pkl.*, pkl.*
+                                     FROM laporan_pkl
+                                     INNER JOIN pkl ON laporan_pkl.id_pkl = pkl.id_pkl;");
                                     $no = 1;
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         // Tampilkan data pada tabel
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
-                                        echo "<td>" . $row['nama_penulis'] . "</td>";
+                                        echo "<td>" . $row['nama_siswa'] . "</td>";
                                         echo "<td>" . $row['tanggal_kumpul'] . "</td>";
-                                        echo "<td><a href='" . $row['berkas'] . "' target='_blank'>" . $row['nama_penulis'] . "/" . $row['berkas'] . "</a></td>";
+                                        echo "<td><a href='" . $row['berkas'] . "' target='_blank'>" . $row['berkas'] . "</a></td>";
                                         echo "<td>";
                                         echo "<div class='btn-group'>";
                                         echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_laporan'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
@@ -208,12 +179,25 @@ if (isset($_GET['id_laporan'])) {
                                                                         readonly>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="nama_penulis">Nama Lengkap</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="nama_penulis"
-                                                                        value="<?= $row['nama_penulis']; ?>"
-                                                                        name="nama_penulis" required>
+                                                                    <label for="id_pkl">ID PKL</label>
+                                                                    <input type="text" class="form-control" id="id_pkl"
+                                                                        value="<?= $row['id_pkl']; ?>" name="id_pkl"
+                                                                        readonly>
                                                                 </div>
+                                                                <div class="form-group">
+                                                                    <label for="nama_siswa">Nama Lengkap :</label>
+                                                                    <select class="form-control" id="nama_siswa"
+                                                                        name="nama_siswa"  required>
+                                                                        <?php
+                                                                        $query_nama_siswa = mysqli_query($koneksi, "SELECT * FROM pkl");
+                                                                        while ($data_nama_siswa = mysqli_fetch_assoc($query_nama_siswa)) {
+                                                                            $selected = ($row['id_pkl'] == $data_nama_siswa['id_pkl']) ? 'selected' : '';
+                                                                            echo "<option value='{$data_nama_siswa['id_pkl']}' $selected>{$data_nama_siswa['nama_siswa']}</option>";
+                                                                        }
+                                                                        ?>
+                                                                    </select>
+                                                                </div>
+
                                                                 <div class="form-group">
                                                                     <label for="tanggal_kumpul">Tanggal
                                                                         Pengumpulan</label>
@@ -252,47 +236,7 @@ if (isset($_GET['id_laporan'])) {
                         </div>
                     </div>
             </main>
-
-            <!-- Modal tambah data-->
-            <div class="modal modal-fullscreen-xxl-down fade" id="tambah" tabindex="-1"
-                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen-xxl-down">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Tambah Data Laporan PKL</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body ">
-                            <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
-                                <div class="mb-3">
-                                    <label for="nama_penulis" class="col-form-label">Nama Lengkap:</label>
-                                    <input type="text" class="form-control" id="nama_penulis" name="nama_penulis"
-                                        required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="tanggal_kumpul" class="col-form-label">Tanggal Pengumpulan:</label>
-                                    <input type="date" class="form-control" id="tanggal_kumpul" name="tanggal_kumpul"
-                                        required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="berkas" class="col-form-label">Berkas:</label>
-                                    <input type="file" class="form-control" id="berkas" name="berkas" required>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary" name="TambahLaporan" value="Submit"
-                                        id="submit">Submit</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-
-
+            
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">

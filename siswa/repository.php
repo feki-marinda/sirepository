@@ -1,3 +1,4 @@
+<?php include '../admin/conn.php' ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,40 +34,42 @@
                     </h1>
                 </div>
                 <div class="col-md-3 d-flex align-items-center justify-content-end">
-                    <img src="assets/img/features.png" alt="" style="max-height: 150px; width: auto;"
-                        class="img-fluid">
-            </div>
+                    <img src="assets/img/features.png" alt="" style="max-height: 150px; width: auto;" class="img-fluid">
+                </div>
             </div>
             <br>
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
                 <table id="example" class="display">
                     <thead>
                         <tr>
-                            <th>ID</th>
+                            <th>No</th>
                             <th>Nama</th>
-                            <th>Alamat</th>
-                            <th>Usia</th>
+                            <th>Judul Laporan</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td>John Doe</td>
-                            <td>Jakarta</td>
-                            <td>25</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Jane Smith</td>
-                            <td>Bandung</td>
-                            <td>28</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Mary Johnson</td>
-                            <td>Surabaya</td>
-                            <td>22</td>
-                        </tr>
+                        <?php
+                        $no = 1;
+                        $query = "SELECT * FROM laporan_pkl";
+                        $result = mysqli_query($koneksi, $query);
+
+                        if (!$result) {
+                            die("Query failed: " . mysqli_error($koneksi));
+                        }
+
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            echo "<tr>";
+                            echo "<td>" . $no++ . "</td>";
+                            echo "<td>" . $row['nama_siswa'] . "</td>";
+                            echo "<td>" . $row['judul_laporan'] . "</td>";
+                            echo "<td><a href='" . $row['berkas'] . "' download>Unduh</a></td>";
+                            echo "</tr>";
+                        }
+
+                        mysqli_free_result($result);
+                        ?>
+
                     </tbody>
                 </table>
 

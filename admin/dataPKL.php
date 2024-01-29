@@ -137,8 +137,8 @@ if (isset($_GET['id_pkl'])) {
                                         ?>
 
                                         <!-- Modal hapus data -->
-                                        <div class="modal fade" id='hapus<?= $row['id_siswa'] ?>' tabindex="-1"
-                                            role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal fade" id='hapus<?= $row['id_pkl'] ?>' tabindex="-1" role="dialog"
+                                            aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -181,11 +181,18 @@ if (isset($_GET['id_pkl'])) {
                                                                         readonly>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="nama_siswa">Nama Lengkap</label>
-                                                                    <input type="text" class="form-control" id="nama_siswa"
-                                                                        value="<?= $row['nama_siswa']; ?>" name="nama_siswa"
-                                                                        required>
+                                                                    <label for="nama_siswa">Nama Lengkap <i
+                                                                            class="fas fa-user"></i></label>
+                                                                    <div class="input-group">
+                                                                        <span class="input-group-text"><i
+                                                                                class="fas fa-user"></i></span>
+                                                                        <input type="text" class="form-control"
+                                                                            id="nama_siswa"
+                                                                            value="<?= $row['nama_siswa']; ?>"
+                                                                            name="nama_siswa" required>
+                                                                    </div>
                                                                 </div>
+
                                                                 <div class="form-group">
                                                                     <label for="tgl_mulai">tgl_mulai</label>
                                                                     <input type="text" class="form-control" id="tgl_mulai"
@@ -212,10 +219,9 @@ if (isset($_GET['id_pkl'])) {
                                                                         name="nama_perusahaan" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label
-                                                                        for="tahun_pelajaran">Tahun Pelajaran</label><input
-                                                                        type="text" class="form-control"
-                                                                        id="tahun_pelajaran"
+                                                                    <label for="tahun_pelajaran">Tahun
+                                                                        Pelajaran</label><input type="text"
+                                                                        class="form-control" id="tahun_pelajaran"
                                                                         value="<?= $row['tahun_pelajaran']; ?>"
                                                                         name="tahun_pelajaran" required>
                                                                 </div>

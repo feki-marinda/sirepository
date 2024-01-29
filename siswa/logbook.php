@@ -1,3 +1,11 @@
+<?php
+session_start();
+
+// Inisialisasi variabel $nama
+$nama = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -44,31 +52,49 @@
                     <table id="example" class="display">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Nama</th>
-                                <th>Alamat</th>
-                                <th>Usia</th>
+                                <th>Tanggal</th>
+                                <th>Aktivitas</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>John Doe</td>
-                                <td>Jakarta</td>
-                                <td>25</td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Jane Smith</td>
-                                <td>Bandung</td>
-                                <td>28</td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>Mary Johnson</td>
-                                <td>Surabaya</td>
-                                <td>22</td>
-                            </tr>
+                            <?php
+                            // Include your database connection file
+                            include '../admin/conn.php';
+                            
+                            $query = "SELECT * FROM logbook WHERE nama = '$nama'";
+
+                            $result = $koneksi->query($query);
+
+                            // Check if the query was successful
+                            if ($result) {
+                                // Loop through the records
+                                while ($row = $result->fetch_assoc()) {
+                                    ?>
+                                    <tr>
+                                        <td>
+                                        <?php echo $nama; ?>
+                                        </td>
+                                        <td>
+                                            <?php echo $row['tanggal']; ?>
+                                        </td>
+                                        <td>
+                                            <?php echo $row['aktivitas']; ?>
+                                        </td>
+                                        <td>
+                                            <?php echo $row['status_logbook']; ?>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                }
+                            } else {
+                                echo "Error executing query: " . $koneksi->error;
+                            }
+
+                            // Close the database connection
+                            $koneksi->close();
+                            ?>
                         </tbody>
                     </table>
 
@@ -96,6 +122,8 @@
 
         <!-- Template Main JS File -->
         <script src="assets/js/main.js"></script>
+
+    </main>
 
 </body>
 
