@@ -174,6 +174,12 @@ if (isset($_GET['id_siswa'])) {
                                         <th>Alamat</th>
                                         <th>Tanggal Lahir</th>
                                         <th>No Hp</th>
+                                        <th>id_user</th>
+                                        <th>id_sertifikat</th>
+                                        <th>id_nilai</th>
+                                        <th>id_pamong</th>
+                                        <th>id_mitra</th>
+                                        <th>id_logbook</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
@@ -192,6 +198,12 @@ if (isset($_GET['id_siswa'])) {
                                         echo "<td>" . $row['jenis_kelamin'] . "</td>";
                                         echo "<td>" . $row['alamat'] . "</td>";
                                         echo "<td>" . $row['tanggal_lahir'] . "</td>";
+                                        echo "<td>" . $row['id_user'] . "</td>";
+                                        echo "<td>" . $row['id_sertifikat'] . "</td>";
+                                        echo "<td>" . $row['id_nilai'] . "</td>";
+                                        echo "<td>" . $row['id_pamong'] . "</td>";
+                                        echo "<td>" . $row['id_mitra'] . "</td>";
+                                        echo "<td>" . $row['id_logbook'] . "</td>";
                                         echo "<td>" . $row['no_hp'] . "</td>";
                                         echo "<td>";
                                         echo "<div class='btn-group'>";
@@ -264,12 +276,11 @@ if (isset($_GET['id_siswa'])) {
                                                                         value="<?= $row['kelas']; ?>" name="kelas" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="foto">Foto</label>
-
+                                                                    <label for="foto">Foto</label><br>
                                                                     <img src="gambar/<?php echo $row['foto']; ?>"
-                                                                        height="120" width="120">
+                                                                        height="120" width="120"><br>
                                                                     <input type="file" name="gambarnew"
-                                                                        class="form-control-file">
+                                                                        class="form-control-file"><br>
                                                                     <small>Abaikan jika tidak merubah gambar.</small>
 
                                                                 </div>
@@ -321,9 +332,9 @@ if (isset($_GET['id_siswa'])) {
             </main>
 
             <!-- Modal tambah data-->
-            <div class="modal modal-fullscreen-xxl-down fade" id="tambah" tabindex="-1"
+            <div class="modal fade" id="tambah" tabindex="-1"
                 aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen-xxl-down">
+                <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Tambah Data siswa PKL</h5>

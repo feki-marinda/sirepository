@@ -1,19 +1,16 @@
 <?php
 include 'conn.php';
 
-$query = "SELECT laporan_pkl.*, pkl.*
-FROM laporan_pkl
-INNER JOIN pkl ON laporan_pkl.id_pkl = pkl.id_pkl;
-";
+$query = "SELECT*FROM laporan_pkl JOIN siswa ON siswa.id_siswa=laporan_pkl.id_siswa";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
     die("Error in query: " . mysqli_error($koneksi));
 }
 
-if (isset($_POST['EditLaporan'])) {
+if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $id_laporan = $_POST['id_laporan'];
-    $id_pkl = $_POST['nama_siswa'];
+    $id_siswa = $_POST['Nama_siswa'];
     $tanggal_kumpul = $_POST['tanggal_kumpul'];
 
     // Tangani file yang diunggah
@@ -25,7 +22,7 @@ if (isset($_POST['EditLaporan'])) {
     // Periksa apakah file sudah diunggah
     if ($file_error === 0) {
         // Pindahkan file ke lokasi yang diinginkan
-        $file_destination = 'Laporan PKL/' . $file_name;
+        $file_destination = 'admin/Laporan PKL/' . $file_name;
         move_uploaded_file($file_tmp, $file_destination);
 
         // Hapus file lama jika ada
@@ -36,10 +33,11 @@ if (isset($_POST['EditLaporan'])) {
 
         // Jalankan query untuk menyimpan data ke database
         mysqli_query($koneksi, "UPDATE laporan_pkl 
-                   SET id_pkl='$id_pkl', 
-                       tanggal_kumpul='$tanggal_kumpul', 
-                       berkas='$file_destination' 
-                   WHERE id_laporan='$id_laporan'");
+        SET id_siswa='$id_siswa', 
+            tanggal_kumpul='$tanggal_kumpul', 
+            berkas='$file_destination' 
+        WHERE id_laporan='$id_laporan'");
+
 
         // Arahkan pengguna ke halaman data setelah berhasil menyimpan
         header("location:datalaporan.php");
@@ -78,7 +76,7 @@ if (isset($_GET['id_laporan'])) {
                     <div class="card mb-4">
                         <div class="button-container">
                             <div class="spacer"></div>
-                            <div class="buttons-right">                                
+                            <div class="buttons-right">
                                 <button id="printButton">
                                     <i class="fas fa-print"></i> Cetak
                                 </button>
@@ -112,17 +110,15 @@ if (isset($_GET['id_laporan'])) {
                                 <tbody>
                                     <?php
                                     include 'conn.php';
-                                    $row = mysqli_query($koneksi, "SELECT laporan_pkl.*, pkl.*
-                                     FROM laporan_pkl
-                                     INNER JOIN pkl ON laporan_pkl.id_pkl = pkl.id_pkl;");
+                                    $row = mysqli_query($koneksi, "SELECT * FROM laporan_pkl");
                                     $no = 1;
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         // Tampilkan data pada tabel
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
-                                        echo "<td>" . $row['nama_siswa'] . "</td>";
-                                        echo "<td>" . $row['tanggal_kumpul'] . "</td>";
-                                        echo "<td><a href='" . $row['berkas'] . "' target='_blank'>" . $row['berkas'] . "</a></td>";
+                                        echo "<td>" . $row['Nama_siswa'] . "</td>";
+                                        echo "<td>" . date('d-m-Y', strtotime($row['tanggal_kumpul'])) . "</td>";
+                                        echo "<td><a href='" . 'Laporan PKL' . '/' . $row['berkas'] . "' target='_blank'>" . $row['berkas'] . "</a></td>";
                                         echo "<td>";
                                         echo "<div class='btn-group'>";
                                         echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_laporan'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
@@ -170,62 +166,53 @@ if (isset($_GET['id_laporan'])) {
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form method="post" action="#" enctype="multipart/form-data">
+                                                        <form method="post" action="datalaporan.php"
+                                                            enctype="multipart/form-data">
                                                             <div class="form-group">
-                                                                <div class="form-group">
-                                                                    <label for="id_laporan">ID</label>
-                                                                    <input type="text" class="form-control" id="id_laporan"
-                                                                        value="<?= $row['id_laporan']; ?>" name="id_laporan"
-                                                                        readonly>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="id_pkl">ID PKL</label>
-                                                                    <input type="text" class="form-control" id="id_pkl"
-                                                                        value="<?= $row['id_pkl']; ?>" name="id_pkl"
-                                                                        readonly>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="nama_siswa">Nama Lengkap :</label>
-                                                                    <select class="form-control" id="nama_siswa"
-                                                                        name="nama_siswa"  required>
-                                                                        <?php
-                                                                        $query_nama_siswa = mysqli_query($koneksi, "SELECT * FROM pkl");
-                                                                        while ($data_nama_siswa = mysqli_fetch_assoc($query_nama_siswa)) {
-                                                                            $selected = ($row['id_pkl'] == $data_nama_siswa['id_pkl']) ? 'selected' : '';
-                                                                            echo "<option value='{$data_nama_siswa['id_pkl']}' $selected>{$data_nama_siswa['nama_siswa']}</option>";
-                                                                        }
-                                                                        ?>
-                                                                    </select>
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="tanggal_kumpul">Tanggal
-                                                                        Pengumpulan</label>
-                                                                    <input type="date" class="form-control"
-                                                                        id="tanggal_kumpul"
-                                                                        value="<?= $row['tanggal_kumpul']; ?>"
-                                                                        name="tanggal_kumpul" required>
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label for="berkas" class="col-form-label">Berkas
-                                                                        (Word/PDF):</label>
-                                                                    <input type="file" class="form-control" id="berkas"
-                                                                        name="berkas" accept=".doc, .docx, .pdf" required>
-                                                                    <small class="form-text text-muted">Pilih file Word
-                                                                        (doc/docx) atau PDF.</small>
-                                                                </div>
-
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary"
-                                                                        data-bs-dismiss="modal">Close</button>
-                                                                    <button type="submit" class="btn btn-primary"
-                                                                        name="EditLaporan" value="Submit">Submit</button>
-                                                                </div>
+                                                                <label for="id_laporan">ID</label>
+                                                                <input type="text" class="form-control" id="id_laporan"
+                                                                    value="<?= $row['id_laporan']; ?>" name="id_laporan"
+                                                                    readonly>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="Nama_siswa">Nama Lengkap :</label>
+                                                                <select class="form-control" id="Nama_siswa"
+                                                                    name="Nama_siswa" required>
+                                                                    <?php
+                                                                    $query_nama_siswa = mysqli_query($koneksi, "SELECT * FROM siswa");
+                                                                    while ($data_nama_siswa = mysqli_fetch_assoc($query_nama_siswa)) {
+                                                                        $selected = ($row['id_siswa'] == $data_nama_siswa['id_siswa']) ? 'selected' : '';
+                                                                        echo "<option value='{$data_nama_siswa['id_siswa']}' $selected>{$data_nama_siswa['Nama_siswa']}</option>";
+                                                                    }
+                                                                    ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="tanggal_kumpul">Tanggal Pengumpulan</label>
+                                                                <input type="date" class="form-control" id="tanggal_kumpul"
+                                                                    value="<?= $row['tanggal_kumpul']; ?>"
+                                                                    name="tanggal_kumpul" required>
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label for="berkas" class="col-form-label">Berkas
+                                                                    (Word/PDF):</label>
+                                                                <input type="file" class="form-control" id="berkas"
+                                                                    name="berkas" accept=".doc, .docx, .pdf" required>
+                                                                <small class="form-text text-muted">Pilih file Word
+                                                                    (doc/docx) atau PDF.</small>
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">Tutup</button>
+                                                                <button type="submit" class="btn btn-primary"
+                                                                    name="EditLaporan">Submit</button>
+                                                            </div>
                                                         </form>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
 
 
                                         <?php
@@ -236,7 +223,7 @@ if (isset($_GET['id_laporan'])) {
                         </div>
                     </div>
             </main>
-            
+
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">

@@ -1,43 +1,43 @@
 <?php
 session_start();
 
-// Check if the form is submitted
+include('conn.php');
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    include('conn.php');
-
     $username = mysqli_real_escape_string($koneksi, $_POST['username']);
-    $password = mysqli_real_escape_string($koneksi, $_POST['password']);
+    $password = $_POST['password'];
 
-    // Query to check if the provided username and password match
-    $query = "SELECT * FROM user WHERE username='$username' AND password='$password'";
-    $result = mysqli_query($koneksi, $query);
+    // Query untuk mendapatkan password dari database
+    $query = "SELECT id_user, username, password FROM user WHERE username=? LIMIT 1";
+    $stmt = mysqli_prepare($koneksi, $query);
+    mysqli_stmt_bind_param($stmt, "s", $username);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $id_user, $username, $db_password);
+    mysqli_stmt_fetch($stmt);
+    mysqli_stmt_close($stmt);
 
-    if ($result) {
-        // Check if any row is returned
-        if (mysqli_num_rows($result) == 1) {
-            // User is authenticated, store user information in session
-            $user = mysqli_fetch_assoc($result);
-            $_SESSION['id_user'] = $user['id_user'];
-            $_SESSION['username'] = $user['username'];
+    // Memeriksa apakah password cocok
+    if ($password == $db_password) {
+        $_SESSION['id_user'] = $id_user;
+        $_SESSION['username'] = $username;
 
-            // Redirect to dashboard or any other page
-            header('Location: siswa/index.php');
-            exit;
-        } else {
-            // Invalid username or password
-            $error_message = "Invalid username or password.";
-        }
+        // Redirect ke dasbor atau halaman lainnya
+        header('Location: home.php');
+        exit;
     } else {
-        // Query execution failed
-        $error_message = "Error executing the query.";
+        // Password salah
+        $error_message = "Invalid username or password.";
     }
-
-    // Close the database connection
-    mysqli_close($koneksi);
 }
+
+mysqli_close($koneksi);
 ?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -78,12 +78,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <form style="position: relative; margin: 50px;" action="" method="post">
                     <div class="mb-3">
                         <label for="exampleInputEmail1" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" required 
+                        <input type="text" class="form-control" id="username" name="username" required
                             placeholder="Masukkan Username Anda">
                     </div>
                     <div class="mb-3">
                         <label for="exampleInputPassword1" class="form-label">Password</label>
-                        <input type="password" class="form-control"id="password" name="password" required
+                        <input type="password" class="form-control" id="password" name="password" required
                             placeholder="Masukkan Password Anda">
                     </div>
                     <div class="d-grid gap-2">
@@ -94,6 +94,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     </div>
                 </form>
+                <?php
+    if (!empty($error_message)) {
+        echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
+    }
+    ?>
             </div>
             <div class="col-sm-6" style="position: relative;">
                 <div

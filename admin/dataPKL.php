@@ -1,7 +1,12 @@
 <?php
 include 'conn.php';
 
-$query = "SELECT * FROM pkl";
+// Fungsi untuk escape string
+function escapeString($koneksi, $string) {
+    return mysqli_real_escape_string($koneksi, $string);
+}
+
+$query = "SELECT * FROM pkl INNER JOIN siswa ON siswa.id_siswa = pkl.id_siswa";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
@@ -9,15 +14,15 @@ if (!$result) {
 }
 
 if (isset($_POST['Tambahpkl'])) {
-    $tgl_mulai = $_POST['tgl_mulai'];
-    $tgl_selesai = $_POST['tgl_selesai'];
-    $nama_siswa = $_POST['nama_siswa'];
-    $angkatan = $_POST['angkatan'];
-    $nama_perusahaan = $_POST['nama_perusahaan'];
-    $tahun_pelajaran = $_POST['tahun_pelajaran'];
+    $id_siswa = escapeString($koneksi, $_POST['id_siswa']);
+    $tgl_mulai = escapeString($koneksi, $_POST['tgl_mulai']);
+    $tgl_selesai = escapeString($koneksi, $_POST['tgl_selesai']);
+    $angkatan = escapeString($koneksi, $_POST['angkatan']);
+    $nama_perusahaan = escapeString($koneksi, $_POST['nama_perusahaan']);
+    $tahun_pelajaran = escapeString($koneksi, $_POST['tahun_pelajaran']);
 
-    $query = "INSERT INTO pkl (tgl_mulai, tgl_selesai, nama_siswa, angkatan, nama_perusahaan, tahun_pelajaran) 
-          VALUES ('$tgl_mulai', '$tgl_selesai', '$nama_siswa','$angkatan','$nama_perusahaan','$tahun_pelajaran')";
+    $query = "INSERT INTO pkl (id_siswa, tgl_mulai, tgl_selesai, angkatan, nama_perusahaan, tahun_pelajaran) 
+          VALUES ('$id_siswa', '$tgl_mulai', '$tgl_selesai', '$angkatan', '$nama_perusahaan', '$tahun_pelajaran')";
 
     // Eksekusi query
     if ($koneksi->query($query) === TRUE) {
@@ -31,36 +36,44 @@ if (isset($_POST['Tambahpkl'])) {
 
     // Tutup koneksi database
     $koneksi->close();
-
 }
-if (isset($_POST['Editpkl'])) {
-    $id_pkl = $_POST['id_pkl'];
-    $tgl_mulai = $_POST['tgl_mulai'];
-    $tgl_selesai = $_POST['tgl_selesai'];
-    $nama_siswa = $_POST['nama_siswa'];
-    $angkatan = $_POST['angkatan'];
-    $nama_perusahaan = $_POST['nama_perusahaan'];
-    $tahun_pelajaran = $_POST['tahun_pelajaran'];
 
+if (isset($_POST['Editpkl'])) {
+    $id_pkl = escapeString($koneksi, $_POST['id_pkl']);
+    $id_siswa = escapeString($koneksi, $_POST['id_siswa']);
+    $tgl_mulai = escapeString($koneksi, $_POST['tgl_mulai']);
+    $tgl_selesai = escapeString($koneksi, $_POST['tgl_selesai']);
+    $angkatan = escapeString($koneksi, $_POST['angkatan']);
+    $nama_perusahaan = escapeString($koneksi, $_POST['nama_perusahaan']);
+    $tahun_pelajaran = escapeString($koneksi, $_POST['tahun_pelajaran']);
+
+    // Query untuk update data PKL
     mysqli_query($koneksi, "UPDATE pkl SET 
                          tgl_mulai='$tgl_mulai',
                          tgl_selesai='$tgl_selesai',
-                         nama_siswa='$nama_siswa',
                          angkatan='$angkatan',
                          nama_perusahaan='$nama_perusahaan',
                          tahun_pelajaran='$tahun_pelajaran'                            
                          WHERE id_pkl='$id_pkl'");
+
+    // Asumsi $_GET['id_pkl'] sudah ada
+    $id_pkl = $_GET['id_pkl'];
+
+    // Redirect ke dataPKL.php setelah mengedit
     header("location:dataPKL.php");
 }
 
 if (isset($_GET['id_pkl'])) {
-    $id_pkl = $_GET['id_pkl'];
+    $id_pkl = escapeString($koneksi, $_GET['id_pkl']);
 
+    // Query untuk hapus data PKL
     mysqli_query($koneksi, "DELETE FROM pkl WHERE id_pkl='$id_pkl'");
+
+    // Redirect ke dataPKL.php setelah menghapus
     header("location:dataPKL.php");
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -120,7 +133,7 @@ if (isset($_GET['id_pkl'])) {
                                         // Tampilkan data pada tabel
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
-                                        echo "<td>" . $row['nama_siswa'] . "</td>";
+                                        echo "<td>" . $row['Nama_siswa'] . "</td>";
                                         echo "<td>" . $row['tgl_mulai'] . "</td>";
                                         echo "<td>" . $row['tgl_selesai'] . "</td>";
                                         echo "<td>" . $row['angkatan'] . "</td>";
@@ -171,6 +184,9 @@ if (isset($_GET['id_pkl'])) {
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
                                                     </div>
+                                                    <input type="hidden" name="id_pkl" value="<?= $row['id_pkl']; ?>">
+                                                    <input type="hidden" name="id_siswa" value="<?= $row['id_siswa']; ?>">
+
                                                     <div class="modal-body">
                                                         <form method="post" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
@@ -181,27 +197,20 @@ if (isset($_GET['id_pkl'])) {
                                                                         readonly>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="nama_siswa">Nama Lengkap <i
-                                                                            class="fas fa-user"></i></label>
-                                                                    <div class="input-group">
-                                                                        <span class="input-group-text"><i
-                                                                                class="fas fa-user"></i></span>
-                                                                        <input type="text" class="form-control"
-                                                                            id="nama_siswa"
-                                                                            value="<?= $row['nama_siswa']; ?>"
-                                                                            name="nama_siswa" required>
-                                                                    </div>
+                                                                    <label for="Nama_siswa">Nama siswa</label>
+                                                                    <input type="text" class="form-control" id="Nama_siswa"
+                                                                        value="<?= $row['Nama_siswa']; ?>" name="Nama_siswa"
+                                                                        required>
                                                                 </div>
-
                                                                 <div class="form-group">
-                                                                    <label for="tgl_mulai">tgl_mulai</label>
-                                                                    <input type="text" class="form-control" id="tgl_mulai"
+                                                                    <label for="tgl_mulai">Tanggal Mulai PKL :</label>
+                                                                    <input type="date" class="form-control" id="tgl_mulai"
                                                                         value="<?= $row['tgl_mulai']; ?>" name="tgl_mulai"
                                                                         required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="tgl_selesai">tgl_selesai</label>
-                                                                    <input type="text" class="form-control" id="tgl_selesai"
+                                                                    <label for="tgl_selesai">Tanggal Selesai PKL :</label>
+                                                                    <input type="date" class="form-control" id="tgl_selesai"
                                                                         value="<?= $row['tgl_selesai']; ?>"
                                                                         name="tgl_selesai" required>
                                                                 </div>
@@ -248,40 +257,49 @@ if (isset($_GET['id_pkl'])) {
             </main>
 
             <!-- Modal tambah data-->
-            <div class="modal modal-fullscreen-xxl-down fade" id="tambah" tabindex="-1"
-                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen-xxl-down">
+            <div class="modal fade" id="tambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Tambah Data PKL</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body ">
+                        <div class="modal-body">
                             <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
-                                <div class="mb-3">
-                                    <label for="nama_siswa" class="col-form-label">Nama Lengkap:</label>
-                                    <input type="text" class="form-control" id="nama_siswa" name="nama_siswa" required>
+                                <div class="form-group">
+                                    <label for="id_siswa">Nama siswa</label>
+                                    <select class="form-control" id="id_siswa" name="id_siswa" required>
+                                        <?php
+                                        // Fetch student names from the 'siswa' table
+                                        $siswaQuery = "SELECT id_siswa, Nama_siswa FROM siswa";
+                                        $siswaResult = mysqli_query($koneksi, $siswaQuery);
+
+                                        while ($siswa = mysqli_fetch_assoc($siswaResult)) {
+                                            echo "<option value='{$siswa['id_siswa']}'>{$siswa['Nama_siswa']}</option>";
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="tgl_mulai" class="col-form-label">tgl_mulai:</label>
+                                <div class="form-group">
+                                    <label for="tgl_mulai">Tanggal Mulai PKL:</label>
                                     <input type="date" class="form-control" id="tgl_mulai" name="tgl_mulai" required>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="tgl_selesai" class="col-form-label">tgl_selesai:</label>
+                                <div class="form-group">
+                                    <label for="tgl_selesai">Tanggal Selesai PKL:</label>
                                     <input type="date" class="form-control" id="tgl_selesai" name="tgl_selesai"
                                         required>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="angkatan" class="col-form-label">angkatan:</label>
+                                <div class="form-group">
+                                    <label for="angkatan">Angkatan:</label>
                                     <input type="text" class="form-control" id="angkatan" name="angkatan" required>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="nama_perusahaan" class="col-form-label">Nama Perusahaan:</label>
+                                <div class="form-group">
+                                    <label for="nama_perusahaan">Nama Perusahaan:</label>
                                     <input type="text" class="form-control" id="nama_perusahaan" name="nama_perusahaan"
                                         required>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="tahun_pelajaran" class="col-form-label">tahun_pelajaran:</label>
+                                <div class="form-group">
+                                    <label for="tahun_pelajaran">Tahun Pelajaran:</label>
                                     <input type="text" class="form-control" id="tahun_pelajaran" name="tahun_pelajaran"
                                         required>
                                 </div>
@@ -292,7 +310,6 @@ if (isset($_GET['id_pkl'])) {
                                         id="submit">Submit</button>
                                 </div>
                             </form>
-
                         </div>
                     </div>
                 </div>
