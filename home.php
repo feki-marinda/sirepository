@@ -3,6 +3,11 @@ include('conn.php');
 session_start();
 
 $id_siswa = isset($_SESSION['id_siswa']) ? $_SESSION['id_siswa'] : '';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  header("Location: daftarpkl.php");
+  exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -86,13 +91,15 @@ $id_siswa = isset($_SESSION['id_siswa']) ? $_SESSION['id_siswa'] : '';
               style="font-weight: bold; color: #FF8C00;">menyimpan</span> semua dokumen <span
               style="font-weight: bold; color: #FF8C00;">Praktek Kerja Lapangan</span> dengan Cepat dan Tepat</h2>
           <div data-aos="fade-up" data-aos-delay="600">
-            <div class="text-start text-lg-start">
-              <a href="#about"
-                class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
-                <span>About SiRepository</span>
-                <i class="bi bi-arrow-right"></i>
-              </a>
-            </div>
+          <div class="text-start text-lg-start">
+    <form action="daftarpkl.php" method="post">
+        <button type="submit" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
+            <span>Daftar PKL</span>
+            <i class="bi bi-arrow-right"></i>
+        </button>
+    </form>
+</div>
+
           </div>
         </div>
         <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200">

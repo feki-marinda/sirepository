@@ -1,67 +1,17 @@
 <?php
-include 'conn.php';
+require 'login.php';
 
 $error_message = $success_message = '';
+if (isset($_POST['register'])) {
 
-$query = "SELECT * FROM siswa";
-$result = mysqli_query($koneksi, $query);
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
-    $nama_siswa = $_POST['Nama_siswa'];
-    $nis = $_POST['NIS'];
-    $kelas = $_POST['kelas'];
-    $jenis_kelamin = $_POST['jenis_kelamin'];
-    $alamat = $_POST['alamat'];
-    $tanggal_lahir = $_POST['tanggal_lahir'];
-
-    // Validasi password
-    if ($password !== $confirm_password) {
-        $error_message = "Password and confirm password do not match.";
-    } else {
-        // Gunakan prepared statement untuk menghindari SQL Injection
-        $insert_user_query = "INSERT INTO user (username, password) VALUES (?, ?)";
-        $stmt_user = mysqli_prepare($koneksi, $insert_user_query);
-
-        // Binding parameter
-        mysqli_stmt_bind_param($stmt_user, "ss", $username, $password);
-
-        // Eksekusi statement untuk user
-        $insert_user_result = mysqli_stmt_execute($stmt_user);
-
-        if ($insert_user_result) {
-            // Dapatkan ID user yang baru saja dibuat
-            $user_id = mysqli_insert_id($koneksi);
-
-            // Gunakan prepared statement untuk data siswa
-            $insert_siswa_query = "INSERT INTO siswa (id_user, Nama_siswa, NIS, kelas, jenis_kelamin, alamat, tanggal_lahir) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            $stmt_siswa = mysqli_prepare($koneksi, $insert_siswa_query);
-
-            // Binding parameter untuk data siswa
-            mysqli_stmt_bind_param($stmt_siswa, "issssss", $user_id, $nama_siswa, $nis, $kelas, $jenis_kelamin, $alamat, $tanggal_lahir);
-
-            // Eksekusi statement untuk siswa
-            $insert_siswa_result = mysqli_stmt_execute($stmt_siswa);
-
-            if ($insert_siswa_result) {
+            if (registrasi($_POST)>0) {
                 $success_message = "Registrasi Berhasil. Kembali Ke Halaman <a href='index.php'>Login</a>.";
             } else {
-                $error_message = "Registration failed for siswa. Error: " . mysqli_error($koneksi);
+                $error_message = "Pendaftaran gagal !";
             }
-
-            // Tutup statement untuk siswa
-            mysqli_stmt_close($stmt_siswa);
-        } else {
-            $error_message = "Registration failed for user. Error: " . mysqli_error($koneksi);
-        }
-
-        // Tutup statement untuk user
-        mysqli_stmt_close($stmt_user);
     }
-}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -96,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
         <div class="row p-3">
             <div class="col-sm-6">
                 <div class="text-center">
-                    <img src="admin/gambar/R.png" alt="" class="mx-auto d-block" style="margin-top: 5%;">
+                    <img src="admin/gambar/R.png" alt="" class="mx-auto d-block">
                     <h3>Sistem Informasi Repository Laporan PKL</h3>
                 </div><br>
                 <div style="text-align: center;">
@@ -120,12 +70,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
                         aria-labelledby="nav-home-tab">
                         <div class="row justify-content-center">
                             <?php
-                            // Tampilkan pesan kesalahan jika ada
                             if (!empty($error_message)) {
                                 echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
                             }
 
-                            // Tampilkan pesan berhasil jika ada
                             if (!empty($success_message)) {
                                 echo '<div class="alert alert-success" role="alert">' . $success_message . '</div>';
                             }
@@ -170,9 +118,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['register'])) {
                                     <div class="col-md-6 mb-3">
                                         <label for="gender">Jenis Kelamin</label>
                                         <select class="form-control" id="jenis_kelamin" name="jenis_kelamin" required>
-                                            <option value="">Select gender</option>
-                                            <option value="male">Male</option>
-                                            <option value="female">Female</option>
+                                            <option value="">Jenis Kelamin</option>
+                                            <option value="Laki-laki">Laki-laki</option>
+                                            <option value="Perempuan">Perempuan</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6 mb-3">

@@ -2,17 +2,16 @@
 <html lang="en">
  <?php include 'head.html'?>
  <style>
-    /* CSS untuk memusatkan gambar */
     .center-image {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 50vh; /* Menyesuaikan tinggi sesuai tinggi viewport */
+      height: 50vh;
     }
 
     .center-image img {
-      max-width: 100%; /* Memastikan gambar tidak melebihi lebar parent */
-      max-height: 100%; /* Memastikan gambar tidak melebihi tinggi parent */
+      max-width: 100%; 
+      max-height: 100%; 
     }
   </style>
 <body>

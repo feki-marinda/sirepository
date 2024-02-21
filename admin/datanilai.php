@@ -1,44 +1,71 @@
 <?php
 include 'conn.php';
 
-$query = "SELECT * FROM nilai_pkl";
+$query = "SELECT * FROM nilai_PKL INNER JOIN siswa on nilai_pkl.id_siswa=siswa.id_siswa";
 $result = $koneksi->query($query);
 
 if (!$result) {
     die("Error: " . $koneksi->error);
 }
 if (isset($_POST['TambahNilai'])) {
-
-    $nama_siswa = $_POST['nama_siswa'];
-    $indikator = $_POST['indikator'];
+    $id_siswa = $_POST['id_siswa'];
     $nilai = $_POST['nilai'];
+    $grade = $_POST['grade'];
+    $file = $_POST['file'];
 
-    $query = "INSERT INTO nilai_pkl (nama_siswa, indikator, nilai) 
-          VALUES ('$nama_siswa', '$indikator', '$nilai')";
+    $query = "INSERT INTO nilai_pkl (id_siswa, grade, nilai, file) 
+              VALUES ('$id_siswa', '$grade', '$nilai', '$file')";
 
-    // Eksekusi query
     if ($koneksi->query($query) === TRUE) {
-        // Jika berhasil, arahkan pengguna ke halaman sukses atau halaman lain
         header('Location: datanilai.php');
         exit;
     } else {
-        // Jika terjadi kesalahan, arahkan pengguna ke halaman error atau tampilkan pesan error
         echo 'Error: ' . $koneksi->error;
     }
-
-    // Tutup koneksi database
-    $koneksi->close();
-
 }
 if (isset($_POST['EditNilai'])) {
     $id_nilai = $_POST['id_nilai'];
     $nilai = $_POST['nilai'];
-    $nama_siswa = $_POST['nama_siswa'];
-    $indikator = $_POST['indikator'];
+    $id_siswa = $_POST['id_siswa'];
+    $grade = $_POST['grade'];
+    $file = $_POST['file'];
 
-    mysqli_query($koneksi, "UPDATE nilai_pkl SET nilai='$nilai', nama_siswa='$nama_siswa', indikator='$indikator' WHERE id_nilai='$id_nilai'");
+    $update_query = "UPDATE nilai_pkl SET nilai=?, id_siswa=?, grade=?, file=? WHERE id_nilai=?";
 
+    // Prepared statement
+    $stmt = mysqli_prepare($koneksi, $update_query);
+
+    if (!$stmt) {
+        // Gagal membuat prepared statement
+        echo 'Error creating prepared statement: ' . mysqli_error($koneksi);
+        exit;
+    }
+
+    // Bind parameters
+    $success_bind = mysqli_stmt_bind_param($stmt, "ssssi", $nilai, $id_siswa, $grade, $file, $id_nilai);
+
+    if (!$success_bind) {
+        // Gagal binding parameters
+        echo 'Error binding parameters: ' . mysqli_stmt_error($stmt);
+        exit;
+    }
+
+    // Eksekusi statement
+    $success_execute = mysqli_stmt_execute($stmt);
+
+    if ($success_execute) {
+        // Redirect setelah edit
+        header('Location: datanilai.php');
+        exit;
+    } else {
+        echo 'Error updating data: ' . mysqli_stmt_error($stmt);
+    }
+
+    // Tutup prepared statement
+    mysqli_stmt_close($stmt);
 }
+
+
 if (isset($_GET['id_nilai'])) {
     $id_nilai = $_GET['id_nilai'];
 
@@ -89,26 +116,25 @@ if (isset($_GET['id_nilai'])) {
                                     <tr>
                                         <th>No.</th>
                                         <th>Nama Siswa</th>
-                                        <th>Indikator</th>
                                         <th>Nilai</th>
+                                        <th>Grade</th>
+                                        <th>File</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
-                                    <!-- Modal edit data-->
                                     <?php
                                     $no = 1;
-                                    $query = "SELECT * FROM nilai_PKL";
-                                    $result = mysqli_query($koneksi, $query);
-
+                                    $query = "SELECT * FROM nilai_PKL INNER JOIN siswa on nilai_pkl.id_siswa=siswa.id_siswa";
+                                    $result = $koneksi->query($query);
                                     while ($row = mysqli_fetch_assoc($result)) {
-                                        // Tampilkan data pada tabel
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
-                                        echo "<td>" . $row['nama_siswa'] . "</td>";
-                                        echo "<td>" . $row['indikator'] . "</td>";
+                                        echo "<td>" . $row['Nama_siswa'] . "</td>";
                                         echo "<td>" . $row['nilai'] . "</td>";
+                                        echo "<td>" . $row['grade'] . "</td>";
+                                        echo "<td>" . $row['file'] . "</td>";
                                         echo "<td>";
                                         echo "<div class='btn-group'>";
                                         echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_nilai'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
@@ -116,11 +142,7 @@ if (isset($_GET['id_nilai'])) {
                                         echo "</div>";
                                         echo "</td>";
                                         echo "</tr>";
-
-                                        // Modal edit diluar loop
                                         ?>
-
-                                        <!-- Modal hapus data -->
                                         <div class="modal fade" id='hapus<?= $row['id_nilai'] ?>' tabindex="-1"
                                             role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog">
@@ -154,46 +176,53 @@ if (isset($_GET['id_nilai'])) {
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <form method="post" action="#" enctype="multipart/form-data">
-                                                            <div class="form-group">
+                                                        <?php
+                                                        var_dump($row['id_siswa']);
+                                                        var_dump($row['Nama_siswa']);
+                                                        ?>
+                                                        <div class="modal-body">
+                                                            <form method="POST" action="#" enctype="multipart/form-data">
                                                                 <div class="form-group">
-                                                                    <label for="id_nilai">ID</label>
-                                                                    <input type="text" class="form-control" id="id_nilai"
-                                                                        value="<?= $row['id_nilai']; ?>" name="id_nilai"
+                                                                    <label for="id_siswa">ID</label>
+                                                                    <input type="text" class="form-control" id="id_siswa"
+                                                                        value="<?= $row['id_siswa']; ?>" name="id_siswa"
                                                                         readonly>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="nama_siswa">Nama Siswa</label>
-                                                                    <input type="text" class="form-control" id="nama_siswa"
-                                                                        value="<?= $row['nama_siswa']; ?>" name="nama_siswa"
+                                                                    <label for="Nama_siswa">Nama Siswa</label>
+                                                                    <input type="text" class="form-control" id="Nama_siswa"
+                                                                        value="<?= $row['Nama_siswa']; ?>" name="Nama_siswa"
                                                                         required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="indikator">Indikator</label>
-                                                                    <input type="longtext" class="form-control"
-                                                                        id="indikator" value="<?= $row['indikator']; ?>"
-                                                                        name="indikator" required>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="nilai">Nilai</label>
+                                                                    <label for="nilai">Rata-rata Nilai</label>
                                                                     <input type="int" class="form-control" id="nilai"
                                                                         value="<?= $row['nilai']; ?>" name="nilai" required>
                                                                 </div>
-
+                                                                <div class="form-group">
+                                                                    <label for="grade">Grade</label>
+                                                                    <input type="text" class="form-control" id="grade"
+                                                                        value="<?= $row['grade']; ?>" name="grade" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="file">File</label>
+                                                                    <input type="text" class="form-control" id="file"
+                                                                        value="<?= $row['file']; ?>" name="file" required>
+                                                                </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary"
                                                                         data-bs-dismiss="modal">Close</button>
                                                                     <button type="submit" class="btn btn-primary"
                                                                         name="EditNilai" value="Submit">Submit</button>
                                                                 </div>
-                                                        </form>
+                                                            </form>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
 
 
-                                        <?php
+                                            <?php
                                     }
                                     ?>
                                 </tbody>
@@ -204,10 +233,8 @@ if (isset($_GET['id_nilai'])) {
             </main>
 
 
-            <!-- Modal tambah data-->
-            <div class="modal modal-fullscreen-xxl-down fade" id="tambah" tabindex="-1"
-                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen-xxl-down">
+            <div class="modal fade" id="tambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Tambah Data nilai</h5>
@@ -217,15 +244,26 @@ if (isset($_GET['id_nilai'])) {
                             <form action="#" method="post" id="formTambahData">
                                 <div class="mb-3">
                                     <label for="nama_siswa" class="col-form-label">Nama Siswa :</label>
-                                    <input type="text" class="form-control" id="nama_siswa" name="nama_siswa" required>
+                                    <select name="id_siswa" id="id_siswa" required>
+                                        <?php
+                                        $query_siswa = "SELECT * FROM siswa";
+                                        $result_siswa = $koneksi->query($query_siswa);
+                                        while ($row_siswa = mysqli_fetch_assoc($result_siswa))
+                                            echo "<option value='" . $row_siswa['id_siswa'] . "'>" . $row_siswa['Nama_siswa'] . "</option>";
+                                        ?>
+                                    </select>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="indikator" class="col-form-label">Indikator :</label>
-                                    <textarea class="form-control" id="indikator" name="indikator" required></textarea>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="nilai" class="col-form-label">Nilai :</label>
+                                    <label for="nilai" class="col-form-label">Rata-rata Nilai :</label>
                                     <input type="int" class="form-control" id="nilai" name="nilai" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="grade" class="col-form-label">Grade :</label>
+                                    <input type="text" class="form-control" id="grade" name="grade" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="file" class="col-form-label">file :</label>
+                                    <input type="text" class="form-control" id="file" name="file" required>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"

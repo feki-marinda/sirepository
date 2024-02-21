@@ -12,108 +12,52 @@ if (isset($_POST['TambahSiswa'])) {
     $Nama_siswa = $_POST['Nama_siswa'];
     $NIS = $_POST['NIS'];
     $kelas = $_POST['kelas'];
-    $foto = $_POST['foto'];
     $jenis_kelamin = $_POST['jenis_kelamin'];
     $alamat = $_POST['alamat'];
     $tanggal_lahir = $_POST['tanggal_lahir'];
     $no_hp = $_POST['no_hp'];
     $rand = rand();
-    $ekstensi = array('png', 'jpg', 'jpeg', 'gif', 'webp');
-    $filename = $_FILES['foto']['name'];
-    $ukuran = $_FILES['foto']['size'];
-    $ext = pathinfo($filename, PATHINFO_EXTENSION);
-    if (!in_array($ext, $ekstensi)) {
-        echo "error";
+
+    $query = "INSERT INTO siswa (Nama_siswa, NIS, kelas, jenis_kelamin, alamat, tanggal_lahir, no_hp) 
+              VALUES ('$Nama_siswa', '$NIS', '$kelas','$jenis_kelamin','$alamat','$tanggal_lahir','$no_hp')";
+
+    // Eksekusi query
+    if ($koneksi->query($query) === TRUE) {
+        header('Location: datasiswa.php');
+        exit;
     } else {
-        if ($ukuran < 208815000) {
-            $xx = $rand . '_' . $filename;
-            move_uploaded_file($_FILES['foto']['tmp_name'], 'gambar/' . $rand . '_' . $filename);
-
-            $query = "INSERT INTO siswa (Nama_siswa, NIS, kelas, foto, jenis_kelamin, alamat, tanggal_lahir, no_hp) 
-          VALUES ('$Nama_siswa', '$NIS', '$kelas','$xx','$jenis_kelamin','$alamat','$tanggal_lahir','$no_hp')";
-
-            // Eksekusi query
-            if ($koneksi->query($query) === TRUE) {
-                // Jika berhasil, arahkan pengguna ke halaman sukses atau halaman lain
-                header('Location: datasiswa.php');
-                exit;
-            } else {
-                // Jika terjadi kesalahan, arahkan pengguna ke halaman error atau tampilkan pesan error
-                echo 'Error: ' . $koneksi->error;
-            }
-
-            // Tutup koneksi database
-            $koneksi->close();
-
-        }
+        echo 'Error: ' . $koneksi->error;
     }
+
+    // Tutup koneksi database
+    $koneksi->close();
 }
+
 if (isset($_POST['EditSiswa'])) {
     $id_siswa = $_POST['id_siswa'];
     $Nama_siswa = $_POST['Nama_siswa'];
     $NIS = $_POST['NIS'];
     $kelas = $_POST['kelas'];
-    $foto_baru = $_FILES['gambarnew']['name'];
     $jenis_kelamin = $_POST['jenis_kelamin'];
     $alamat = $_POST['alamat'];
     $tanggal_lahir = $_POST['tanggal_lahir'];
     $no_hp = $_POST['no_hp'];
 
-    if ($foto_baru != "") {
-        $ekstensi_diperbolehkan = array('png', 'jpg', 'jpeg', 'webp', 'gif');
-        $x = explode('.', $foto_baru);
-        $ekstensi = strtolower(end($x));
-        $file_tmp = $_FILES['gambarnew']['tmp_name'];
-        $angka_acak = rand(1, 999);
-        $nama_gambar_baru = $angka_acak . '-' . $foto_baru;
-        if (in_array($ekstensi, $ekstensi_diperbolehkan) === true) {
-            $dt = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM siswa WHERE id_siswa='$id_siswa'"));
-            $gambarlama = $dt['foto'];
-            if (is_file("gambar/" . $gambarlama)) {
-                unlink("gambar/" . $gambarlama);
-            }
-            move_uploaded_file($file_tmp, 'gambar/' . $nama_gambar_baru);
+    $query = "UPDATE siswa SET 
+                Nama_siswa='$Nama_siswa',
+                NIS='$NIS',
+                kelas='$kelas',
+                jenis_kelamin='$jenis_kelamin',
+                alamat='$alamat',
+                tanggal_lahir='$tanggal_lahir',
+                no_hp='$no_hp'
+                WHERE id_siswa='$id_siswa'";
 
-
-            mysqli_query($koneksi, "UPDATE siswa SET 
-                            Nama_siswa='$Nama_siswa',
-                            NIS='$NIS',
-                            kelas='$kelas',
-                            foto='$nama_gambar_baru',
-                            jenis_kelamin='$jenis_kelamin',
-                            alamat='$alamat',
-                            tanggal_lahir='$tanggal_lahir',
-                            no_hp='$no_hp'
-                            WHERE id_siswa='$id_siswa'");
-
-            
-            if (!$result) {
-                die("Query gagal dijalankan: " . mysqli_errno($koneksi) .
-                    " - " . mysqli_error($koneksi));
-            } else {
-                echo "<script>alert('Data berhasil diubah.');window.location='datasiswa.php';</script>";
-            }
-        } else {
-            echo "<script>alert('Ekstensi gambar yang boleh hanya jpg, png,atau jpeg.');window.location='datasiswa.php';</script>";
-        }
+    $result = mysqli_query($koneksi, $query);
+    if (!$result) {
+        die("Query gagal dijalankan: " . mysqli_errno($koneksi) . " - " . mysqli_error($koneksi));
     } else {
-        $query = $query = "UPDATE siswa SET 
-        Nama_siswa='$Nama_siswa',
-        NIS='$NIS',
-        kelas='$kelas',
-        jenis_kelamin='$jenis_kelamin',
-        alamat='$alamat',
-        tanggal_lahir='$tanggal_lahir',
-        no_hp='$no_hp'
-        WHERE id_siswa='$id_siswa'";
-
-        $result = mysqli_query($koneksi, $query);
-        if (!$result) {
-            die("Query gagal dijalankan: " . mysqli_errno($koneksi) .
-                " - " . mysqli_error($koneksi));
-        } else {
-            header("location:datasiswa.php");
-        }
+        header("location:datasiswa.php");
     }
 }
 
@@ -125,6 +69,7 @@ if (isset($_GET['id_siswa'])) {
 }
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -169,7 +114,6 @@ if (isset($_GET['id_siswa'])) {
                                         <th>Nama Lengkap</th>
                                         <th>NIS</th>
                                         <th>Kelas</th>
-                                        <th>Foto</th>
                                         <th>Jenis Kelamin</th>
                                         <th>Alamat</th>
                                         <th>Tanggal Lahir</th>
@@ -194,7 +138,6 @@ if (isset($_GET['id_siswa'])) {
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
                                         echo "<td>" . $row['NIS'] . "</td>";
                                         echo "<td>" . $row['kelas'] . "</td>";
-                                        echo "<td><img src='gambar/" . $row['foto'] . "' width='120' height='120'></td>";
                                         echo "<td>" . $row['jenis_kelamin'] . "</td>";
                                         echo "<td>" . $row['alamat'] . "</td>";
                                         echo "<td>" . $row['tanggal_lahir'] . "</td>";
@@ -274,15 +217,6 @@ if (isset($_GET['id_siswa'])) {
                                                                     <label for="kelas">Kelas</label>
                                                                     <input type="text" class="form-control" id="kelas"
                                                                         value="<?= $row['kelas']; ?>" name="kelas" required>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="foto">Foto</label><br>
-                                                                    <img src="gambar/<?php echo $row['foto']; ?>"
-                                                                        height="120" width="120"><br>
-                                                                    <input type="file" name="gambarnew"
-                                                                        class="form-control-file"><br>
-                                                                    <small>Abaikan jika tidak merubah gambar.</small>
-
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="jenis_kelamin">Jenis Kelamin</label>

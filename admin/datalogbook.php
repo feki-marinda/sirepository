@@ -1,7 +1,7 @@
 <?php
 include 'conn.php';
 
-$query = "SELECT * FROM logbook";
+$query = "SELECT * FROM logbook INNER JOIN siswa ON logbook.id_siswa=siswa.id_siswa";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
@@ -16,17 +16,13 @@ if (isset($_POST['TambahLogbook'])) {
     $query = "INSERT INTO logbook (tanggal, aktivitas, status_logbook) 
           VALUES ('$tanggal', '$aktivitas', '$status_logbook')";
 
-    // Eksekusi query
     if ($koneksi->query($query) === TRUE) {
-        // Jika berhasil, arahkan pengguna ke halaman sukses atau halaman lain
         header('Location: datalogbook.php');
         exit;
     } else {
-        // Jika terjadi kesalahan, arahkan pengguna ke halaman error atau tampilkan pesan error
         echo 'Error: ' . $koneksi->error;
     }
 
-    // Tutup koneksi database
     $koneksi->close();
 
 }
@@ -94,6 +90,7 @@ if (isset($_GET['id_logbook'])) {
                                 <thead>
                                     <tr>
                                         <th>No.</th>
+                                        <th>Nama</th>
                                         <th>Tanggal</th>
                                         <th>Aktivitas</th>
                                         <th>Status</th>
@@ -105,9 +102,9 @@ if (isset($_GET['id_logbook'])) {
                                     <?php
                                     $no = 1;
                                     while ($row = mysqli_fetch_assoc($result)) {
-                                        // Tampilkan data pada tabel
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
+                                        echo "<td>" . $row['Nama_siswa']. "</td>";
                                         echo "<td>" . $row['tanggal'] . "</td>";
                                         echo "<td>" . $row['aktivitas'] . "</td>";
                                         echo "<td>" . $row['status_logbook'] . "</td>";

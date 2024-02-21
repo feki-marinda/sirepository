@@ -31,7 +31,6 @@ include 'conn.php';
                 </ol>
                 <h2>
                     <?php
-                    // Periksa apakah session nama sudah ada
                     if (isset($_SESSION['username'])) {
                         $nama_siswa = $_SESSION['username'];
                         echo '<h2>Hallo ' . $nama_siswa . '</h2>';
