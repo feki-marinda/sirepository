@@ -49,7 +49,6 @@
   </header>
 
   <?php
-    // Fungsi untuk menentukan apakah halaman aktif atau tidak
     function isActivePage($page) {
       $currentPage = basename($_SERVER['PHP_SELF']);
       return ($currentPage == $page) ? 'active' : '';

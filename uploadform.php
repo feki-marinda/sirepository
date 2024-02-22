@@ -5,13 +5,10 @@
 
 <body>
 
-    <!-- ======= Header ======= -->
     <?php include '../sirepository/siswa/header_siswa.php' ?>
-    <!-- End Header -->
 
     <main id="main">
 
-        <!-- ======= Breadcrumbs ======= -->
         <section class="breadcrumbs">
             <div class="container">
 
@@ -22,7 +19,6 @@
                 </ol>
                 <h2>
                     <?php
-                    // Periksa apakah session nama sudah ada
                     if (isset($_SESSION['username'])) {
                         $nama_siswa = $_SESSION['username'];
                         echo '<h2>Hallo ' . $nama_siswa . '</h2>';
@@ -33,7 +29,7 @@
                 </h2>
 
             </div>
-        </section><!-- End Breadcrumbs -->
+        </section>
         <div class="container">
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
                 <div class="col-md-9">
@@ -64,7 +60,6 @@
                         <input class="form-control" type="file" id="fileLaporan" name="fileLaporan" required>
                     </div>
                     <div class="d-grid gap-2">
-                        <!-- Button trigger modal -->
                         <button class="btn btn-primary" type="submit">Unggah</button>
                     </div>
                 </form>
@@ -98,10 +93,8 @@
         <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
                 class="bi bi-arrow-up-short"></i></a>
 
-        <!-- Pastikan menggunakan id yang benar "modalSubmitBtn" -->
         <script>
             document.getElementById("uploadForm").addEventListener("submit", function (event) {
-                // document.getElementById("submitBtn").setAttribute("disabled", "true");
                 document.getElementById("modalSubmitBtn").setAttribute("disabled", "true");
 
                 event.preventDefault();
@@ -114,17 +107,6 @@
         </script>
 
 
-        <!-- Vendor JS Files -->
-        <!-- Hapus baris-baris berikut jika tidak diperlukan -->
-        <!-- <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
-        <script src="assets/vendor/aos/aos.js"></script>
-        <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-        <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-        <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-        <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-        <script src="assets/vendor/php-email-form/validate.js"></script> -->
-
-        <!-- Template Main JS File -->
         <script src="assets/js/main.js"></script>
 
 </body>

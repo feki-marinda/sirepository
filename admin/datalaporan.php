@@ -13,25 +13,20 @@ if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $id_siswa = $_POST['Nama_siswa'];
     $tanggal_kumpul = $_POST['tanggal_kumpul'];
 
-    // Tangani file yang diunggah
     $file_name = $_FILES['berkas']['name'];
     $file_tmp = $_FILES['berkas']['tmp_name'];
     $file_size = $_FILES['berkas']['size'];
     $file_error = $_FILES['berkas']['error'];
 
-    // Periksa apakah file sudah diunggah
     if ($file_error === 0) {
-        // Pindahkan file ke lokasi yang diinginkan
         $file_destination = 'admin/Laporan PKL/' . $file_name;
         move_uploaded_file($file_tmp, $file_destination);
 
-        // Hapus file lama jika ada
         $old_file = mysqli_fetch_array(mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'"));
         if (is_file($old_file['berkas'])) {
             unlink($old_file['berkas']);
         }
 
-        // Jalankan query untuk menyimpan data ke database
         mysqli_query($koneksi, "UPDATE laporan_pkl 
         SET id_siswa='$id_siswa', 
             tanggal_kumpul='$tanggal_kumpul', 
@@ -39,10 +34,8 @@ if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
         WHERE id_laporan='$id_laporan'");
 
 
-        // Arahkan pengguna ke halaman data setelah berhasil menyimpan
         header("location:datalaporan.php");
     } else {
-        // Handle error file, bisa ditambahkan pesan kesalahan sesuai kebutuhan
         echo 'Error uploading file.';
     }
 }
@@ -113,7 +106,6 @@ if (isset($_GET['id_laporan'])) {
                                     $row = mysqli_query($koneksi, "SELECT * FROM laporan_pkl");
                                     $no = 1;
                                     while ($row = mysqli_fetch_assoc($result)) {
-                                        // Tampilkan data pada tabel
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
@@ -127,10 +119,8 @@ if (isset($_GET['id_laporan'])) {
                                         echo "</td>";
                                         echo "</tr>";
 
-                                        // Modal edit diluar loop
                                         ?>
 
-                                        <!-- Modal hapus data -->
                                         <div class="modal fade" id='hapus<?= $row['id_laporan'] ?>' tabindex="-1"
                                             role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog">
@@ -238,16 +228,7 @@ if (isset($_GET['id_laporan'])) {
             </footer>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/scripts.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-    <script src="assets/demo/chart-area-demo.js"></script>
-    <script src="assets/demo/chart-bar-demo.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/datatables-simple-demo.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <?php include 'footer.php';?>
 
 </body>
 

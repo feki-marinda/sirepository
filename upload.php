@@ -3,7 +3,7 @@ require __DIR__.'/vendor/autoload.php';
 
 use Google\Client;
 use Google\Service\Drive;
-# TODO - PHP client currently chokes on fetching start page token
+
 function uploadBasic()
 {
     try {

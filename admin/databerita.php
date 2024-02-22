@@ -42,7 +42,7 @@ if (isset($_POST['EditBerita'])) {
     $judul = $_POST['judul'];
     $isi_berita = $_POST['isi_berita'];
     $tanggal = $_POST['tanggal'];
-    $foto_baru = $_FILES['gambarnew']['name']; // Menggunakan nama file, bukan path sementara
+    $foto_baru = $_FILES['gambarnew']['name']; 
 
     if (!empty($foto_baru)) {
         $ekstensi_diperbolehkan = array('png', 'jpg', 'jpeg', 'webp', 'gif');
@@ -56,19 +56,15 @@ if (isset($_POST['EditBerita'])) {
             $dt = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM berita WHERE id_berita='$id_berita'"));
             $gambarlama = $dt['foto'];
 
-            // Hapus gambar lama jika ada
             if (is_file("gambar/siswa/" . $gambarlama)) {
                 unlink("gambar/siswa/" . $gambarlama);
             }
 
-            // Pindahkan file baru
             move_uploaded_file($file_tmp, 'gambar/siswa/' . $nama_gambar_baru);
 
-            // Update data ke database
             $query = "UPDATE berita SET judul='$judul', isi_berita='$isi_berita', tanggal='$tanggal', foto='$nama_gambar_baru' WHERE id_berita='$id_berita'";
             $result = mysqli_query($koneksi, $query);
 
-            // Periksa hasil query
             if (!$result) {
                 die("Query gagal dijalankan: " . mysqli_errno($koneksi) . " - " . mysqli_error($koneksi));
             } else {
@@ -78,11 +74,9 @@ if (isset($_POST['EditBerita'])) {
             echo "<script>alert('Ekstensi gambar yang diperbolehkan hanya jpg, png, atau jpeg.');window.location='databerita.php';</script>";
         }
     } else {
-        // Jika tidak ada gambar baru, update data tanpa mengubah gambar
         $query = "UPDATE berita SET judul='$judul', isi_berita='$isi_berita', tanggal='$tanggal' WHERE id_berita='$id_berita'";
         $result = mysqli_query($koneksi, $query);
 
-        // Periksa hasil query
         if (!$result) {
             die("Query gagal dijalankan: " . mysqli_errno($koneksi) . " - " . mysqli_error($koneksi));
         } else {
@@ -158,14 +152,12 @@ if (isset($_GET['id_berita'])) {
                                     </tr>
                                 </tfoot>
                                 <tbody>
-                                    <!-- Modal edit data-->
                                     <?php
                                     $no = 1;
                                     $query = "SELECT * FROM berita";
                                     $result = mysqli_query($koneksi, $query);
 
                                     while ($row = mysqli_fetch_assoc($result)) {
-                                        // Tampilkan data pada tabel
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['judul'] . "</td>";
@@ -181,7 +173,6 @@ if (isset($_GET['id_berita'])) {
                                         echo "</td>";
                                         echo "</tr>";
 
-                                        // Modal edit diluar loop
                                         ?>
 
                                         <!-- Modal hapus data -->
@@ -329,18 +320,7 @@ if (isset($_GET['id_berita'])) {
             </footer>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/scripts.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-    <script src="assets/demo/chart-area-demo.js"></script>
-    <script src="assets/demo/chart-bar-demo.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/datatables-simple-demo.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-
+    <?php include 'footer.php';?>
 </body>
 
 </html>

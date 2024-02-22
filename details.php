@@ -4,13 +4,11 @@ include('admin/conn.php');
 if (isset($_GET['id_berita'])) {
     $id_berita = $_GET['id_berita'];
 
-    // Lakukan query untuk mendapatkan detail berita berdasarkan ID
     $query = $koneksi->prepare("SELECT * FROM berita WHERE id_berita = ?");
     $query->bind_param("i", $id_berita);
     $query->execute();
     $result = $query->get_result();
 
-    // Periksa apakah berita ditemukan
     if ($result->num_rows > 0) {
         $berita = $result->fetch_assoc();
         ?>
@@ -31,14 +29,12 @@ if (isset($_GET['id_berita'])) {
     // Tutup koneksi
     $query->close();
 } else {
-    // Jika parameter 'id_berita' tidak ada, mungkin tampilkan pesan kesalahan atau arahkan ke halaman lain
-    echo "Parameter ID berita tidak ditemukan.";
+        echo "Parameter ID berita tidak ditemukan.";
 }
 ?>
 
     <main id="main">
 
-        <!-- ======= Breadcrumbs ======= -->
         <section class="breadcrumbs">
             <div class="container">
                 <ol>
@@ -48,9 +44,8 @@ if (isset($_GET['id_berita'])) {
                 </ol>
                 <h2>SMK Al-Muhajirin</h2>
             </div>
-        </section><!-- End Breadcrumbs -->
+        </section>
 
-        <!-- ======= Blog Single Section ======= -->
         <section id="blog" class="blog">
             <div class="container" data-aos="fade-up">
                 <div class="row">
@@ -87,8 +82,8 @@ if (isset($_GET['id_berita'])) {
                                     <li><a href="#">Marketing</a></li>
                                 </ul>
                             </div>
-                        </article><!-- End blog entry -->
-                    </div><!-- End blog entries list -->
+                        </article>
+                    </div>
                     <div class="col-lg-4">
                         <div class="sidebar">
                             <h3 class="sidebar-title">Search</h3>
@@ -97,8 +92,7 @@ if (isset($_GET['id_berita'])) {
                                     <input type="text">
                                     <button type="submit"><i class="bi bi-search"></i></button>
                                 </form>
-                            </div><!-- End sidebar search formn-->
-
+                            </div>
                             <h3 class="sidebar-title">Categories</h3>
                             <div class="sidebar-item categories">
                                 <ul>
@@ -109,7 +103,7 @@ if (isset($_GET['id_berita'])) {
                                     <li><a href="#">Creative <span>(8)</span></a></li>
                                     <li><a href="#">Educaion <span>(14)</span></a></li>
                                 </ul>
-                            </div><!-- End sidebar categories-->
+                            </div>
 
                             <h3 class="sidebar-title">Recent Posts</h3>
                             <div class="sidebar-item recent-posts">
@@ -144,7 +138,7 @@ if (isset($_GET['id_berita'])) {
                                     <time datetime="2020-01-01">Jan 1, 2020</time>
                                 </div>
 
-                            </div><!-- End sidebar recent posts-->
+                            </div>
 
                             <h3 class="sidebar-title">Tags</h3>
                             <div class="sidebar-item tags">
@@ -161,34 +155,20 @@ if (isset($_GET['id_berita'])) {
                                     <li><a href="#">Tips</a></li>
                                     <li><a href="#">Marketing</a></li>
                                 </ul>
-                            </div><!-- End sidebar tags-->
+                            </div>
 
-                        </div><!-- End sidebar -->
+                        </div>
 
-                    </div><!-- End blog sidebar -->
-
+                    </div>
                 </div>
 
             </div>
-        </section><!-- End Blog Single Section -->
-
-    </main><!-- End #main -->
+        </section>
+    </main>
 
     <?php include 'footer.html' ?>
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-            class="bi bi-arrow-up-short"></i></a>
 
-    <!-- Vendor JS Files -->
-    <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
-    <script src="assets/vendor/aos/aos.js"></script>
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-    <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="assets/vendor/php-email-form/validate.js"></script>
-
-    <!-- Template Main JS File -->
     <script src="assets/js/main.js"></script>
 
 </body>

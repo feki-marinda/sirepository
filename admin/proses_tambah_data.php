@@ -9,7 +9,6 @@ $tanggal = $_POST['tanggal'];
 $query = "INSERT INTO berita (judul, isi_berita, tanggal, gambar) 
           VALUES ('$judul', '$isi_berita', '$tanggal', '$gambar')";
 
-// Eksekusi query
 if ($koneksi->query($query) === TRUE) {
     header('Location: tambahberita.php');
     exit;
@@ -17,6 +16,5 @@ if ($koneksi->query($query) === TRUE) {
     echo 'Error: ' . $koneksi->error;
 }
 
-// Tutup koneksi database
 $koneksi->close();
 ?>

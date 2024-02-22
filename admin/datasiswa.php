@@ -21,7 +21,6 @@ if (isset($_POST['TambahSiswa'])) {
     $query = "INSERT INTO siswa (Nama_siswa, NIS, kelas, jenis_kelamin, alamat, tanggal_lahir, no_hp) 
               VALUES ('$Nama_siswa', '$NIS', '$kelas','$jenis_kelamin','$alamat','$tanggal_lahir','$no_hp')";
 
-    // Eksekusi query
     if ($koneksi->query($query) === TRUE) {
         header('Location: datasiswa.php');
         exit;
@@ -29,7 +28,6 @@ if (isset($_POST['TambahSiswa'])) {
         echo 'Error: ' . $koneksi->error;
     }
 
-    // Tutup koneksi database
     $koneksi->close();
 }
 
@@ -132,7 +130,6 @@ if (isset($_GET['id_siswa'])) {
                                     <?php
                                     $no = 1;
                                     while ($row = mysqli_fetch_assoc($result)) {
-                                        // Tampilkan data pada tabel
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
@@ -156,7 +153,6 @@ if (isset($_GET['id_siswa'])) {
                                         echo "</td>";
                                         echo "</tr>";
 
-                                        // Modal edit diluar loop
                                         ?>
 
                                         <!-- Modal hapus data -->
@@ -340,16 +336,7 @@ if (isset($_GET['id_siswa'])) {
             </footer>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/scripts.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-    <script src="assets/demo/chart-area-demo.js"></script>
-    <script src="assets/demo/chart-bar-demo.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/datatables-simple-demo.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <?php include 'footer.php';?>
 
 </body>
 

@@ -14,7 +14,6 @@ if (isset($_POST['register'])) {
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,14 +21,15 @@ if (isset($_POST['register'])) {
     <title>Registrasi SiRepository</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Gaya Font dari Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=PT+Serif&family=Poppins:wght@300;400;500;700&family=Ubuntu:wght@300&display=swap"
         rel="stylesheet">
 
-    <style>
+    
+</head>
+<style>
         body {
             font-family: 'Poppins', sans-serif;
         }
@@ -38,8 +38,6 @@ if (isset($_POST['register'])) {
             font-family: 'Libre Baskerville', serif;
         }
     </style>
-</head>
-
 <body>
 
     <div class="container-fluid">

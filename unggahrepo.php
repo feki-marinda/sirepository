@@ -13,13 +13,11 @@ ini_set('display_errors', 0);
 
 $nama_siswa_login = getLoggedInUserName();
 
-// Initialize $showForm to true
 $showForm = true;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nama_siswa = $_POST['Nama_siswa']; // Ambil nama siswa dari input form
+    $nama_siswa = $_POST['Nama_siswa']; 
 
-    // Query to get id_siswa from siswa table based on username
     $query_get_id_siswa = "SELECT id_siswa FROM siswa WHERE Nama_siswa = ?";
     $stmt_get_id_siswa = $koneksi->prepare($query_get_id_siswa);
     $stmt_get_id_siswa->bind_param("s", $nama_siswa);
@@ -32,7 +30,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($id_siswa === null) {
         echo "Nama siswa tidak ditemukan.";
     } else {
-        // Query to check if the student has already uploaded a report
         $query_check_upload = "SELECT COUNT(*) AS total FROM laporan_pkl WHERE id_siswa = ?";
         $stmt_check_upload = $koneksi->prepare($query_check_upload);
         $stmt_check_upload->bind_param("s", $id_siswa);
@@ -41,7 +38,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $row_check_upload = $result_check_upload->fetch_assoc();
 
         if ($row_check_upload['total'] == 0) {
-            // Process the uploaded file if the student hasn't uploaded a report yet
             $judul_laporan = $_POST['judul_laporan'];
             $tanggal_kumpul = $_POST['tanggal_kumpul'];
 
@@ -52,14 +48,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 try {
                     $googleDriveFileId = uploadToGoogleDrive('admin/Laporan PKL/' . $file_name, $file_name);
 
-                    // Query to insert data into laporan_pkl table
                     $query_insert = "INSERT INTO laporan_pkl (id_siswa, tanggal_kumpul, berkas, judul_laporan, google_drive_file_id) 
                                     VALUES (?, ?, ?, ?, ?)";
                     $stmt_insert = $koneksi->prepare($query_insert);
                     $stmt_insert->bind_param("sssss", $id_siswa, $tanggal_kumpul, $file_name, $judul_laporan, $googleDriveFileId);
 
                     if ($stmt_insert->execute()) {
-                        // Set $showForm to false after successful upload
                         $showForm = false;
                         header("Location: repository.php");
                         exit;                        
@@ -91,13 +85,10 @@ $koneksi->close();
 
 <body>
 
-    <!-- ======= Header ======= -->
     <?php include 'header_siswa.php' ?>
-    <!-- End Header -->
 
     <main id="main">
 
-        <!-- ======= Breadcrumbs ======= -->
         <section class="breadcrumbs">
             <div class="container">
 
@@ -108,7 +99,6 @@ $koneksi->close();
                 </ol>
                 <h2>
                     <?php
-                    // Periksa apakah session nama sudah ada
                     if (isset($_SESSION['username'])) {
                         $nama_siswa = $_SESSION['username'];
                         echo '<h2>Hallo ' . $nama_siswa . '</h2>';
@@ -119,7 +109,7 @@ $koneksi->close();
                 </h2>
 
             </div>
-        </section><!-- End Breadcrumbs -->
+        </section>
         <div class="container">
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
                 <div class="col-md-9">
@@ -187,10 +177,8 @@ $koneksi->close();
         <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
                 class="bi bi-arrow-up-short"></i></a>
 
-        <!-- Pastikan menggunakan id yang benar "modalSubmitBtn" -->
         <script>
             document.getElementById("uploadForm").addEventListener("submit", function (event) {
-                // document.getElementById("submitBtn").setAttribute("disabled", "true");
                 document.getElementById("modalSubmitBtn").setAttribute("disabled", "true");
 
                 event.preventDefault();
@@ -201,18 +189,6 @@ $koneksi->close();
                 document.getElementById("uploadForm").submit();
             });
         </script>
-
-        <!-- Vendor JS Files -->
-        <!-- Hapus baris-baris berikut jika tidak diperlukan -->
-        <!-- <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
-        <script src="assets/vendor/aos/aos.js"></script>
-        <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-        <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-        <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-        <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-        <script src="assets/vendor/php-email-form/validate.js"></script> -->
-
-        <!-- Template Main JS File -->
         <script src="assets/js/main.js"></script>
 
     </body>

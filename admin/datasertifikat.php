@@ -15,17 +15,13 @@ if (isset($_POST['TambahSertifikat'])) {
     $query = "INSERT INTO sertifikat (nama_siswa, file_sertifikat) 
           VALUES ('$nama_siswa', '$file_sertifikat')";
 
-    // Eksekusi query
     if ($koneksi->query($query) === TRUE) {
-        // Jika berhasil, arahkan pengguna ke halaman sukses atau halaman lain
         header('Location: datasertifikat.php');
         exit;
     } else {
-        // Jika terjadi kesalahan, arahkan pengguna ke halaman error atau tampilkan pesan error
         echo 'Error: ' . $koneksi->error;
     }
 
-    // Tutup koneksi database
     $koneksi->close();
 
 }
@@ -100,7 +96,6 @@ if (isset($_GET['id_sertifikat'])) {
                                     <?php
                                     $no = 1;
                                     while ($row = mysqli_fetch_assoc($result)) {
-                                        // Tampilkan data pada tabel
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['nama_siswa'] . "</td>";
@@ -240,16 +235,7 @@ if (isset($_GET['id_sertifikat'])) {
             </footer>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/scripts.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-    <script src="assets/demo/chart-area-demo.js"></script>
-    <script src="assets/demo/chart-bar-demo.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/datatables-simple-demo.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <?php include 'footer.php';?>
 
 </body>
 

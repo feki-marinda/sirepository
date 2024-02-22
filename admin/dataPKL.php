@@ -1,7 +1,6 @@
 <?php
 include 'conn.php';
 
-// Fungsi untuk escape string
 function escapeString($koneksi, $string) {
     return mysqli_real_escape_string($koneksi, $string);
 }
@@ -24,17 +23,13 @@ if (isset($_POST['Tambahpkl'])) {
     $query = "INSERT INTO pkl (id_siswa, tgl_mulai, tgl_selesai, angkatan, nama_perusahaan, tahun_pelajaran) 
           VALUES ('$id_siswa', '$tgl_mulai', '$tgl_selesai', '$angkatan', '$nama_perusahaan', '$tahun_pelajaran')";
 
-    // Eksekusi query
     if ($koneksi->query($query) === TRUE) {
-        // Jika berhasil, arahkan pengguna ke halaman sukses atau halaman lain
         header('Location: dataPKL.php');
         exit;
     } else {
-        // Jika terjadi kesalahan, arahkan pengguna ke halaman error atau tampilkan pesan error
         echo 'Error: ' . $koneksi->error;
     }
 
-    // Tutup koneksi database
     $koneksi->close();
 }
 
@@ -47,7 +42,6 @@ if (isset($_POST['Editpkl'])) {
     $nama_perusahaan = escapeString($koneksi, $_POST['nama_perusahaan']);
     $tahun_pelajaran = escapeString($koneksi, $_POST['tahun_pelajaran']);
 
-    // Query untuk update data PKL
     mysqli_query($koneksi, "UPDATE pkl SET 
                          tgl_mulai='$tgl_mulai',
                          tgl_selesai='$tgl_selesai',
@@ -56,20 +50,16 @@ if (isset($_POST['Editpkl'])) {
                          tahun_pelajaran='$tahun_pelajaran'                            
                          WHERE id_pkl='$id_pkl'");
 
-    // Asumsi $_GET['id_pkl'] sudah ada
     $id_pkl = $_GET['id_pkl'];
 
-    // Redirect ke dataPKL.php setelah mengedit
     header("location:dataPKL.php");
 }
 
 if (isset($_GET['id_pkl'])) {
     $id_pkl = escapeString($koneksi, $_GET['id_pkl']);
 
-    // Query untuk hapus data PKL
     mysqli_query($koneksi, "DELETE FROM pkl WHERE id_pkl='$id_pkl'");
 
-    // Redirect ke dataPKL.php setelah menghapus
     header("location:dataPKL.php");
 }
 ?>
@@ -270,7 +260,6 @@ if (isset($_GET['id_pkl'])) {
                                     <label for="id_siswa">Nama siswa</label>
                                     <select class="form-control" id="id_siswa" name="id_siswa" required>
                                         <?php
-                                        // Fetch student names from the 'siswa' table
                                         $siswaQuery = "SELECT id_siswa, Nama_siswa FROM siswa";
                                         $siswaResult = mysqli_query($koneksi, $siswaQuery);
 
@@ -330,17 +319,7 @@ if (isset($_GET['id_pkl'])) {
             </footer>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/scripts.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-    <script src="assets/demo/chart-area-demo.js"></script>
-    <script src="assets/demo/chart-bar-demo.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/datatables-simple-demo.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
+    <?php include 'footer.php';?>
 </body>
 
 </html>

@@ -84,13 +84,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container">
       <div class="row">
         <div class="col-lg-6 d-flex flex-column align-items-left">
-          <h1 style="text-align: left;" data-aos="fade-up">Selamat Datang Di Sistem Informasi Repository Laporan PKL
+          <h1 style="text-align: left;" >Selamat Datang Di Sistem Informasi Repository Laporan PKL
           </h1>
-          <h2 data-aos="fade-up" data-aos-delay="400" class="justify-content-center">Anda dapat <span
+          <h2   class="justify-content-center">Anda dapat <span
               style="font-weight: bold; color: #FF8C00;">menemukan</span> dan <span
               style="font-weight: bold; color: #FF8C00;">menyimpan</span> semua dokumen <span
               style="font-weight: bold; color: #FF8C00;">Praktek Kerja Lapangan</span> dengan Cepat dan Tepat</h2>
-          <div data-aos="fade-up" data-aos-delay="600">
+          <div>
           <div class="text-start text-lg-start">
     <form action="daftarpkl.php" method="post">
         <button type="submit" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
           </div>
         </div>
-        <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200">
+        <div class="col-lg-6 hero-img">
           <img src="assets/img/hero-img.png" class="img-fluid" alt="">
         </div>
       </div>
@@ -112,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   <!-- ======= Recent Blog Posts Section ======= -->
   <section id="recent-blog-posts" class="recent-blog-posts">
-    <div class="container" data-aos="fade-up">
+    <div class="container" >
       <header class="section-header">
         <p>Berita dan Informasi</p>
       </header>
@@ -143,24 +143,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           }
         }
 
-        // Tutup koneksi
         $koneksi->close();
         ?>
       </div>
     </div>
   </section>
 
-  <!-- End Recent Blog Posts Section -->
 
 
   <main id="main">
-    <!-- ======= About Section ======= -->
     <section id="about" class="about">
 
-      <div class="container" data-aos="fade-up">
+      <div class="container" >
         <div class="row gx-0">
 
-          <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="col-lg-6 d-flex flex-column justify-content-center"  data-aos-delay="200">
             <div class="content">
               <h3>Who SiRepository Are</h3>
               <h2>Sistem Informasi Repository Laporan PKL Siswa SMK Al-Muhajirin</h2>
@@ -183,8 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
           </div>
 
-          <div class="col-lg-6 d-flex align-items-center justify-content-center" data-aos="zoom-out"
-            data-aos-delay="200">
+          <div class="col-lg-6 d-flex align-items-center justify-content-center">
             <img src="assets/img/about.png" class="img-fluid" alt="">
           </div>
 
@@ -197,7 +193,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- ======= Services Section ======= -->
     <section id="services" class="services">
 
-      <div class="container" data-aos="fade-up">
+      <div class="container" >
 
         <header class="section-header">
           <h2>Dokumen PKL</h2>
@@ -244,21 +240,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </main><!-- End #main -->
 
   <?php include 'footer.html' ?>
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
-      class="bi bi-arrow-up-short"></i></a>
-
-  <!-- Vendor JS Files -->
-  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
-  <script src="assets/vendor/aos/aos.js"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
-
-  <!-- Template Main JS File -->
-  <script src="assets/js/main.js"></script>
-
 </body>
 
 </html>

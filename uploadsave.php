@@ -10,7 +10,6 @@ function uploadToGoogleDriveAndDatabase($filePath, $folderId)
     global $koneksi;
 
     try {
-        // Pastikan session sudah di-start
         session_start();
 
         $client = new Client();
@@ -39,12 +38,10 @@ function uploadToGoogleDriveAndDatabase($filePath, $folderId)
 
         $fileId = $file->id;
 
-        // Periksa apakah $_SESSION['username'] sudah terdefinisi
         if (!isset($_SESSION['username'])) {
             throw new Exception("Error: Nama siswa tidak ditemukan di sesi.");
         }
 
-        // Gunakan $_SESSION['username'] pada bind parameter
         $query_insert = "INSERT INTO laporan_pkl (nama_siswa, tanggal_kumpul, berkas, judul_laporan, google_drive_file_id) 
 VALUES (?, CURRENT_DATE, ?, ?, ?)";
 $stmt_insert = $koneksi->prepare($query_insert);
@@ -53,8 +50,7 @@ $stmt_insert = $koneksi->prepare($query_insert);
             throw new Exception("Prepare statement error: " . $koneksi->error);
         }
 
-        $judul_laporan = $_POST['judul_laporan']; // Ambil judul laporan dari form
-
+        $judul_laporan = $_POST['judul_laporan']; 
         $stmt_insert->bind_param("ssss", $_SESSION['username'], $fileId, $judul_laporan, $fileId);
 
         if ($stmt_insert->execute()) {

@@ -15,26 +15,21 @@ if (isset($_POST['TambahDokumen'])) {
     $ukuran_dokumen = $_FILES['Dokumen']['size'];
     $ext_dokumen = pathinfo($filename_dokumen, PATHINFO_EXTENSION);
 
-    // Pastikan ekstensi dokumen sesuai dengan kebutuhan
     if (!in_array($ext_dokumen, $ekstensi_dokumen)) {
         echo "error: ekstensi dokumen tidak diizinkan";
     } else {
-        // Pastikan ukuran dokumen tidak melebihi batas
         if ($ukuran_dokumen < 208815000) {
             $file_dokumen = $rand . '_' . $filename_dokumen;
             $upload_dir = 'Dokumen/';
 
             if (move_uploaded_file($_FILES['Dokumen']['tmp_name'], $upload_dir . $file_dokumen)) {
-                // Lanjutkan dengan menyimpan nama dokumen ke database
                 $query = "INSERT INTO dokumen (judul_dokumen, Dokumen) 
                           VALUES ('$judul_dokumen', '$file_dokumen')";
 
                 if ($koneksi->query($query) === TRUE) {
-                    // Jika berhasil, arahkan pengguna ke halaman sukses atau halaman lain
                     header('Location: datadokumen.php');
                     exit;
                 } else {
-                    // Jika terjadi kesalahan, arahkan pengguna ke halaman error atau tampilkan pesan error
                     echo 'Error: ' . $koneksi->error;
                 }
             } else {
@@ -50,12 +45,10 @@ if (isset($_POST['EditDokumen'])) {
     $id_dokumen = $_POST['id_dokumen'];
     $judul_dokumen = $_POST['judul_dokumen'];
 
-    // Pengunggahan dokumen baru (jika ada)
     if ($_FILES['Dokumen']['name'] != "") {
         $file_name = $_FILES['Dokumen']['name'];
         $file_tmp = $_FILES['Dokumen']['tmp_name'];
 
-        // Pindahkan file ke direktori penyimpanan
         $file_destination = 'Dokumen/' . $file_name;
         move_uploaded_file($file_tmp, $file_destination);
 
@@ -81,7 +74,6 @@ if (isset($_POST['EditDokumen'])) {
 if (isset($_GET['id_dokumen'])) {
     $id_dokumen = $_GET['id_dokumen'];
 
-    // Peroleh informasi dokumen berdasarkan ID
     $query_select = "SELECT * FROM dokumen WHERE id_dokumen='$id_dokumen'";
     $result_select = $koneksi->query($query_select);
 
@@ -89,16 +81,13 @@ if (isset($_GET['id_dokumen'])) {
         $row_select = $result_select->fetch_assoc();
         $file_to_delete = $row_select['Dokumen'];
 
-        // Hapus dokumen dari direktori
         $file_path = 'Dokumen/' . $file_to_delete;
         if (file_exists($file_path)) {
             unlink($file_path);
         }
 
-        // Hapus data dokumen dari database
         $query_delete = "DELETE FROM dokumen WHERE id_dokumen='$id_dokumen'";
         if ($koneksi->query($query_delete) === TRUE) {
-            // Redirect ke halaman datadokumen.php setelah menghapus
             header("location: datadokumen.php");
             exit;
         } else {
@@ -160,14 +149,12 @@ if (isset($_GET['id_dokumen'])) {
                                 </thead>
 
                                 <tbody>
-                                    <!-- Modal edit data-->
                                     <?php
                                     $no = 1;
                                     $query = "SELECT * FROM dokumen";
                                     $result = mysqli_query($koneksi, $query);
 
                                     while ($row = mysqli_fetch_assoc($result)) {
-                                        // Tampilkan data pada tabel
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['judul_dokumen'] . "</td>";
@@ -180,7 +167,6 @@ if (isset($_GET['id_dokumen'])) {
                                         echo "</td>";
                                         echo "</tr>";
 
-                                        // Modal edit diluar loop
                                         ?>
 
                                         <!-- Modal hapus data -->
@@ -313,17 +299,7 @@ if (isset($_GET['id_dokumen'])) {
             </footer>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/scripts.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-    <script src="assets/demo/chart-area-demo.js"></script>
-    <script src="assets/demo/chart-bar-demo.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js"
-        crossorigin="anonymous"></script>
-    <script src="js/datatables-simple-demo.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
+    <?php include 'footer.php';?>
 </body>
 
 </html>

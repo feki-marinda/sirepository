@@ -2,10 +2,8 @@
 include 'conn.php';
 session_start();
 
-// Pastikan session 'username' berisi username dari tabel pengguna
 $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
-// Query untuk mendapatkan ID siswa berdasarkan username dari tabel pengguna
 $query_get_id = "SELECT siswa.id_siswa FROM siswa
                 INNER JOIN user ON siswa.id_user = user.id_user
                 WHERE user.username = '$username' LIMIT 1";
@@ -13,55 +11,43 @@ $query_get_id = "SELECT siswa.id_siswa FROM siswa
 $result_id = $koneksi->query($query_get_id);
 
 if ($result_id !== false && $result_id->num_rows > 0) {
-    // Ambil data ID siswa
     $row_id = $result_id->fetch_assoc();
     $id_siswa = $row_id['id_siswa'];
 
-    // Simpan ID siswa ke dalam session
     $_SESSION['id_siswa'] = $id_siswa;
 } else {
-    // Handle jika data tidak ditemukan atau query gagal
     $id_siswa = 'ID Siswa Tidak Ditemukan';
 }
 
 $Nama_siswa = '';
 $id_siswa = isset($_SESSION['id_siswa']) ? $_SESSION['id_siswa'] : '';
 
-// Query untuk mendapatkan nama siswa berdasarkan ID siswa dengan JOIN
 $query_get_nama = "SELECT siswa.Nama_siswa FROM logbook
                     INNER JOIN siswa ON logbook.id_siswa = siswa.id_siswa
                     WHERE logbook.id_siswa = '$id_siswa' LIMIT 1";
 $result_nama = $koneksi->query($query_get_nama);
 
 if ($result_nama !== false && $result_nama->num_rows > 0) {
-    // Ambil data nama siswa
     $row_nama = $result_nama->fetch_assoc();
     $Nama_siswa = $row_nama['Nama_siswa'];
 } else {
-    // Handle jika data tidak ditemukan atau query gagal
     $Nama_siswa = 'Nama Siswa Tidak Ditemukan';
 }
 
-// Inisialisasi variabel $show_modal
 $show_modal = false;
 
-// Periksa apakah form telah disubmit
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Ambil data dari formulir
     $tanggal = $_POST['tanggal'];
     $aktivitas = $_POST['aktivitas'];
     $id_siswa = $_POST['id_siswa'];
 
-    // Periksa apakah data sudah ada untuk tanggal tertentu dan pengguna tertentu
     $check_query = "SELECT * FROM logbook WHERE tanggal = '$tanggal' AND id_siswa = '$id_siswa'";
     $result = $koneksi->query($check_query);
 
     if ($result !== false) {
         if ($result->num_rows > 0) {
-            // Jika data sudah ada, set $show_modal menjadi true
             $show_modal = true;
         } else {
-            // Jika data belum ada, simpan data ke dalam database
             $insert_query = "INSERT INTO logbook (tanggal, aktivitas, id_siswa) VALUES ('$tanggal', '$aktivitas', '$id_siswa')";
 
             if ($koneksi->query($insert_query) === TRUE) {
@@ -72,15 +58,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
     } else {
-        // Handle query execution failure
         echo "Error executing query: " . $koneksi->error;
     }
 }
 
 $koneksi->close();
 ?>
-
-<!-- Bagian HTML dan lainnya tetap sama -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -89,13 +72,10 @@ $koneksi->close();
 
 <body>
 
-    <!-- ======= Header ======= -->
     <?php include 'header_siswa.php' ?>
-    <!-- End Header -->
 
     <main id="main">
 
-        <!-- ======= Breadcrumbs ======= -->
         <section class="breadcrumbs">
             <div class="container">
 
@@ -106,7 +86,7 @@ $koneksi->close();
                 </ol>
                 <h2>
                     <?php
-                    // Periksa apakah session nama sudah ada
+                    // Periksa session nama sudah ada
                     if (isset($_SESSION['username'])) {
                         $Nama_siswa = $_SESSION['username'];
                         echo '<h2>Hallo ' . $Nama_siswa . '</h2>';
@@ -117,7 +97,7 @@ $koneksi->close();
                 </h2>
 
             </div>
-        </section><!-- End Breadcrumbs -->
+        </section>
 
         <div class="container">
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
@@ -205,7 +185,6 @@ $koneksi->close();
 
         <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 
@@ -222,16 +201,6 @@ $koneksi->close();
             });
         </script>
 
-        <!-- Vendor JS Files -->
-        <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
-        <script src="assets/vendor/aos/aos.js"></script>
-        <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-        <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-        <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-        <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-        <script src="assets/vendor/php-email-form/validate.js"></script>
-
-        <!-- Template Main JS File -->
         <script src="assets/js/main.js"></script>
 
     </main>
