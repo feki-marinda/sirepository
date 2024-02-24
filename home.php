@@ -15,6 +15,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <?php include 'head.html' ?>
 <style>
+.hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: url(assets/img/sekolah.jpg) top center no-repeat;
+    background-size: cover;
+    
+}
+
+.overlay {
+  position: absolute;
+  top : 0;
+  left : 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8); 
+}
+.hero .container {
+    position: relative;
+    z-index: 2;
+}
+
+.hero h1,
+.hero h2,
+.hero .btn-get-started {
+    color: #000; 
+  }
   .recent-blog-posts {
     padding: 60px 0;
   }
@@ -74,43 +101,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
 
-  <!-- ======= Header ======= -->
   <?php include 'header_siswa.php' ?>
-  <!-- End Header -->
-
-  <!-- ======= Hero Section ======= -->
-  <section id="hero" class="hero d-flex align-items-center">
-
+  <section id="hero" class="hero d-flex align-items-center ">
+    <div class="overlay"></div>
     <div class="container">
-      <div class="row">
-        <div class="col-lg-6 d-flex flex-column align-items-left">
-          <h1 style="text-align: left;" >Selamat Datang Di Sistem Informasi Repository Laporan PKL
-          </h1>
-          <h2   class="justify-content-center">Anda dapat <span
-              style="font-weight: bold; color: #FF8C00;">menemukan</span> dan <span
-              style="font-weight: bold; color: #FF8C00;">menyimpan</span> semua dokumen <span
-              style="font-weight: bold; color: #FF8C00;">Praktek Kerja Lapangan</span> dengan Cepat dan Tepat</h2>
-          <div>
-          <div class="text-start text-lg-start">
-    <form action="daftarpkl.php" method="post">
-        <button type="submit" class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center">
-            <span>Daftar PKL</span>
-            <i class="bi bi-arrow-right"></i>
-        </button>
-    </form>
+        <div class="row">
+            <div class="col-lg-10 d-flex flex-column align-items-center">
+                <h1 style="text-align: center;" data-aos="fade-up" data-aos-duration="1000">Selamat Datang Di Sistem Informasi Repository Laporan Praktek Kerja Lapangan Siswa <br> SMK AL - MUHAJIRIN</h1>
+                <h2 data-aos="fade-up" data-aos-delay="400" data-aos-duration="1000" class="justify-content-center">Anda dapat <span
+                    style="font-weight: bold; color: #FF8C00;">menemukan</span> dan <span
+                    style="font-weight: bold; color: #FF8C00;">menyimpan</span> semua dokumen <span
+                    style="font-weight: bold; color: #FF8C00;">Praktek Kerja Lapangan</span> dengan Cepat dan Tepat. Untuk memulai silahkan <span
+                    style="font-weight: bold; color: #FF8C00;">daftar</span> terlebih dahulu.</h2>
+                <div data-aos="fade-up" data-aos-delay="600" data-aos-duration="1000">
+                <div class="text-start text-lg-start">
+    <a href="daftarpkl.php"
+        class="btn-get-started scrollto d-inline-flex align-items-center justify-content-center align-self-center"
+        style="width: 300px; background-color: #FF8C00; ">
+        <span style="color: #ffffff;">Daftar PKL</span>
+        <i class="bi bi-arrow-right" style="color: #ffffff;"></i>
+    </a>
 </div>
 
-          </div>
+                </div>
+            </div>
+            <!-- <div class="col-lg-6 hero-img" data-aos="zoom-out" data-aos-delay="200" data-aos-duration="1000">
+                <img src="assets/img/dewi.png" style="width: 70%" class="img-fluid" alt="">
+            </div> -->
         </div>
-        <div class="col-lg-6 hero-img">
-          <img src="assets/img/hero-img.png" class="img-fluid" alt="">
-        </div>
-      </div>
     </div>
-
-  </section><!-- End Hero -->
-
-  <!-- ======= Recent Blog Posts Section ======= -->
+</section>
   <section id="recent-blog-posts" class="recent-blog-posts">
     <div class="container" >
       <header class="section-header">
@@ -152,45 +172,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
   <main id="main">
-    <section id="about" class="about">
+    <section id="about" class="about" style="background-color: #F5F5F5;">
 
       <div class="container" >
-        <div class="row gx-0">
+        <div class="row gx-0 " >
 
-          <div class="col-lg-6 d-flex flex-column justify-content-center"  data-aos-delay="200">
-            <div class="content">
-              <h3>Who SiRepository Are</h3>
+          <div class="col-lg-12 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="500">
+          <h3 style="text-align: center;">Apa itu Sirepository ?</h3>
+          <div class="content rounded" style="background-color: #B0E0E6;">
+              
               <h2>Sistem Informasi Repository Laporan PKL Siswa SMK Al-Muhajirin</h2>
-              <p style="text-align: justify;">
+              <h4 style="text-align: justify;">
                 Sistem Informasi Repository Laporan PKL (Praktek Kerja Lapangan) adalah suatu platform atau sistem yang
                 dirancang untuk menyimpan, mengelola, dan membagikan laporan praktek kerja lapangan siswa. Sistem ini
                 bertujuan untuk menyediakan wadah terpusat di mana laporan-laporan tersebut dapat diunggah, dicari, dan
                 diakses oleh pihak-pihak yang berkepentingan, seperti instansi yang menyelenggarakan PKL, Siswa, dan
                 pihak lainnya.
-              </p>
+      </h4>
 
-              <div class="text-center text-lg-start">
-                <a href="about.php"
-                  class="btn-read-more d-inline-flex align-items-center justify-content-center align-self-center">
-                  <span>Read More</span>
-                  <i class="bi bi-arrow-right"></i>
-                </a>
-              </div>
+              
+              <div class="text-start text-lg-start">
+    <a href="daftarpkl.php"
+        class="btn-get-started rounded scrollto d-inline-flex align-items-center justify-content-center align-self-center"
+        style="width: 300px; height:50px; background-color: #FF8C00; ">
+        <span style="color: #ffffff;">Daftar PKL</span>
+        <i class="bi bi-arrow-right" style="color: #ffffff;"></i>
+    </a>
 
             </div>
           </div>
 
-          <div class="col-lg-6 d-flex align-items-center justify-content-center">
+          <!-- <div class="col-lg-6 d-flex align-items-center justify-content-center">
             <img src="assets/img/about.png" class="img-fluid" alt="">
-          </div>
+          </div> -->
 
 
         </div>
       </div>
 
-    </section><!-- End About Section -->
-
-    <!-- ======= Services Section ======= -->
+    </section>
+    
     <section id="services" class="services">
 
       <div class="container" >
@@ -238,8 +259,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
   </main><!-- End #main -->
-
+  <script>
+    AOS.init();
+</script>
   <?php include 'footer.html' ?>
+  <script src="assets/js/main.js"></script>
 </body>
 
 </html>
