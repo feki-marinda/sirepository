@@ -147,20 +147,20 @@ $koneksi->close();
             </div><br>
 
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
-                <form action="#" method="post" class="form-container">
-                    <input type="hidden" name="id_siswa" value="<?php echo $_SESSION['id_siswa']; ?>">
+            <form action="#" method="post" class="form-container">
+    <input type="hidden" name="id_siswa" value="<?php echo $_SESSION['id_siswa']; ?>">
 
-                    <div class="mb-3">
-                        <label for="exampleFormControlInput1" class="form-label fw-bold">Tanggal Kegiatan</label>
-                        <input type="date" class="form-control" id="exampleFormControlInput1" name="tanggal" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="exampleFormControlTextarea1" class="form-label fw-bold">Deskripsikan Aktivitasmu</label>
-                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"
-                            placeholder="Deskripsikan Kegiatanmu" name="aktivitas" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
+    <div class="col-3 mb-3">
+        <label for="exampleFormControlInput1" class="form-label fw-bold">Tanggal Kegiatan</label>
+        <input type="date" class="form-control" id="exampleFormControlInput1" name="tanggal" required>
+    </div>
+    <div class="mb-3">
+        <label for="exampleFormControlTextarea1" class="form-label fw-bold">Deskripsikan Aktivitasmu</label>
+        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" placeholder="Deskripsikan Kegiatanmu" name="aktivitas" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
             </div>
 
             <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"

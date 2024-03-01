@@ -54,7 +54,7 @@ if (isset($_GET['id_logbook'])) {
 <?php include 'head.html' ?>
 
 <body class="sb-nav-fixed">
-    <?php include 'header.html' ?>
+    <?php include 'header.php' ?>
     <div id="layoutSidenav" style="width: 100%">
 
         <div id="layoutSidenav_content">

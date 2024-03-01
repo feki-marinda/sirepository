@@ -61,7 +61,7 @@ include 'conn.php';
                     </div><br>
 
                     <table id="example" class="display">
-                        <thead>
+                        <thead class="table-primary">
                             <tr>
                                 <th>Nama</th>
                                 <th>Tanggal</th>

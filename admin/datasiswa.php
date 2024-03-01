@@ -8,28 +8,28 @@ if (!$result) {
     die("Error in query: " . mysqli_error($koneksi));
 }
 
-if (isset($_POST['TambahSiswa'])) {
-    $Nama_siswa = $_POST['Nama_siswa'];
-    $NIS = $_POST['NIS'];
-    $kelas = $_POST['kelas'];
-    $jenis_kelamin = $_POST['jenis_kelamin'];
-    $alamat = $_POST['alamat'];
-    $tanggal_lahir = $_POST['tanggal_lahir'];
-    $no_hp = $_POST['no_hp'];
-    $rand = rand();
+// if (isset($_POST['TambahSiswa'])) {
+//     $Nama_siswa = $_POST['Nama_siswa'];
+//     $NIS = $_POST['NIS'];
+//     $kelas = $_POST['kelas'];
+//     $jenis_kelamin = $_POST['jenis_kelamin'];
+//     $alamat = $_POST['alamat'];
+//     $tanggal_lahir = $_POST['tanggal_lahir'];
+//     $no_hp = $_POST['no_hp'];
+//     $rand = rand();
 
-    $query = "INSERT INTO siswa (Nama_siswa, NIS, kelas, jenis_kelamin, alamat, tanggal_lahir, no_hp) 
-              VALUES ('$Nama_siswa', '$NIS', '$kelas','$jenis_kelamin','$alamat','$tanggal_lahir','$no_hp')";
+//     $query = "INSERT INTO siswa (Nama_siswa, NIS, kelas, jenis_kelamin, alamat, tanggal_lahir, no_hp) 
+//               VALUES ('$Nama_siswa', '$NIS', '$kelas','$jenis_kelamin','$alamat','$tanggal_lahir','$no_hp')";
 
-    if ($koneksi->query($query) === TRUE) {
-        header('Location: datasiswa.php');
-        exit;
-    } else {
-        echo 'Error: ' . $koneksi->error;
-    }
+//     if ($koneksi->query($query) === TRUE) {
+//         header('Location: datasiswa.php');
+//         exit;
+//     } else {
+//         echo 'Error: ' . $koneksi->error;
+//     }
 
-    $koneksi->close();
-}
+//     $koneksi->close();
+// }
 
 if (isset($_POST['EditSiswa'])) {
     $id_siswa = $_POST['id_siswa'];
@@ -62,10 +62,21 @@ if (isset($_POST['EditSiswa'])) {
 if (isset($_GET['id_siswa'])) {
     $id_siswa = $_GET['id_siswa'];
 
-    mysqli_query($koneksi, "DELETE FROM siswa WHERE id_siswa='$id_siswa'");
-    header("location:datasiswa.php");
-}
+    $stmt = mysqli_prepare($koneksi, "DELETE FROM siswa WHERE id_siswa = ?");
 
+    mysqli_stmt_bind_param($stmt, "i", $id_siswa);
+    mysqli_stmt_execute($stmt);
+
+    $affected_rows = mysqli_stmt_affected_rows($stmt);
+
+    if ($affected_rows > 0) {
+        $success_message = "Berhasil Menghapus data siswa!";
+    } else {
+        $error_message = "Tidak dapat menghapus data siswa !";
+    }
+
+    mysqli_stmt_close($stmt);
+}
 ?>
 
 <!DOCTYPE html>
@@ -74,7 +85,7 @@ if (isset($_GET['id_siswa'])) {
 <?php include 'head.html' ?>
 
 <body class="sb-nav-fixed">
-    <?php include 'header.html' ?>
+    <?php include 'header.php' ?>
     <div id="layoutSidenav" style="width: 100%">
         <div id="layoutSidenav_content">
             <main>
@@ -89,9 +100,9 @@ if (isset($_GET['id_siswa'])) {
                         <div class="button-container">
                             <div class="spacer"></div>
                             <div class="buttons-right">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
-                                    Tambah Data siswa PKL</button>
+                                    Tambah Data siswa PKL</button> -->
                                 <button id="printButton">
                                     <i class="fas fa-print"></i> Cetak
                                 </button>
@@ -102,9 +113,17 @@ if (isset($_GET['id_siswa'])) {
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            Data Guru Pamong
+                            Data Siswa
                         </div>
                         <div class="card-body">
+                        <?php
+                            if (!empty($error_message)) {
+                                echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
+                            }
+                            if (!empty($success_message)) {
+                                echo '<div class="alert alert-success" role="alert">' . $success_message . '</div>';
+                            }
+                            ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
                                 <thead>
                                     <tr>
@@ -116,12 +135,6 @@ if (isset($_GET['id_siswa'])) {
                                         <th>Alamat</th>
                                         <th>Tanggal Lahir</th>
                                         <th>No Hp</th>
-                                        <th>id_user</th>
-                                        <th>id_sertifikat</th>
-                                        <th>id_nilai</th>
-                                        <th>id_pamong</th>
-                                        <th>id_mitra</th>
-                                        <th>id_logbook</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
@@ -138,12 +151,6 @@ if (isset($_GET['id_siswa'])) {
                                         echo "<td>" . $row['jenis_kelamin'] . "</td>";
                                         echo "<td>" . $row['alamat'] . "</td>";
                                         echo "<td>" . $row['tanggal_lahir'] . "</td>";
-                                        echo "<td>" . $row['id_user'] . "</td>";
-                                        echo "<td>" . $row['id_sertifikat'] . "</td>";
-                                        echo "<td>" . $row['id_nilai'] . "</td>";
-                                        echo "<td>" . $row['id_pamong'] . "</td>";
-                                        echo "<td>" . $row['id_mitra'] . "</td>";
-                                        echo "<td>" . $row['id_logbook'] . "</td>";
                                         echo "<td>" . $row['no_hp'] . "</td>";
                                         echo "<td>";
                                         echo "<div class='btn-group'>";
@@ -262,7 +269,7 @@ if (isset($_GET['id_siswa'])) {
             </main>
 
             <!-- Modal tambah data-->
-            <div class="modal fade" id="tambah" tabindex="-1"
+            <!-- <div class="modal fade" id="tambah" tabindex="-1"
                 aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -283,10 +290,6 @@ if (isset($_GET['id_siswa'])) {
                                 <div class="mb-3">
                                     <label for="kelas" class="col-form-label">Kelas:</label>
                                     <input type="text" class="form-control" id="kelas" name="kelas" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="foto" class="col-form-label">Foto:</label>
-                                    <input type="file" class="form-control" id="foto" name="foto" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="jenis_kelamin" class="col-form-label">Jenis Kelamin:</label>
@@ -317,7 +320,7 @@ if (isset($_GET['id_siswa'])) {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
 
 

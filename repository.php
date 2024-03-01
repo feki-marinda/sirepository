@@ -50,7 +50,7 @@ session_start();
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
                 <table id="example" class="display">
                     <thead>
-                        <tr>
+                        <tr class="table-primary">
                             <th>No</th>
                             <th>Nama</th>
                             <th>Judul Laporan</th>

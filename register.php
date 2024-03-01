@@ -4,16 +4,17 @@ require 'login.php';
 $error_message = $success_message = '';
 if (isset($_POST['register'])) {
 
-            if (registrasi($_POST)>0) {
-                $success_message = "Registrasi Berhasil. Kembali Ke Halaman <a href='index.php'>Login</a>.";
-            } else {
-                $error_message = "Pendaftaran gagal !";
-            }
+    if (registrasi($_POST) > 0) {
+        $success_message = "Registrasi Berhasil. Kembali Ke Halaman <a href='index.php'>Login</a>.";
+    } else {
+        $error_message = "Pendaftaran gagal !";
     }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,21 +28,22 @@ if (isset($_POST['register'])) {
         href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=PT+Serif&family=Poppins:wght@300;400;500;700&family=Ubuntu:wght@300&display=swap"
         rel="stylesheet">
 
-    
+
 </head>
 <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
 
-        h3 {
-            font-family: 'Libre Baskerville', serif;
-        }
-    </style>
+    h3 {
+        font-family: 'Libre Baskerville', serif;
+    }
+</style>
+
 <body>
 
     <div class="container-fluid">
-        <div class="row p-3">
+        <div class="row">
             <div class="col-sm-6">
                 <div class="text-center">
                     <img src="admin/gambar/R.png" alt="" class="mx-auto d-block">
@@ -55,8 +57,7 @@ if (isset($_POST['register'])) {
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
                         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab"
                             data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home"
-                            aria-selected="true" onclick="showForm('siswa')">Siswa
-                        </button>
+                            aria-selected="true" onclick="showForm('siswa')">Siswa</button>
                         <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile"
                             type="button" role="tab" aria-controls="nav-profile" aria-selected="false"
                             onclick="showForm('guru')">Guru
@@ -94,17 +95,23 @@ if (isset($_POST['register'])) {
                                             name="confirm_password" placeholder="Confirm your password" required>
                                     </div>
                                 </div>
-
-                                <div class="mb-3">
-                                    <label for="full_name">Nama Lengkap</label>
-                                    <input type="text" class="form-control" id="Nama_siswa" name="Nama_siswa"
-                                        placeholder="Enter student name" required>
-                                </div>
                                 <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="full_name">Nama Lengkap</label>
+                                        <input type="text" class="form-control" id="Nama_siswa" name="Nama_siswa"
+                                            placeholder="Enter student name" required>
+                                    </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="full_name">NIS</label>
                                         <input type="text" class="form-control" id="NIS" name="NIS"
                                             placeholder="Enter student name" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="address">Alamat</label>
+                                        <input type="text" class="form-control" id="alamat" name="alamat"
+                                            placeholder="Enter class" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="birth_info">Tempat/Tanggal Lahir</label>
@@ -123,16 +130,31 @@ if (isset($_POST['register'])) {
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="class">Kelas</label>
-                                        <input type="text" class="form-control" id="kelas" name="kelas"
+                                        <select class="form-select" id="kelas" name="kelas" required>
+                                            <option value="" selected disabled>Select Class</option>
+                                            <option value="1A">XI A</option>
+                                            <option value="1B">XI B</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email">Email</label>
+                                        <input type="text" class="form-control" id="email" name="email"
+                                            placeholder="Enter class" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="no_hp">No HP</label>
+                                        <input type="text" class="form-control" id="no_hp" name="no_hp"
                                             placeholder="Enter class" required>
                                     </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="address">Alamat</label>
-                                    <input type="text" class="form-control" id="alamat" name="alamat"
-                                        placeholder="Enter class" required>
+                                <div class="d-grid gap-2 mb-3">
+                                    <button type="submit" class="btn btn-primary btn-block"
+                                        name="register">Register</button>
                                 </div>
-                                <button type="submit" class="btn btn-primary" name="register">Register</button>
+
                             </form>
                         </div>
                     </div>

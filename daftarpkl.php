@@ -119,7 +119,6 @@ if (isset($_POST['daftar'])) {
                                             <label for="tgl_selesai" class="form-label">Tanggal Selesai :</label>
                                             <input type="date" class="form-control" id="tgl_selesai" name="tgl_selesai">
                                         </div>
-                                        <small>Lama PKL </small>
                                     </div>
                                     <div class="mb-3">
                                         <label for="nama_perusahaan" class="form-label">Tempat PKL :</label>
@@ -143,7 +142,7 @@ if (isset($_POST['daftar'])) {
         </div>
         <div class="div">
     <table class="table">
-        <thead>
+        <thead class="table-primary">
             <tr>
                 <td>Nama</td>
                 <td>Kelas</td>

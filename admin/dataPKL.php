@@ -1,11 +1,12 @@
 <?php
 include 'conn.php';
 
-function escapeString($koneksi, $string) {
+function escapeString($koneksi, $string)
+{
     return mysqli_real_escape_string($koneksi, $string);
 }
 
-$query = "SELECT * FROM pkl INNER JOIN siswa ON siswa.id_siswa = pkl.id_siswa";
+$query = "SELECT siswa.Nama_siswa, pkl.id_pkl, pkl.id_siswa, pkl.tgl_mulai, pkl.tgl_selesai, pkl.kelas, pkl.nama_perusahaan, pkl.tahun_pelajaran FROM pkl INNER JOIN siswa ON siswa.id_siswa = pkl.id_siswa";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
@@ -16,12 +17,12 @@ if (isset($_POST['Tambahpkl'])) {
     $id_siswa = escapeString($koneksi, $_POST['id_siswa']);
     $tgl_mulai = escapeString($koneksi, $_POST['tgl_mulai']);
     $tgl_selesai = escapeString($koneksi, $_POST['tgl_selesai']);
-    $angkatan = escapeString($koneksi, $_POST['angkatan']);
+    $kelas = escapeString($koneksi, $_POST['kelas']);
     $nama_perusahaan = escapeString($koneksi, $_POST['nama_perusahaan']);
     $tahun_pelajaran = escapeString($koneksi, $_POST['tahun_pelajaran']);
 
-    $query = "INSERT INTO pkl (id_siswa, tgl_mulai, tgl_selesai, angkatan, nama_perusahaan, tahun_pelajaran) 
-          VALUES ('$id_siswa', '$tgl_mulai', '$tgl_selesai', '$angkatan', '$nama_perusahaan', '$tahun_pelajaran')";
+    $query = "INSERT INTO pkl (id_siswa, tgl_mulai, tgl_selesai, kelas, nama_perusahaan, tahun_pelajaran) 
+          VALUES ('$id_siswa', '$tgl_mulai', '$tgl_selesai', '$kelas', '$nama_perusahaan', '$tahun_pelajaran')";
 
     if ($koneksi->query($query) === TRUE) {
         header('Location: dataPKL.php');
@@ -38,14 +39,14 @@ if (isset($_POST['Editpkl'])) {
     $id_siswa = escapeString($koneksi, $_POST['id_siswa']);
     $tgl_mulai = escapeString($koneksi, $_POST['tgl_mulai']);
     $tgl_selesai = escapeString($koneksi, $_POST['tgl_selesai']);
-    $angkatan = escapeString($koneksi, $_POST['angkatan']);
+    $kelas = escapeString($koneksi, $_POST['kelas']);
     $nama_perusahaan = escapeString($koneksi, $_POST['nama_perusahaan']);
     $tahun_pelajaran = escapeString($koneksi, $_POST['tahun_pelajaran']);
 
     mysqli_query($koneksi, "UPDATE pkl SET 
                          tgl_mulai='$tgl_mulai',
                          tgl_selesai='$tgl_selesai',
-                         angkatan='$angkatan',
+                         kelas='$kelas',
                          nama_perusahaan='$nama_perusahaan',
                          tahun_pelajaran='$tahun_pelajaran'                            
                          WHERE id_pkl='$id_pkl'");
@@ -70,7 +71,7 @@ if (isset($_GET['id_pkl'])) {
 <?php include 'head.html' ?>
 
 <body class="sb-nav-fixed">
-    <?php include 'header.html' ?>
+    <?php include 'header.php' ?>
     <div id="layoutSidenav" style="width: 100%">
 
         <div id="layoutSidenav_content">
@@ -109,7 +110,7 @@ if (isset($_GET['id_pkl'])) {
                                         <th>Nama Lengkap</th>
                                         <th>Tanggal Mulai</th>
                                         <th>Tanggal Selesai</th>
-                                        <th>Angkatan</th>
+                                        <th>kelas</th>
                                         <th>Nama Perusahaan</th>
                                         <th>Tahun Pelajaran</th>
                                         <th>Keterangan</th>
@@ -126,7 +127,7 @@ if (isset($_GET['id_pkl'])) {
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
                                         echo "<td>" . $row['tgl_mulai'] . "</td>";
                                         echo "<td>" . $row['tgl_selesai'] . "</td>";
-                                        echo "<td>" . $row['angkatan'] . "</td>";
+                                        echo "<td>" . $row['kelas'] . "</td>";
                                         echo "<td>" . $row['nama_perusahaan'] . "</td>";
                                         echo "<td>" . $row['tahun_pelajaran'] . "</td>";
                                         echo "<td>";
@@ -205,11 +206,14 @@ if (isset($_GET['id_pkl'])) {
                                                                         name="tgl_selesai" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="angkatan">angkatan</label>
-                                                                    <input type="text" class="form-control" id="angkatan"
-                                                                        value="<?= $row['angkatan']; ?>" name="angkatan"
+                                                                    <label for="kelas">Kelas</label>
+                                                                    <select class="form-control" id="kelas" name="kelas"
                                                                         required>
+                                                                        <option value="XI A" <?= ($row['kelas'] === 'kelas1') ? 'selected' : ''; ?>>XI A</option>
+                                                                        <option value="XI B" <?= ($row['kelas'] === 'kelas2') ? 'selected' : ''; ?>>XI B</option>                                                                       
+                                                                    </select>
                                                                 </div>
+
                                                                 <div class="form-group">
                                                                     <label for="nama_perusahaan">Nama Perusahaan</label>
                                                                     <input type="text" class="form-control"
@@ -279,8 +283,8 @@ if (isset($_GET['id_pkl'])) {
                                         required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="angkatan">Angkatan:</label>
-                                    <input type="text" class="form-control" id="angkatan" name="angkatan" required>
+                                    <label for="kelas">kelas:</label>
+                                    <input type="text" class="form-control" id="kelas" name="kelas" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="nama_perusahaan">Nama Perusahaan:</label>
@@ -319,7 +323,7 @@ if (isset($_GET['id_pkl'])) {
             </footer>
         </div>
     </div>
-    <?php include 'footer.php';?>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

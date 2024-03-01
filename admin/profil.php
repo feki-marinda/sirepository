@@ -5,7 +5,7 @@
 
 <body class="sb-nav-fixed">
     <div id="layoutSidenav">
-        <?php include 'header.html' ?>
+        <?php include 'header.php' ?>
         <div id="layoutSidenav_content">
             <main>
                 <div class="container-fluid px-4">

@@ -16,7 +16,7 @@ function uploadToGoogleDrive($filePath, $fileName)
 
         $fileMetadata = new Google_Service_Drive_DriveFile(array(
             'name' => $fileName,
-            'parents' => ['1WmABjy2PW424qM9bRZ4YOqJEdJo7_80z']
+            'parents' => ['1t4miHgS9QTm8YA5wjOvmIpCPhauE-YPw']
         ));
 
         $content = file_get_contents($filePath);

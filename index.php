@@ -13,9 +13,8 @@ if (isset($_POST["login"])) {
         $row = mysqli_fetch_assoc($result);
 
         if ($password === $row["password"]) {
-            // Password cocok
             $_SESSION['username'] = $username;
-            $_SESSION['id_user'] = $row['id_user'];  // Sesuaikan dengan nama kolom yang sesuai
+            $_SESSION['id_user'] = $row['id_user'];  
             header("Location: home.php");
             exit;
         } else {

@@ -7,26 +7,29 @@ require 'uploadscript.php';
 use Google\Client;
 use Google\Service\Drive;
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 error_reporting(0);
 ini_set('display_errors', 0);
 
-
 $nama_siswa_login = getLoggedInUserName();
-
 $showForm = true;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nama_siswa = $_POST['Nama_siswa']; 
+    $nama_siswa = $_POST['Nama_siswa'];
 
-    $query_get_id_siswa = "SELECT id_siswa FROM siswa WHERE Nama_siswa = ?";
+    $query_get_id_siswa = "SELECT id_siswa, email FROM siswa WHERE LOWER(Nama_siswa) = LOWER(?)";
     $stmt_get_id_siswa = $koneksi->prepare($query_get_id_siswa);
-    $stmt_get_id_siswa->bind_param("s", $nama_siswa);
+    $lowered_nama_siswa = strtolower($nama_siswa);
+    $stmt_get_id_siswa->bind_param("s", $lowered_nama_siswa);
     $stmt_get_id_siswa->execute();
     $result_id_siswa = $stmt_get_id_siswa->get_result();
     $row_id_siswa = $result_id_siswa->fetch_assoc();
-    
+    $emailPenerima = $row_id_siswa['email'];
+
     $id_siswa = $row_id_siswa['id_siswa'];
-    
+
     if ($id_siswa === null) {
         echo "Nama siswa tidak ditemukan.";
     } else {
@@ -55,8 +58,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     if ($stmt_insert->execute()) {
                         $showForm = false;
-                        header("Location: repository.php");
-                        exit;                        
+
+                        require_once "library/PHPMailer.php";
+                        require_once "library/Exception.php";
+                        require_once "library/OAuth.php";
+                        require_once "library/POP3.php";
+                        require_once "library/SMTP.php";
+
+                        // Pengiriman email hanya saat laporan pertama kali diunggah
+                        if (isset($_POST['send']) && $_POST['send'] == "uploadLaporan") {
+                            $mail = new PHPMailer();
+
+                            $mail->SMTPDebug = 0;
+                            $mail->isSMTP();
+                            $mail->Host = "ssl://smtp.gmail.com";
+                            $mail->SMTPAuth = true;
+                            $mail->Username = "sirepositorysmkalmujahirin@gmail.com";
+                            $mail->Password = "cqutrhboyqtviwck";
+                            $mail->SMTPSecure = "ssl";
+                            $mail->Port = 465;
+
+                            $mail->From = $mail->Username;
+                            $mail->FromName = "Sirepository-Sistem Informasi Repository";
+
+                            // Penerima
+                            $mail->addAddress($emailPenerima);
+                            if (empty($emailPenerima)) {
+                                echo "Email siswa tidak ditemukan atau kosong.";
+                            } else {
+                                $mail->addAddress($emailPenerima);
+                            }
+
+                            $mail->isHTML(true);
+
+                            $mail->Subject = $nama_siswa;
+                            $mail->Body = "Selamat, laporan praktik kerja lapangan Anda berhasil diunggah. Berikut detailnya:<br>"
+                            . "Nama Siswa: " . $_POST['Nama_siswa'] . "<br>"    
+                            . "Tanggal Kumpul: " . $_POST['tanggal_kumpul'] . "<br>"
+                                . "Judul Laporan: " . $_POST['judul_laporan'] . "<br>"
+                                . "File Laporan: " . $_POST['fileLaporan'];
+
+                            if (!$mail->send()) {
+                                echo "mailer eror" . $mail->ErrorInfo;
+                            } else {
+                                echo "Pesan email berhasil dikirim";
+                                echo "<script>
+                                        setTimeout(function(){
+                                            window.location.href='repository.php';
+                                        }, 5000); // Redirect setelah 5 detik
+                                      </script>";
+                                exit;
+                                
+                            }
+                            
+
+                        }
                     } else {
                         throw new Exception('Error executing query: ' . $stmt_insert->error);
                     }
@@ -91,7 +147,6 @@ $koneksi->close();
 
         <section class="breadcrumbs">
             <div class="container">
-
                 <ol>
                     <li><a href="index.php">Home</a></li>
                     <li><a href="repository.php">Repository</a></li>
@@ -107,9 +162,9 @@ $koneksi->close();
                     }
                     ?>
                 </h2>
-
             </div>
         </section>
+
         <div class="container">
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
                 <div class="col-md-9">
@@ -126,9 +181,10 @@ $koneksi->close();
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
                 <?php if ($showForm) { ?>
                     <form action="#" method="post" enctype="multipart/form-data" id="uploadForm">
-                    <div class="mb-3">
+                        <div class="mb-3">
                             <label for="Nama_siswa" class="form-label fw-bold">Nama Lengkap :</label>
-                            <input type="text" class="form-control" id="Nama_siswa" name="Nama_siswa" required>
+                            <input type="text" class="form-control" id="Nama_siswa" name="Nama_siswa" required
+                            placeholder="Masukkan Nama Lengkap Anda">
                         </div>
                         <div class="mb-3">
                             <label for="tanggal_kumpul" class="form-label fw-bold">Tanggal Pengumpulan</label>
@@ -137,7 +193,8 @@ $koneksi->close();
                         <div class="mb-3">
                             <label for="judul_laporan" class="form-label fw-bold">Judul Laporan</label>
                             <small>Format Judul : Laporan Praktik Kerja Lapangan di (Nama Perusahaan)</small>
-                            <input type="text" class="form-control" id="judul_laporan" name="judul_laporan" required>
+                            <input type="text" class="form-control" id="judul_laporan" name="judul_laporan" required
+                            placeholder="Masukkan Judul Dokumen">
                         </div>
                         <div class="mb-3">
                             <label for="fileLaporan" class="form-label fw-bold">File Laporan</label><br>
@@ -146,32 +203,33 @@ $koneksi->close();
                         <div class="d-grid gap-2">
                             <button class="btn btn-primary" type="button" id="modalSubmitBtn">Unggah</button>
                         </div>
+                        <input type="hidden" value="uploadLaporan" name="send">
                     </form>
-                </div>
+                <?php } else { ?>
+                    <p>Laporan PKL sudah pernah diunggah untuk siswa ini.</p>
+                <?php } ?>
+            </div>
 
-                <!-- Modal -->
-                <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-                    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="staticBackdropLabel">Apakah anda yakin ingin mengunggah laporan
-                                    ? </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                Laporan yang sudah diunggah tidak dapat diedit kembali !
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button class="btn btn-primary" type="button" id="modalSubmitBtn">Unggah</button>
-                            </div>
+            <!-- Modal -->
+            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="staticBackdropLabel">Apakah anda yakin ingin mengunggah laporan
+                                ? </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Laporan yang sudah diunggah tidak dapat diedit kembali !
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button class="btn btn-primary" type="button" id="modalSubmitBtn">Unggah</button>
                         </div>
                     </div>
                 </div>
-            <?php } else { ?>
-                <p>Laporan PKL sudah pernah diunggah untuk siswa ini.</p>
-            <?php } ?>
+            </div>
         </div>
 
         <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
@@ -191,5 +249,7 @@ $koneksi->close();
         </script>
         <script src="assets/js/main.js"></script>
 
-    </body>
+    </main>
+</body>
+
 </html>
