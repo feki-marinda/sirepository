@@ -1,4 +1,14 @@
+<?php
+session_start();
+include('conn.php');
 
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+
+if (empty($id_user)) {
+    header("Location: index.php");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <?php include 'head.html' ?>

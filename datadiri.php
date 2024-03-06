@@ -1,6 +1,13 @@
 <?php
-include 'conn.php';
 session_start();
+include('conn.php');
+
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+
+if (empty($id_user)) {
+    header("Location: index.php");
+    exit;
+}
 $nama = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
 $query = "SELECT * FROM siswa INNER JOIN user ON siswa.id_user = user.id_user WHERE user.username = '$nama'";
@@ -13,6 +20,11 @@ $result = mysqli_query($koneksi, $query);
 <link rel="stylesheet" href="assets/css/styl.css">
 <?php include 'head.html'; ?>
 
+<style>
+  .warna{
+    color: #012970;
+  }
+</style>
 
 <body>
   <?php include 'header_siswa.php'; ?>
@@ -36,40 +48,45 @@ $result = mysqli_query($koneksi, $query);
         </h2>
       </div>
     </section>
+    
     <div class="container mt-3 card shadow">
-      <div class="row ">
-      <div class="col-md-2 mt-3 mb-3 me-2 ms-2 border-end bg-gray">
-    <ul class="nav nav-pills flex-column" id="myTab" role="tablist" aria-orientation="vertical">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active btn-custom" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
-                role="tab" aria-controls="home" aria-selected="true">Data Siswa</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link btn-custom" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
-                role="tab" aria-controls="profile" aria-selected="false">Data Nilai</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link btn-custom" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button"
-                role="tab" aria-controls="contact" aria-selected="false">Sertifikat</button>
-        </li>
-    </ul>
-</div>
+            <div class="row">
+            <div class="col-md-2 border-end rounded" style="background: #012970;">
+                    <ul class="nav nav-pills flex-column" id="myTab" role="tablist" aria-orientation="vertical">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active btn-custom" id="home-tab" data-bs-toggle="tab"
+                                data-bs-target="#home" type="button" role="tab" aria-controls="home"
+                                aria-selected="true">Data Siswa</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link btn-custom" id="profile-tab" data-bs-toggle="tab"
+                                data-bs-target="#profile" type="button" role="tab" aria-controls="profile"
+                                aria-selected="false">Data Nilai</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link btn-custom" id="contact-tab" data-bs-toggle="tab"
+                                data-bs-target="#contact" type="button" role="tab" aria-controls="contact"
+                                aria-selected="false">Sertifikat</button>
+                        </li>
+                    </ul>
+                </div>
 
-        <div class="col-md-9">
-          <div class="tab-content" id="myTabContent">
-            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-              <?php include 'datasiswa.php'; ?>
+                <div class="col-md-9">
+                    <div class="tab-content" id="myTabContent">
+                        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                            <?php include 'datasiswa.php'; ?>
+                        </div>
+                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                            <?php include 'datanilai.php'; ?>
+                        </div>
+                        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                            <?php include 'datasertifikat.php'; ?>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-              <?php include 'datanilai.php'; ?>
-            </div>
-            <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-              <?php include 'datasertifikat.php'; ?>
-            </div>
-          </div>
         </div>
-      </div>
-    </div>
+
 
   </main>
 

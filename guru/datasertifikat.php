@@ -10,21 +10,28 @@ if (!$result) {
 
 if (isset($_POST['TambahSertifikat'])) {
     $nama_siswa = $_POST['nama_siswa'];
-    $file_sertifikat = $_POST['file_sertifikat'];        
 
-    $query = "INSERT INTO sertifikat (nama_siswa, file_sertifikat) 
-          VALUES ('$nama_siswa', '$file_sertifikat')";
+    $file_sertifikat = $_FILES['file_sertifikat']['name'];
+    $file_temp = $_FILES['file_sertifikat']['tmp_name'];
+    $file_path = "path/to/upload/directory/" . $file_sertifikat; 
+    if (move_uploaded_file($file_temp, $file_path)) {
+        $query = "INSERT INTO sertifikat (nama_siswa, file_sertifikat) 
+                  VALUES ('$nama_siswa', '$file_path')";
 
-    if ($koneksi->query($query) === TRUE) {
-        header('Location: datasertifikat.php');
-        exit;
+        if ($koneksi->query($query) === TRUE) {
+            header('Location: datasertifikat.php');
+            exit;
+        } else {
+            echo 'Error: ' . $koneksi->error;
+        }
     } else {
-        echo 'Error: ' . $koneksi->error;
+        echo 'Error uploading file.';
     }
 
     $koneksi->close();
-
 }
+
+
 if (isset($_POST['EditSertifikat'])) {
     $id_sertifikat = $_POST['id_sertifikat'];
     $nama_siswa = $_POST['nama_siswa'];
@@ -199,22 +206,20 @@ if (isset($_GET['id_sertifikat'])) {
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body ">
-                            <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
-                                <div class="mb-3">
-                                    <label for="nama_siswa" class="col-form-label">Nama Siswa :</label>
-                                    <input type="text" class="form-control" id="nama_siswa" name="nama_siswa" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="file_sertifikat" class="col-form-label">File :</label>
-                                    <input type="text" class="form-control" id="file_sertifikat" name="file_sertifikat" required>
-                                </div>                                
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary" name="TambahSertifikat" value="Submit"
-                                        id="submit">Submit</button>
-                                </div>
-                            </form>
+                        <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
+    <div class="mb-3">
+        <label for="nama_siswa" class="col-form-label">Nama Siswa:</label>
+        <input type="text" class="form-control" id="nama_siswa" name="nama_siswa" required>
+    </div>
+    <div class="mb-3">
+        <label for="file_sertifikat" class="col-form-label">File Sertifikat:</label>
+        <input type="file" class="form-control" id="file_sertifikat" name="file_sertifikat" required>
+    </div>                                
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" name="TambahSertifikat" value="Submit" id="submit">Submit</button>
+    </div>
+</form>
 
                         </div>
                     </div>

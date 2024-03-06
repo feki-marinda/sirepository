@@ -1,53 +1,91 @@
 <?php
+require '../vendor/autoload.php';
 include 'conn.php';
+require '../uploadsave.php';
 
-$query = "SELECT * FROM sertifikat";
+use Google\Client;
+use Google\Service\Drive;
+
+$query = "SELECT sertifikat.*, siswa.Nama_siswa 
+          FROM sertifikat
+          INNER JOIN siswa ON sertifikat.id_siswa = siswa.id_siswa";
+
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
     die("Error in query: " . mysqli_error($koneksi));
 }
 
+
 if (isset($_POST['TambahSertifikat'])) {
-    $nama_siswa = $_POST['nama_siswa'];
-    $file_sertifikat = $_POST['file_sertifikat'];        
+    $Nama_siswa = $_POST['Nama_siswa'];
 
-    $query = "INSERT INTO sertifikat (nama_siswa, file_sertifikat) 
-          VALUES ('$nama_siswa', '$file_sertifikat')";
+    $file_sertifikat_name = $_FILES['file_sertifikat']['name'];
+    $file_sertifikat_temp = $_FILES['file_sertifikat']['tmp_name'];
+    $file_sertifikat_path = "admin/Sertifikat/" . $file_sertifikat_name;
 
-    if ($koneksi->query($query) === TRUE) {
+    $query_get_id = "SELECT id_siswa FROM siswa WHERE Nama_siswa = ?";
+    $stmt_get_id = $koneksi->prepare($query_get_id);
+    $stmt_get_id->bind_param("s", $Nama_siswa);
+    $stmt_get_id->execute();
+    $stmt_get_id->bind_result($id_siswa);
+    $stmt_get_id->fetch();
+    $stmt_get_id->close();
+
+    $googleDriveFileId = uploadToGoogleDrive($file_sertifikat_path, $file_sertifikat_name);
+
+    $query_insert = "INSERT INTO sertifikat (id_siswa, file_sertifikat, google_drive) 
+                    VALUES (?, ?, ?)";
+    $stmt_insert = $koneksi->prepare($query_insert);
+    $stmt_insert->bind_param("sss", $id_siswa, $file_sertifikat_path, $googleDriveFileId);
+
+    if ($stmt_insert->execute()) {
         header('Location: datasertifikat.php');
         exit;
     } else {
-        echo 'Error: ' . $koneksi->error;
+        echo 'Error: ' . $stmt_insert->error;
     }
-
-    $koneksi->close();
-
+} else {
+    echo 'Error uploading file.';
 }
+
+
 if (isset($_POST['EditSertifikat'])) {
     $id_sertifikat = $_POST['id_sertifikat'];
-    $nama_siswa = $_POST['nama_siswa'];
-    $file_sertifikat = $_POST['file_sertifikat'];    
+    $Nama_siswa = $_POST['Nama_siswa'];
 
-    mysqli_query($koneksi, "UPDATE sertifikat SET 
-                         nama_siswa='$nama_siswa',
-                         file_sertifikat='$file_sertifikat'                                                                             
-                         WHERE id_sertifikat='$id_sertifikat'");
-    header("location:datasertifikat.php");
+    if ($_FILES['file_sertifikat']['name'] != "") {
+        $file_sertifikat_name = $_FILES['file_sertifikat']['name'];
+
+        $secure_file_name = strtolower(preg_replace('/[^a-zA-Z0-9_.]/', '_', $file_sertifikat_name));
+
+        $file_sertifikat_path = "../admin/Sertifikat/" . $secure_file_name;
+
+        move_uploaded_file($_FILES['file_sertifikat']['tmp_name'], $file_sertifikat_path);
+
+        mysqli_query($koneksi, "UPDATE sertifikat SET 
+                                 file_sertifikat='$secure_file_name'                                                                             
+                                 WHERE id_sertifikat='$id_sertifikat'");
+    } else {
+        // Jika tidak ada file baru diunggah, hanya mengupdate data lainnya
+        mysqli_query($koneksi, "SELECT sertifikat.*, siswa.Nama_siswa 
+        FROM sertifikat
+        INNER JOIN siswa ON sertifikat.id_siswa = siswa.id_siswa");
+    }
+
+    header("location: datasertifikat.php");
 }
 
 if (isset($_GET['id_sertifikat'])) {
     $id_sertifikat = $_GET['id_sertifikat'];
 
     mysqli_query($koneksi, "DELETE FROM sertifikat WHERE id_sertifikat='$id_sertifikat'");
-    header("location:datasertifikat.php");
+    header("location: datasertifikat.php");
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <?php include 'head.html' ?>
 
 <body class="sb-nav-fixed">
@@ -87,7 +125,7 @@ if (isset($_GET['id_sertifikat'])) {
                                     <tr>
                                         <th>No.</th>
                                         <th>Nama Siswa</th>
-                                        <th>File</th>                                        
+                                        <th>File</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
@@ -98,8 +136,8 @@ if (isset($_GET['id_sertifikat'])) {
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
-                                        echo "<td>" . $row['nama_siswa'] . "</td>";
-                                        echo "<td>" . $row['file_sertifikat'] . "</td>";                                        
+                                        echo "<td>" . $row['Nama_siswa'] . "</td>";
+                                        echo "<td>" . $row['file_sertifikat'] . "</td>";
                                         echo "<td>";
                                         echo "<div class='btn-group'>";
                                         echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_sertifikat'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
@@ -150,23 +188,25 @@ if (isset($_GET['id_sertifikat'])) {
                                                         <form method="post" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
                                                                 <div class="form-group">
-                                                                    <label for="id_sertifikat">ID</label>
-                                                                    <input type="text" class="form-control" id="id_sertifikat"
-                                                                        value="<?= $row['id_sertifikat']; ?>" name="id_sertifikat"
-                                                                        readonly>
+                                                                    <input type="text" class="form-control"
+                                                                        id="id_sertifikat"
+                                                                        value="<?= $row['id_sertifikat']; ?>"
+                                                                        name="id_sertifikat" hidden>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="nama_siswa">Nama Siswa</label>
-                                                                    <input type="text" class="form-control" id="nama_siswa"
-                                                                        value="<?= $row['nama_siswa']; ?>" name="nama_siswa"
+                                                                    <label for="Nama_siswa">Nama Siswa</label>
+                                                                    <input type="text" class="form-control" id="Nama_siswa"
+                                                                        value="<?= $row['Nama_siswa']; ?>" name="Nama_siswa"
                                                                         required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="file_sertifikat">File</label>
-                                                                    <input type="text" class="form-control" id="file_sertifikat"
-                                                                        value="<?= $row['file_sertifikat']; ?>" name="file_sertifikat"
-                                                                        required>
-                                                                </div>                                                                
+                                                                    <input type="file" class="form-control"
+                                                                        id="file_sertifikat" name="file_sertifikat">
+                                                                    <small class="text-muted">Current File:
+                                                                        <?= $row['file_sertifikat']; ?>
+                                                                    </small>
+                                                                </div>
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary"
@@ -175,10 +215,12 @@ if (isset($_GET['id_sertifikat'])) {
                                                                     name="EditSertifikat" value="Submit">Submit</button>
                                                             </div>
                                                         </form>
+
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+
                                         <?php
                                     }
                                     ?>
@@ -201,13 +243,23 @@ if (isset($_GET['id_sertifikat'])) {
                         <div class="modal-body ">
                             <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
                                 <div class="mb-3">
-                                    <label for="nama_siswa" class="col-form-label">Nama Siswa :</label>
-                                    <input type="text" class="form-control" id="nama_siswa" name="nama_siswa" required>
+                                    <label for="Nama_siswa" class="col-form-label">Pilih Siswa:</label>
+                                    <select class="form-select" id="Nama_siswa" name="Nama_siswa" required>
+                                        <option value="" disabled selected>Pilih Siswa</option>
+                                        <?php
+                                        $result_siswa = mysqli_query($koneksi, "SELECT * FROM siswa");
+                                        while ($row_siswa = mysqli_fetch_assoc($result_siswa)) {
+                                            echo "<option value='" . $row_siswa['Nama_siswa'] . "'>" . $row_siswa['Nama_siswa'] . "</option>";
+                                        }
+                                        ?>
+                                    </select>
                                 </div>
+
                                 <div class="mb-3">
-                                    <label for="file_sertifikat" class="col-form-label">File :</label>
-                                    <input type="text" class="form-control" id="file_sertifikat" name="file_sertifikat" required>
-                                </div>                                
+                                    <label for="file_sertifikat" class="col-form-label">File Sertifikat:</label>
+                                    <input type="file" class="form-control" id="file_sertifikat" name="file_sertifikat"
+                                        required>
+                                </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
                                         data-bs-dismiss="modal">Close</button>
@@ -235,7 +287,7 @@ if (isset($_GET['id_sertifikat'])) {
             </footer>
         </div>
     </div>
-    <?php include 'footer.php';?>
+    <?php include 'footer.php'; ?>
 
 </body>
 

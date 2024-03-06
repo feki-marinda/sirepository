@@ -1,35 +1,39 @@
 <?php
+session_start();
 include 'conn.php';
 
-$query = "SELECT * FROM siswa";
-$result = mysqli_query($koneksi, $query);
-
-if (!$result) {
-    die("Error in query: " . mysqli_error($koneksi));
+if (!$koneksi) {
+    die("Koneksi database gagal: " . mysqli_connect_error());
 }
 
-// if (isset($_POST['TambahSiswa'])) {
-//     $Nama_siswa = $_POST['Nama_siswa'];
-//     $NIS = $_POST['NIS'];
-//     $kelas = $_POST['kelas'];
-//     $jenis_kelamin = $_POST['jenis_kelamin'];
-//     $alamat = $_POST['alamat'];
-//     $tanggal_lahir = $_POST['tanggal_lahir'];
-//     $no_hp = $_POST['no_hp'];
-//     $rand = rand();
 
-//     $query = "INSERT INTO siswa (Nama_siswa, NIS, kelas, jenis_kelamin, alamat, tanggal_lahir, no_hp) 
-//               VALUES ('$Nama_siswa', '$NIS', '$kelas','$jenis_kelamin','$alamat','$tanggal_lahir','$no_hp')";
+if (isset($_POST['TambahSiswa'])) {
+    $Nama_siswa = $_POST['Nama_siswa'];
+    $NIS = $_POST['NIS'];
+    $kelas = $_POST['kelas'];
+    $jenis_kelamin = $_POST['jenis_kelamin'];
+    $alamat = $_POST['alamat'];
+    $tanggal_lahir = $_POST['tanggal_lahir'];
+    $no_hp = $_POST['no_hp'];
+    $id_user = $_POST['id_user'];
 
-//     if ($koneksi->query($query) === TRUE) {
-//         header('Location: datasiswa.php');
-//         exit;
-//     } else {
-//         echo 'Error: ' . $koneksi->error;
-//     }
+    $query = "INSERT INTO siswa (id_user, Nama_siswa, NIS, kelas, jenis_kelamin, alamat, tanggal_lahir, no_hp) 
+              VALUES ('$id_user', '$Nama_siswa', '$NIS', '$kelas', '$jenis_kelamin', '$alamat', '$tanggal_lahir', '$no_hp')";
 
-//     $koneksi->close();
-// }
+if ($koneksi->query($query) === TRUE) {
+    $_SESSION['success_message'] = "Berhasil Menambah Data User!";
+    header("Location: datauser.php");
+    exit();
+} else {
+    $_SESSION['error_message'] = "Error: " . $koneksi->error;
+    header("Location: datauser.php");
+    exit();
+}
+
+}
+$koneksi->close();
+
+
 
 if (isset($_POST['EditSiswa'])) {
     $id_siswa = $_POST['id_siswa'];
@@ -52,12 +56,20 @@ if (isset($_POST['EditSiswa'])) {
                 WHERE id_siswa='$id_siswa'";
 
     $result = mysqli_query($koneksi, $query);
-    if (!$result) {
-        die("Query gagal dijalankan: " . mysqli_errno($koneksi) . " - " . mysqli_error($koneksi));
+
+    if ($result) {
+        $rows_affected = mysqli_affected_rows($koneksi);
+        if ($rows_affected > 0) {
+            $success_message = "Berhasil Memperbarui Data Siswa!";
+        } else {
+            $alert_message = "Tidak ada perubahan pada Data Siswa!";
+        }
     } else {
+        $error_message = "Tidak dapat Memperbarui Data Siswa!";
         header("location:datasiswa.php");
     }
 }
+
 
 if (isset($_GET['id_siswa'])) {
     $id_siswa = $_GET['id_siswa'];
@@ -100,9 +112,9 @@ if (isset($_GET['id_siswa'])) {
                         <div class="button-container">
                             <div class="spacer"></div>
                             <div class="buttons-right">
-                                <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
-                                    Tambah Data siswa PKL</button> -->
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#tambahsiswa" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
+                                    Tambah Data siswa PKL</button>
                                 <button id="printButton">
                                     <i class="fas fa-print"></i> Cetak
                                 </button>
@@ -116,7 +128,10 @@ if (isset($_GET['id_siswa'])) {
                             Data Siswa
                         </div>
                         <div class="card-body">
-                        <?php
+                            <?php
+                            if (!empty($alert_message)) {
+                                echo '<div class="alert alert-primary" role="alert">' . $error_message . '</div>';
+                            }
                             if (!empty($error_message)) {
                                 echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
                             }
@@ -141,7 +156,14 @@ if (isset($_GET['id_siswa'])) {
 
                                 <tbody>
                                     <?php
+                                    include 'conn.php';
                                     $no = 1;
+                                    $query = "SELECT * FROM siswa";
+                                    $result = mysqli_query($koneksi, $query);
+
+                                    if (!$result) {
+                                        die("Error in query: " . mysqli_error($koneksi));
+                                    }
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
@@ -188,7 +210,7 @@ if (isset($_GET['id_siswa'])) {
 
                                         <div class='modal fade' id='edit<?= $row['id_siswa'] ?>' tabindex='-1'
                                             aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
@@ -218,16 +240,26 @@ if (isset($_GET['id_siswa'])) {
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="kelas">Kelas</label>
-                                                                    <input type="text" class="form-control" id="kelas"
-                                                                        value="<?= $row['kelas']; ?>" name="kelas" required>
+                                                                    <select class="form-control" id="kelas" name="kelas"
+                                                                        required>
+                                                                        <option value="" disabled selected>Pilih Kelas
+                                                                        </option>
+                                                                        <option value="XI A" <?php echo ($row['kelas'] == 'XI A') ? 'selected' : ''; ?>>Kelas XI A</option>
+                                                                        <option value="XI B" <?php echo ($row['kelas'] == 'XI B') ? 'selected' : ''; ?>>Kelas XI B</option>
+                                                                    </select>
                                                                 </div>
+
                                                                 <div class="form-group">
                                                                     <label for="jenis_kelamin">Jenis Kelamin</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="jenis_kelamin"
-                                                                        value="<?= $row['jenis_kelamin']; ?>"
+                                                                    <select class="form-control" id="jenis_kelamin"
                                                                         name="jenis_kelamin" required>
+                                                                        <option value="" disabled selected>Pilih Jenis
+                                                                            Kelamin</option>
+                                                                        <option value="Laki-laki" <?php echo ($row['jenis_kelamin'] == 'Laki-laki') ? 'selected' : ''; ?>>Laki-laki</option>
+                                                                        <option value="Perempuan" <?php echo ($row['jenis_kelamin'] == 'Perempuan') ? 'selected' : ''; ?>>Perempuan</option>
+                                                                    </select>
                                                                 </div>
+
                                                                 <div class="form-group">
                                                                     <label for="alamat">Alamat</label>
                                                                     <input type="text" class="form-control" id="alamat"
@@ -268,10 +300,10 @@ if (isset($_GET['id_siswa'])) {
                 </div>
             </main>
 
-            <!-- Modal tambah data-->
-            <!-- <div class="modal fade" id="tambah" tabindex="-1"
-                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
+            <!-- Form tambah siswa -->
+            <div class="modal fade" id="tambahsiswa" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Tambah Data siswa PKL</h5>
@@ -279,33 +311,58 @@ if (isset($_GET['id_siswa'])) {
                         </div>
                         <div class="modal-body ">
                             <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
-                                <div class="mb-3">
+                                <div class="mb-2">
+                                    <label for="id_user" class="col-form-label">Pilih User:</label>
+                                    <select class="form-select" id="id_user" name="id_user" required>
+                                        <!-- Option dari data user -->
+                                        <?php
+                                        $queryUser = "SELECT id_user, username FROM user";
+                                        $resultUser = mysqli_query($koneksi, $queryUser);
+
+                                        while ($rowUser = mysqli_fetch_assoc($resultUser)) {
+                                            echo "<option value='" . $rowUser['id_user'] . "'>" . $rowUser['username'] . "</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
+                                <div class="mb-2">
                                     <label for="Nama_siswa" class="col-form-label">Nama Lengkap:</label>
                                     <input type="text" class="form-control" id="Nama_siswa" name="Nama_siswa" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="NIS" class="col-form-label">NIS:</label>
-                                    <input type="text" class="form-control" id="NIS" name="NIS" required>
+                                    <input type="number" class="form-control" id="NIS" name="NIS" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="kelas" class="col-form-label">Kelas:</label>
-                                    <input type="text" class="form-control" id="kelas" name="kelas" required>
+                                    <select class="form-control" id="kelas" name="kelas" required>
+                                        <option value="" disabled selected>Pilih Kelas</option>
+                                        <option value="XI A">Kelas XI A</option>
+                                        <option value="XI B">Kelas XI B</option>
+                                    </select>
                                 </div>
-                                <div class="mb-3">
+
+                                <div class="mb-2">
                                     <label for="jenis_kelamin" class="col-form-label">Jenis Kelamin:</label>
-                                    <input type="text" class="form-control" id="jenis_kelamin" name="jenis_kelamin"
-                                        required>
+                                    <select class="form-control" id="jenis_kelamin" name="jenis_kelamin" required>
+                                        <option value="" disabled selected>Pilih Jenis Kelamin</option>
+                                        <option value="Laki-laki">Laki-laki</option>
+                                        <option value="Perempuan">Perempuan</option>
+                                        <!-- Tambahkan opsi jenis kelamin lain sesuai kebutuhan -->
+                                    </select>
                                 </div>
-                                <div class="mb-3">
+
+                                <div class="mb-2">
                                     <label for="alamat" class="col-form-label">Alamat:</label>
                                     <input type="text" class="form-control" id="alamat" name="alamat" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="tanggal_lahir" class="col-form-label">Tanggal Lahir:</label>
                                     <input type="date" class="form-control" id="tanggal_lahir" name="tanggal_lahir"
                                         required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="mb-2">
                                     <label for="no_hp" class="col-form-label">Nomor HP:</label>
                                     <input type="text" class="form-control" id="no_hp" name="no_hp" required>
                                 </div>
@@ -316,12 +373,10 @@ if (isset($_GET['id_siswa'])) {
                                         id="submit">Submit</button>
                                 </div>
                             </form>
-
                         </div>
                     </div>
                 </div>
-            </div> -->
-
+            </div>
 
 
 
@@ -339,7 +394,7 @@ if (isset($_GET['id_siswa'])) {
             </footer>
         </div>
     </div>
-    <?php include 'footer.php';?>
+    <?php include 'footer.php'; ?>
 
 </body>
 

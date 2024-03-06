@@ -95,8 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $mail->Body = "Selamat, laporan praktik kerja lapangan Anda berhasil diunggah. Berikut detailnya:<br>"
                             . "Nama Siswa: " . $_POST['Nama_siswa'] . "<br>"    
                             . "Tanggal Kumpul: " . $_POST['tanggal_kumpul'] . "<br>"
-                                . "Judul Laporan: " . $_POST['judul_laporan'] . "<br>"
-                                . "File Laporan: " . $_POST['fileLaporan'];
+                                . "Judul Laporan: " . $_POST['judul_laporan'] . "<br>";
 
                             if (!$mail->send()) {
                                 echo "mailer eror" . $mail->ErrorInfo;

@@ -1,82 +1,34 @@
 <?php
+
 require __DIR__ . '/vendor/autoload.php';
-include 'conn.php';
 
 use Google\Client;
 use Google\Service\Drive;
 
-function uploadToGoogleDriveAndDatabase($filePath, $folderId)
+function uploadToGoogleDrive($filePath, $fileName)
 {
-    global $koneksi;
-
     try {
-        session_start();
-
         $client = new Client();
         putenv('GOOGLE_APPLICATION_CREDENTIALS=./credentials.json');
         $client->useApplicationDefaultCredentials();
         $client->addScope(Drive::DRIVE);
         $driveService = new Drive($client);
 
-        $fileName = basename($filePath);
-        $mimeType = mime_content_type($filePath);
-
-        $fileMetadata = new Drive\DriveFile(
-            array(
-                'name' => $fileName,
-                'parents' => $folderId
-            )
-        );
+        $fileMetadata = new Google_Service_Drive_DriveFile(array(
+            'name' => $fileName,
+            'parents' => ['1qfiPKFujNlkT0E0YuftIAJi14zIuI45A']
+        ));
 
         $content = file_get_contents($filePath);
         $file = $driveService->files->create($fileMetadata, array(
             'data' => $content,
-            'mimeType' => $mimeType,
+            'mimeType' => mime_content_type($filePath),
             'uploadType' => 'multipart',
             'fields' => 'id'
         ));
 
-        $fileId = $file->id;
-
-        if (!isset($_SESSION['username'])) {
-            throw new Exception("Error: Nama siswa tidak ditemukan di sesi.");
-        }
-
-        $query_insert = "INSERT INTO laporan_pkl (nama_siswa, tanggal_kumpul, berkas, judul_laporan, google_drive_file_id) 
-VALUES (?, CURRENT_DATE, ?, ?, ?)";
-$stmt_insert = $koneksi->prepare($query_insert);
-
-        if (!$stmt_insert) {
-            throw new Exception("Prepare statement error: " . $koneksi->error);
-        }
-
-        $judul_laporan = $_POST['judul_laporan']; 
-        $stmt_insert->bind_param("ssss", $_SESSION['username'], $fileId, $judul_laporan, $fileId);
-
-        if ($stmt_insert->execute()) {
-            echo "File berhasil diunggah dan informasi disimpan ke database.";
-        } else {
-            echo 'Error: ' . $stmt_insert->error;
-        }
-
-        $stmt_insert->close();
-        $koneksi->close();
-
-        return $fileId;
+        return $file->id;
     } catch (Exception $e) {
-        echo "Error Message: " . $e->getMessage();
+        return "Error: " . $e->getMessage();
     }
 }
-
-if (isset($_FILES['fileLaporan'])) {
-    $uploadedFile = $_FILES['fileLaporan']['tmp_name'];
-
-    // Pastikan folder_id disesuaikan dengan folder di Google Drive Anda
-    $folderId = ['1WmABjy2PW424qM9bRZ4YOqJEdJo7_80z'];
-
-    $fileId = uploadToGoogleDriveAndDatabase($uploadedFile, $folderId);
-    echo "File ID: " . $fileId;
-} else {
-    echo "File tidak ditemukan.";
-}
-?>

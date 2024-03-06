@@ -1,5 +1,4 @@
 <?php
-// Mendapatkan nama halaman aktif dari URL
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <style>

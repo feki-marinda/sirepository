@@ -1,14 +1,16 @@
 <?php
-include('conn.php');
 session_start();
+include('conn.php');
 
-$id_siswa = isset($_SESSION['id_siswa']) ? $_SESSION['id_siswa'] : '';
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  header("Location: daftarpkl.php");
-  exit();
+if (empty($id_user)) {
+    header("Location: index.php");
+    exit;
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">

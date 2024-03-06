@@ -1,6 +1,17 @@
+<?php
+session_start();
+include('conn.php');
+
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+
+if (empty($id_user)) {
+    header("Location: index.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <?php include 'head.html' ?>
 
 <body>
@@ -29,7 +40,7 @@
 
       </div>
     </section>
-    <div class="container">
+    <div class="container lobster-regular">
       <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
         <div class="text-center">
           <h1 class="font-weight-bold text-left" style="font-size: 2.5rem; color: #333;">
@@ -72,7 +83,6 @@
     <script src="assets/js/main.js"></script>
 
   </main>
-
 </body>
 
 </html>
