@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'conn.php';
 
 function escapeString($koneksi, $string)
@@ -24,12 +25,12 @@ if (isset($_POST['Tambahpkl'])) {
     $query = "INSERT INTO pkl (id_siswa, tgl_mulai, tgl_selesai, kelas, nama_perusahaan, tahun_pelajaran) 
           VALUES ('$id_siswa', '$tgl_mulai', '$tgl_selesai', '$kelas', '$nama_perusahaan', '$tahun_pelajaran')";
 
-    if ($koneksi->query($query) === TRUE) {
-        header('Location: dataPKL.php');
-        exit;
-    } else {
-        echo 'Error: ' . $koneksi->error;
+    if ($result) {
+        $_SESSION['success_message'] = "Data Guru Pamong berhasil ditambahkan!";
+        header("Location: dataGP.php");
+        exit();
     }
+
 
     $koneksi->close();
 }
@@ -53,15 +54,32 @@ if (isset($_POST['Editpkl'])) {
 
     $id_pkl = $_GET['id_pkl'];
 
-    header("location:dataPKL.php");
+    if ($result) {
+        $rows_affected = mysqli_affected_rows($koneksi);
+        if ($rows_affected > 0) {
+            $_SESSION['success_message'] = "Data Guru Pamong berhasil diubah!";
+        } else {
+            $_SESSION['error_message'] = "Tidak ada perubahan pada Data Pamong!";
+        }
+    } else {
+        $_SESSION['error_message'] = "Error: " . $koneksi->error;
+    }
+
+    header("Location: dataPKL.php");
+    exit();
+
 }
 
 if (isset($_GET['id_pkl'])) {
     $id_pkl = escapeString($koneksi, $_GET['id_pkl']);
 
     mysqli_query($koneksi, "DELETE FROM pkl WHERE id_pkl='$id_pkl'");
+    if ($result) {
+        $_SESSION['success_message'] = "Data Guru Pamong berhasil dihapus!";
+        header("Location: dataGP.php");
+        exit();
+    }
 
-    header("location:dataPKL.php");
 }
 ?>
 
@@ -104,6 +122,17 @@ if (isset($_GET['id_pkl'])) {
                         </div>
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-striped table-hover">
+                                <?php
+                                if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
+                                    echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+                                    unset($_SESSION['error_message']);
+                                }
+
+                                if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
+                                    echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
+                                    unset($_SESSION['success_message']);
+                                }
+                                ?>
                                 <thead>
                                     <tr>
                                         <th>No.</th>
@@ -143,7 +172,7 @@ if (isset($_GET['id_pkl'])) {
                                         <!-- Modal hapus data -->
                                         <div class="modal fade" id='hapus<?= $row['id_pkl'] ?>' tabindex="-1" role="dialog"
                                             aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Hapus Data dokumen
@@ -167,7 +196,7 @@ if (isset($_GET['id_pkl'])) {
                                         <!-- Modal edit data -->
                                         <div class='modal fade' id='edit<?= $row['id_pkl'] ?>' tabindex='-1'
                                             aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
@@ -209,11 +238,10 @@ if (isset($_GET['id_pkl'])) {
                                                                     <label for="kelas">Kelas</label>
                                                                     <select class="form-control" id="kelas" name="kelas"
                                                                         required>
-                                                                        <option value="XI A" <?= ($row['kelas'] === 'kelas1') ? 'selected' : ''; ?>>XI A</option>
-                                                                        <option value="XI B" <?= ($row['kelas'] === 'kelas2') ? 'selected' : ''; ?>>XI B</option>                                                                       
+                                                                        <option value="XI A" <?= ($row['kelas'] === 'XI A') ? 'selected' : ''; ?>>XI A</option>
+                                                                        <option value="XI B" <?= ($row['kelas'] === 'XI B') ? 'selected' : ''; ?>>XI B</option>
                                                                     </select>
                                                                 </div>
-
                                                                 <div class="form-group">
                                                                     <label for="nama_perusahaan">Nama Perusahaan</label>
                                                                     <input type="text" class="form-control"
@@ -252,7 +280,7 @@ if (isset($_GET['id_pkl'])) {
 
             <!-- Modal tambah data-->
             <div class="modal fade" id="tambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Tambah Data PKL</h5>
@@ -283,7 +311,7 @@ if (isset($_GET['id_pkl'])) {
                                         required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="kelas">kelas:</label>
+                                    <label for="kelas">Kelas:</label>
                                     <input type="text" class="form-control" id="kelas" name="kelas" required>
                                 </div>
                                 <div class="form-group">
@@ -293,8 +321,8 @@ if (isset($_GET['id_pkl'])) {
                                 </div>
                                 <div class="form-group">
                                     <label for="tahun_pelajaran">Tahun Pelajaran:</label>
-                                    <input type="text" class="form-control" id="tahun_pelajaran" name="tahun_pelajaran"
-                                        required>
+                                    <input type="number" class="form-control" id="tahun_pelajaran"
+                                        name="tahun_pelajaran" required>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
@@ -307,6 +335,7 @@ if (isset($_GET['id_pkl'])) {
                     </div>
                 </div>
             </div>
+
 
 
             <footer class="py-4 bg-light mt-auto">

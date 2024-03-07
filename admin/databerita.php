@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'conn.php';
 
 $query = "SELECT * FROM berita";
@@ -26,12 +27,22 @@ if (isset($_POST['TambahBerita'])) {
 
             $query = "INSERT INTO berita (judul, isi_berita, tanggal, foto) VALUES ('$judul', '$isi_berita', '$tanggal', '$xx')";
 
-            // Eksekusi query
             if ($koneksi->query($query) === TRUE) {
-                header('Location: tambahberita.php');
-                exit;
+                $rows_affected = $koneksi->affected_rows;
+
+                if ($rows_affected > 0) {
+                    $_SESSION['success_message'] = "Berhasil Menambah Data User!";
+                    header("Location: databerita.php");
+                    exit();
+                } else {
+                    $_SESSION['error_message'] = "Tidak ada perubahan pada Data User!";
+                    header("Location: databerita.php");
+                    exit();
+                }
             } else {
-                echo 'Error: ' . $koneksi->error;
+                $_SESSION['error_message'] = "Error: " . $koneksi->error;
+                header("Location: databerita.php");
+                exit();
             }
         }
     }
@@ -42,9 +53,11 @@ if (isset($_POST['EditBerita'])) {
     $judul = $_POST['judul'];
     $isi_berita = $_POST['isi_berita'];
     $tanggal = $_POST['tanggal'];
-    $foto_baru = $_FILES['gambarnew']['name']; 
+    $foto_baru = $_FILES['gambarnew']['name'];
 
+    // Cek apakah ada file gambar baru yang diunggah
     if (!empty($foto_baru)) {
+        // Ekstensi yang diperbolehkan
         $ekstensi_diperbolehkan = array('png', 'jpg', 'jpeg', 'webp', 'gif');
         $x = explode('.', $foto_baru);
         $ekstensi = strtolower(end($x));
@@ -52,43 +65,68 @@ if (isset($_POST['EditBerita'])) {
         $angka_acak = rand(1, 999);
         $nama_gambar_baru = $angka_acak . '-' . $foto_baru;
 
+        // Cek ekstensi gambar
         if (in_array($ekstensi, $ekstensi_diperbolehkan)) {
-            $dt = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM berita WHERE id_berita='$id_berita'"));
-            $gambarlama = $dt['foto'];
+            // Ambil data berita sebelum diubah
+            $berita_sebelumnya = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT * FROM berita WHERE id_berita='$id_berita'"));
+            $gambar_lama = $berita_sebelumnya['foto'];
 
-            if (is_file("gambar/siswa/" . $gambarlama)) {
-                unlink("gambar/siswa/" . $gambarlama);
+            // Hapus gambar lama jika ada
+            if (is_file("gambar/siswa/" . $gambar_lama)) {
+                unlink("gambar/siswa/" . $gambar_lama);
             }
 
+            // Pindahkan file gambar baru
             move_uploaded_file($file_tmp, 'gambar/siswa/' . $nama_gambar_baru);
 
-            $query = "UPDATE berita SET judul='$judul', isi_berita='$isi_berita', tanggal='$tanggal', foto='$nama_gambar_baru' WHERE id_berita='$id_berita'";
-            $result = mysqli_query($koneksi, $query);
-
-            if (!$result) {
-                die("Query gagal dijalankan: " . mysqli_errno($koneksi) . " - " . mysqli_error($koneksi));
-            } else {
-                echo "<script>alert('Data berhasil diubah.');window.location='databerita.php';</script>";
-            }
+            // Perbarui data berita dengan gambar baru
+            $query = "UPDATE berita SET judul=?, isi_berita=?, tanggal=?, foto=? WHERE id_berita=?";
+            $stmt = mysqli_prepare($koneksi, $query);
+            mysqli_stmt_bind_param($stmt, 'ssssi', $judul, $isi_berita, $tanggal, $nama_gambar_baru, $id_berita);
         } else {
-            echo "<script>alert('Ekstensi gambar yang diperbolehkan hanya jpg, png, atau jpeg.');window.location='databerita.php';</script>";
+            // Ekstensi tidak valid
+            $_SESSION['error_message'] = "Ekstensi file gambar tidak valid. Gunakan png, jpg, jpeg, webp, atau gif.";
         }
     } else {
-        $query = "UPDATE berita SET judul='$judul', isi_berita='$isi_berita', tanggal='$tanggal' WHERE id_berita='$id_berita'";
-        $result = mysqli_query($koneksi, $query);
-
-        if (!$result) {
-            die("Query gagal dijalankan: " . mysqli_errno($koneksi) . " - " . mysqli_error($koneksi));
-        } else {
-            header("location:databerita.php");
-        }
+        // Tidak ada gambar baru, perbarui data berita tanpa gambar
+        $query = "UPDATE berita SET judul=?, isi_berita=?, tanggal=? WHERE id_berita=?";
+        $stmt = mysqli_prepare($koneksi, $query);
+        mysqli_stmt_bind_param($stmt, 'sssi', $judul, $isi_berita, $tanggal, $id_berita);
     }
+
+    // Eksekusi query jika query telah disiapkan
+    if (isset($stmt)) {
+        $result = mysqli_stmt_execute($stmt);
+
+        if ($result) {
+            $rows_affected = mysqli_stmt_affected_rows($stmt);
+            if ($rows_affected > 0) {
+                $_SESSION['success_message'] = "Data Berita berhasil diubah!";
+            } else {
+                $_SESSION['error_message'] = "Tidak ada perubahan pada Data Berita!";
+            }
+        } else {
+            $_SESSION['error_message'] = "Error: " . mysqli_stmt_error($stmt);
+        }
+
+        // Tutup statement
+        mysqli_stmt_close($stmt);
+    }
+
+    // Redirect ke halaman databerita.php
+    header("location:databerita.php");
+    exit();
 }
 
 if (isset($_GET['id_berita'])) {
     $id_berita = $_GET['id_berita'];
 
     mysqli_query($koneksi, "DELETE FROM berita WHERE id_berita='$id_berita'");
+    if ($result) {
+        $_SESSION['success_message'] = "Data Berita Berhasil Dihapus!";
+        header("Location: databerita.php");
+        exit();
+    }
 }
 
 ?>
@@ -130,6 +168,17 @@ if (isset($_GET['id_berita'])) {
                             Data Berita
                         </div>
                         <div class="card-body">
+                            <?php
+                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+                                unset($_SESSION['error_message']);
+                            }
+
+                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
+                                unset($_SESSION['success_message']);
+                            }
+                            ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
                                 <thead>
                                     <tr>
@@ -147,7 +196,7 @@ if (isset($_GET['id_berita'])) {
                                         <th>Judul Berita</th>
                                         <th>Isi</th>
                                         <th>Tanggal</th>
-                                        <th>gambar</th>
+                                        <th>Gambar</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </tfoot>
@@ -165,10 +214,13 @@ if (isset($_GET['id_berita'])) {
                                         echo "<td>" . $row['tanggal'] . "</td>";
                                         echo "<td> <img src='gambar/siswa/" . $row['foto'] . "' width='120' height='120'></td>";
                                         echo "<td>";
-                                        echo "<div class='btn-group'>";
-                                        echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_berita'] . "' data-bs-whatever='@mdo'>Edit</button>";
-                                        echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_berita'] . "'>Hapus</button>";
-
+                                        echo "<div class='d-flex'>";
+                                        echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_berita'] . "' data-bs-whatever='@mdo'>";
+                                        echo "<i class='fas fa-pencil-alt'></i> Edit";
+                                        echo "</button>";
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_berita'] . "'>";
+                                        echo "<i class='fas fa-trash'></i> Hapus";
+                                        echo "</button>";
                                         echo "</div>";
                                         echo "</td>";
                                         echo "</tr>";
@@ -178,7 +230,7 @@ if (isset($_GET['id_berita'])) {
                                         <!-- Modal hapus data -->
                                         <div class="modal fade" id='hapus<?= $row['id_berita'] ?>' tabindex="-1"
                                             role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Hapus Data Berita
@@ -201,7 +253,7 @@ if (isset($_GET['id_berita'])) {
 
                                         <div class='modal fade' id='edit<?= $row['id_berita'] ?>' tabindex='-1'
                                             aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Edit Data Berita</h5>
@@ -215,7 +267,7 @@ if (isset($_GET['id_berita'])) {
                                                                     <label for="id_berita">ID</label>
                                                                     <input type="text" class="form-control" id="id_berita"
                                                                         value="<?= $row['id_berita']; ?>" name="id_berita"
-                                                                        readonly>
+                                                                        hidden>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="judul">Judul</label>
@@ -235,7 +287,7 @@ if (isset($_GET['id_berita'])) {
                                                                         required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="foto">Foto Siswa</label>
+                                                                    <label for="foto">Gambar</label>
                                                                     <img src="gambar/siswa/<?php echo $row['foto']; ?>"
                                                                         height="120" width="120">
                                                                     <input type="file" name="gambarnew"
@@ -245,10 +297,15 @@ if (isset($_GET['id_berita'])) {
                                                                 </div>
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary"
-                                                                        data-bs-dismiss="modal">Close</button>
+                                                                        data-bs-dismiss="modal">
+                                                                        <i class="fas fa-times"></i> Tutup
+                                                                    </button>
                                                                     <button type="submit" class="btn btn-primary"
-                                                                        name="EditBerita" value="Submit">Submit</button>
+                                                                        name="EditBerita" value="Submit">
+                                                                        <i class="fas fa-check"></i> Submit
+                                                                    </button>
                                                                 </div>
+
                                                         </form>
                                                     </div>
                                                 </div>
@@ -268,9 +325,8 @@ if (isset($_GET['id_berita'])) {
 
 
             <!-- Modal tamabah data-->
-            <div class="modal modal-fullscreen-xxl-down fade" id="tambah" tabindex="-1"
-                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen-xxl-down">
+            <div class="modal fade" id="tambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Tambah Data Berita</h5>
@@ -291,7 +347,7 @@ if (isset($_GET['id_berita'])) {
                                     <input type="date" class="form-control" id="tanggal" name="tanggal">
                                 </div>
                                 <div class="mb-3">
-                                    <label for="foto" class="col-form-label">Foto Siswa</label>
+                                    <label for="foto" class="col-form-label">Gambar</label>
                                     <input type="file" class="form-control" id="foto" name="foto">
                                 </div>
                                 <div class="modal-footer">
@@ -320,7 +376,7 @@ if (isset($_GET['id_berita'])) {
             </footer>
         </div>
     </div>
-    <?php include 'footer.php';?>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

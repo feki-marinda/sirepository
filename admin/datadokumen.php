@@ -1,5 +1,8 @@
 <?php
+session_start();
 include 'conn.php';
+
+$error_message = $success_message = '';
 
 $query = "SELECT * FROM dokumen";
 $result = $koneksi->query($query);
@@ -27,10 +30,13 @@ if (isset($_POST['TambahDokumen'])) {
                           VALUES ('$judul_dokumen', '$file_dokumen')";
 
                 if ($koneksi->query($query) === TRUE) {
-                    header('Location: datadokumen.php');
-                    exit;
+                    $_SESSION['success_message'] = "Dokumen berhasil ditambahkan!";
+                    header("Location: datadokumen.php");
+                    exit();
                 } else {
-                    echo 'Error: ' . $koneksi->error;
+                    $_SESSION['error_message'] = "Error: " . $koneksi->error;
+                    header("Location: datadokumen.php");
+                    exit();
                 }
             } else {
                 echo 'Error saat mengunggah file.';
@@ -62,13 +68,15 @@ if (isset($_POST['EditDokumen'])) {
 
     $queryEdit = "UPDATE dokumen SET judul_dokumen='$judul_dokumen', Dokumen='$file_name' WHERE id_dokumen='$id_dokumen'";
     if ($koneksi->query($queryEdit) === TRUE) {
-        header("location: datadokumen.php");
-        exit;
+        $_SESSION['success_message'] = "Dokumen berhasil Diubah !";
+        header("Location: datadokumen.php");
+        exit();
     } else {
-        echo 'Error: ' . $koneksi->error;
+        $_SESSION['error_message'] = "Error: " . $koneksi->error;
+                    header("Location: datadokumen.php");
+                    exit();
     }
 }
-
 
 
 if (isset($_GET['id_dokumen'])) {
@@ -87,15 +95,23 @@ if (isset($_GET['id_dokumen'])) {
         }
 
         $query_delete = "DELETE FROM dokumen WHERE id_dokumen='$id_dokumen'";
+        
         if ($koneksi->query($query_delete) === TRUE) {
+            $_SESSION['success_message'] = "Dokumen Dihapus !";
             header("location: datadokumen.php");
             exit;
         } else {
-            echo 'Error: ' . $koneksi->error;
+            $_SESSION['error_message'] = "Error: Gagal Menghapus Dokumen !" . $koneksi->error;
+            header("Location: datadokumen.php");
+            exit();
         }
     } else {
         echo 'Dokumen tidak ditemukan.';
     }
+
+    $koneksi->close();
+} else {
+    echo 'Parameter id_dokumen tidak ditemukan.';
 }
 
 
@@ -138,6 +154,17 @@ if (isset($_GET['id_dokumen'])) {
                             Data Dokumen PKL
                         </div>
                         <div class="card-body">
+                            <?php
+                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+                                unset($_SESSION['error_message']);
+                            }
+
+                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
+                                unset($_SESSION['success_message']);
+                            }
+                            ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
                                 <thead>
                                     <tr>
@@ -220,7 +247,8 @@ if (isset($_GET['id_dokumen'])) {
                                                                         name="judul_dokumen" required>
                                                                 </div>
                                                                 <div class="mb-3">
-                                                                    <label for="Dokumen" class="col-form-label">Dokumen :</label>
+                                                                    <label for="Dokumen" class="col-form-label">Dokumen
+                                                                        :</label>
                                                                     <input type="file" class="form-control" id="Dokumen"
                                                                         name="Dokumen" accept=".doc, .docx, .pdf" required>
                                                                     <small class="form-text text-muted">Pilih file Word
@@ -299,7 +327,7 @@ if (isset($_GET['id_dokumen'])) {
             </footer>
         </div>
     </div>
-    <?php include 'footer.php';?>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

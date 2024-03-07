@@ -109,10 +109,10 @@ $koneksi->close();
                     </div>
                     <?php
                     if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
-                        echo '<div class="alert alert-primary" role="alert">' . $_SESSION['error_message'] . '</div>';
+                        echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
                         unset($_SESSION['error_message']);
                     }
-                    
+
                     if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
                         echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
                         unset($_SESSION['success_message']);
@@ -178,7 +178,7 @@ $koneksi->close();
 
                                         <div class='modal fade' id='edit<?= $row['id_user'] ?>' tabindex='-1'
                                             aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Edit Data User</h5>
@@ -186,61 +186,57 @@ $koneksi->close();
                                                             aria-label="Close"></button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <div class="modal-body">
-                                                            <form method="POST" action="#" enctype="multipart/form-data">
-                                                                <div class="form-group">
-                                                                    <label for="id_user">ID</label>
-                                                                    <input type="text" class="form-control" id="id_user"
-                                                                        value="<?= $row['id_user']; ?>" name="id_user"
-                                                                        readonly>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="username">username</label>
-                                                                    <input type="text" class="form-control" id="username"
-                                                                        value="<?= $row['username']; ?>" name="username"
-                                                                        required>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="password">Password</label>
-                                                                    <input type="int" class="form-control" id="password"
-                                                                        value="<?= $row['password']; ?>" name="password"
-                                                                        required>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="status">Status</label>
-                                                                    <select class="form-select" id="status" name="status"
-                                                                        required>
-                                                                        <option value="admin" <?= ($row['status'] == 'Admin') ? 'selected' : ''; ?>>Admin</option>
-                                                                        <option value="guru" <?= ($row['status'] == 'Guru') ? 'selected' : ''; ?>>Guru</option>
-                                                                        <option value="siswa" <?= ($row['status'] == 'Siswa') ? 'selected' : ''; ?>>Siswa</option>
-                                                                    </select>
-                                                                </div>
+                                                        <form method="POST" action="#" enctype="multipart/form-data">
+                                                            <div class="form-group">
+                                                                <label for="id_user">ID</label>
+                                                                <input type="text" class="form-control" id="id_user"
+                                                                    value="<?= $row['id_user']; ?>" name="id_user" readonly>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="username">username</label>
+                                                                <input type="text" class="form-control" id="username"
+                                                                    value="<?= $row['username']; ?>" name="username"
+                                                                    required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="password">Password</label>
+                                                                <input type="int" class="form-control" id="password"
+                                                                    value="<?= $row['password']; ?>" name="password"
+                                                                    required>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="status">Status</label>
+                                                                <select class="form-select" id="status" name="status"
+                                                                    required>
+                                                                    <option value="admin" <?= ($row['status'] == 'Admin') ? 'selected' : ''; ?>>Admin</option>
+                                                                    <option value="guru" <?= ($row['status'] == 'Guru') ? 'selected' : ''; ?>>Guru</option>
+                                                                    <option value="siswa" <?= ($row['status'] == 'Siswa') ? 'selected' : ''; ?>>Siswa</option>
+                                                                </select>
+                                                            </div>
 
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary"
-                                                                        data-bs-dismiss="modal">Close</button>
-                                                                    <button type="submit" class="btn btn-primary"
-                                                                        name="edituser" value="Submit">Submit</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">Close</button>
+                                                                <button type="submit" class="btn btn-primary"
+                                                                    name="edituser" value="Submit">Submit</button>
+                                                            </div>
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
 
-
-                                            <?php
-                                    }
-                                    ?>
+                                    <?php } ?>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
+
             </main>
 
             <div class="modal fade" id="tambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Tambah Data User</h5>

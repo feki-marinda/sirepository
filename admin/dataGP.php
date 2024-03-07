@@ -1,4 +1,5 @@
 <?php
+session_start();
 include 'conn.php';
 
 $query = "SELECT * FROM guru_pamong";
@@ -13,35 +14,33 @@ if (isset($_POST['TambahGP'])) {
     $NIP = $_POST['NIP'];
     $Email = $_POST['Email'];
     $Alamat = $_POST['Alamat'];
-    $Foto = $_POST['Foto'];
     $no_telp = $_POST['no_telp'];
 
     $rand = rand();
-$ekstensi = array('png', 'jpg', 'jpeg', 'gif', 'webp');
-$filename = $_FILES['Foto']['name'];
-$ukuran = $_FILES['Foto']['size'];
-$ext = pathinfo($filename, PATHINFO_EXTENSION);
-if (!in_array($ext, $ekstensi)) {
-    echo "error";
-} else {
-    if ($ukuran < 208815000) {
-        $xx = $rand . '_' . $filename;
-        move_uploaded_file($_FILES['Foto']['tmp_name'], 'gambar/' . $xx);
+    $ekstensi = array('png', 'jpg', 'jpeg', 'gif', 'webp');
+    $filename = $_FILES['Foto']['name'];
+    $ukuran = $_FILES['Foto']['size'];
+    $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-        $query = "INSERT INTO guru_pamong (nama, NIP, Email, Alamat, Foto, no_telp) 
-            VALUES ('$nama', '$NIP', '$Email', '$Alamat', '$xx', '$no_telp')";
+    if (!in_array($ext, $ekstensi)) {
+        echo "error";
+    } else {
+        if ($ukuran < 208815000) {
+            $xx = $rand . '_' . $filename;
+            move_uploaded_file($_FILES['Foto']['tmp_name'], 'gambar/' . $xx);
 
-            // Eksekusi query
+            $query = "INSERT INTO guru_pamong (nama, NIP, Email, Alamat, Foto, no_telp) 
+                      VALUES ('$nama', '$NIP', '$Email', '$Alamat', '$xx', '$no_telp')";
+
             if ($koneksi->query($query) === TRUE) {
-                // Jika berhasil, arahkan pengguna ke halaman sukses atau halaman lain
-                header('Location: dataGP.php');
-                exit;
+                $_SESSION['success_message'] = "Data Guru Pamong berhasil ditambahkan!";
+                header("Location: dataGP.php");
+                exit();
             } else {
-                // Jika terjadi kesalahan, tampilkan pesan error dan hentikan eksekusi
-                die("Error in query: " . $koneksi->error);
+                $_SESSION['error_message'] = "Error: " . $koneksi->error;
+                header("Location: dataGP.php");
+                exit();
             }
-           
-
         }
     }
 }
@@ -62,44 +61,54 @@ if (isset($_POST['EditGP'])) {
         $file_tmp = $_FILES['gambarnew']['tmp_name'];
         $angka_acak = rand(1, 999);
         $nama_gambar_baru = $angka_acak . '-' . $foto_baru;
+
         if (in_array($ekstensi, $ekstensi_diperbolehkan) === true) {
             $dt = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM guru_pamong WHERE id_guru='$id_guru'"));
             $gambarlama = $dt['Foto'];
+            
             if (is_file("gambar/" . $gambarlama)) {
                 unlink("gambar/" . $gambarlama);
             }
 
             move_uploaded_file($_FILES['gambarnew']['tmp_name'], 'gambar/' . $nama_gambar_baru);
-            mysqli_query($koneksi, "UPDATE guru_pamong SET nama='$nama', NIP='$NIP', Email='$Email', Alamat='$Alamat', Foto='$nama_gambar_baru', no_telp='$no_telp'  WHERE id_guru='$id_guru'");
-
-
-            if (!$result) {
-                die("Query gagal dijalankan: " . mysqli_errno($koneksi) .
-                    " - " . mysqli_error($koneksi));
-            } else {
-                echo "<script>alert('Data berhasil diubah.');window.location='dataGP.php';</script>";
-            }
+            $query = "UPDATE guru_pamong SET nama='$nama', NIP='$NIP', Email='$Email', Alamat='$Alamat', Foto='$nama_gambar_baru', no_telp='$no_telp' WHERE id_guru='$id_guru'";
         } else {
-            echo "<script>alert('Ekstensi gambar yang boleh hanya jpg, png,atau jpeg.');window.location='dataGP.php';</script>";
+            $_SESSION['error_message'] = "Ekstensi gambar yang diizinkan hanya jpg, png, atau jpeg.";
+            header("Location: dataGP.php");
+            exit();
         }
     } else {
-        $query = $query = "UPDATE guru_pamong SET nama='$nama', NIP='$NIP', Email='$Email', Alamat='$Alamat', no_telp='$no_telp'  WHERE id_guru='$id_guru'";
-
-        $result = mysqli_query($koneksi, $query);
-        if (!$result) {
-            die("Query gagal dijalankan: " . mysqli_errno($koneksi) .
-                " - " . mysqli_error($koneksi));
-        } else {
-            header("location:dataGP.php");
-        }
+        $query = "UPDATE guru_pamong SET nama='$nama', NIP='$NIP', Email='$Email', Alamat='$Alamat', no_telp='$no_telp' WHERE id_guru='$id_guru'";
     }
+
+    $result = mysqli_query($koneksi, $query);
+
+    if ($result) {
+        $rows_affected = mysqli_affected_rows($koneksi);
+        if ($rows_affected > 0) {
+            $_SESSION['success_message'] = "Data Guru Pamong berhasil diubah!";
+        } else {
+            $_SESSION['error_message'] = "Tidak ada perubahan pada Data Pamong!";
+        }
+    } else {
+        $_SESSION['error_message'] = "Error: " . $koneksi->error;
+    }
+
+    header("Location: dataGP.php");
+    exit();
 }
+
 
 if (isset($_GET['id_guru'])) {
     $id_guru = $_GET['id_guru'];
 
     mysqli_query($koneksi, "DELETE FROM guru_pamong WHERE id_guru='$id_guru'");
-    header('Location: dataGP.php');
+    if ($result) {
+        $_SESSION['success_message'] = "Data Guru Pamong berhasil dihapus!";
+        header("Location: dataGP.php");
+        exit();
+    }
+
 }
 
 ?>
@@ -141,6 +150,17 @@ if (isset($_GET['id_guru'])) {
                             Data Guru Pamong
                         </div>
                         <div class="card-body">
+                            <?php
+                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+                                unset($_SESSION['error_message']);
+                            }
+
+                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
+                                unset($_SESSION['success_message']);
+                            }
+                            ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
                                 <thead>
                                     <tr>
@@ -159,7 +179,7 @@ if (isset($_GET['id_guru'])) {
                                     <?php
                                     $no = 1;
                                     while ($row = mysqli_fetch_assoc($result)) {
-                                        
+
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['nama'] . "</td>";
@@ -342,7 +362,8 @@ if (isset($_GET['id_guru'])) {
                 </div>
             </footer>
         </div>
-    </div><?php include 'footer.php';?>
+    </div>
+    <?php include 'footer.php'; ?>
 
 </body>
 

@@ -16,14 +16,23 @@ if (isset($_POST['TambahLogbook'])) {
     $query = "INSERT INTO logbook (tanggal, aktivitas, status_logbook) 
           VALUES ('$tanggal', '$aktivitas', '$status_logbook')";
 
-    if ($koneksi->query($query) === TRUE) {
-        header('Location: datalogbook.php');
-        exit;
-    } else {
-        echo 'Error: ' . $koneksi->error;
-    }
+if ($koneksi->query($query) === TRUE) {
+    $rows_affected = $koneksi->affected_rows;
 
-    $koneksi->close();
+    if ($rows_affected > 0) {
+        $_SESSION['success_message'] = "Berhasil Menambah Data Logbook!";
+        header("Location: datalogbook.php");
+        exit();
+    } else {
+        $_SESSION['error_message'] = "Tidak ada perubahan pada Data Logbook!";
+        header("Location: datalogbook.php");
+        exit();
+    }
+} else {
+    $_SESSION['error_message'] = "Error: " . $koneksi->error;
+    header("Location: datalogbook.php");
+    exit();
+}
 
 }
 if (isset($_POST['EditLogbook'])) {
@@ -44,8 +53,14 @@ if (isset($_GET['id_logbook'])) {
     $id_logbook = $_GET['id_logbook'];
 
     mysqli_query($koneksi, "DELETE FROM logbook WHERE id_logbook='$id_logbook'");
-    header("location:datalogbook.php");
+    if ($result) {
+        $_SESSION['success_message'] = "Data Logbook Berhasil Dihapus!";
+        header("Location: datalogbook.php");
+        exit();
+    }
 }
+
+$koneksi->close();
 
 ?>
 <!DOCTYPE html>

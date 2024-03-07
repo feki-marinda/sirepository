@@ -5,7 +5,7 @@ include 'conn.php';
 if (!$koneksi) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
-
+$error_message = $success_message ='';
 
 if (isset($_POST['TambahSiswa'])) {
     $Nama_siswa = $_POST['Nama_siswa'];
@@ -20,19 +20,17 @@ if (isset($_POST['TambahSiswa'])) {
     $query = "INSERT INTO siswa (id_user, Nama_siswa, NIS, kelas, jenis_kelamin, alamat, tanggal_lahir, no_hp) 
               VALUES ('$id_user', '$Nama_siswa', '$NIS', '$kelas', '$jenis_kelamin', '$alamat', '$tanggal_lahir', '$no_hp')";
 
-if ($koneksi->query($query) === TRUE) {
-    $_SESSION['success_message'] = "Berhasil Menambah Data User!";
-    header("Location: datauser.php");
-    exit();
-} else {
-    $_SESSION['error_message'] = "Error: " . $koneksi->error;
-    header("Location: datauser.php");
-    exit();
-}
+    if ($koneksi->query($_query) === TRUE) {
+        $_SESSION['success_message'] = "Berhasil Menambah Data User!";
+        header("Location: datauser.php");
+        exit();
+    } else {
+        $_SESSION['error_message'] = "Error: Username telah terdaftar" . $koneksi->error;
+        header("Location: datauser.php");
+        exit();
+    }
 
 }
-$koneksi->close();
-
 
 
 if (isset($_POST['EditSiswa'])) {
@@ -62,7 +60,7 @@ if (isset($_POST['EditSiswa'])) {
         if ($rows_affected > 0) {
             $success_message = "Berhasil Memperbarui Data Siswa!";
         } else {
-            $alert_message = "Tidak ada perubahan pada Data Siswa!";
+            $error_message = "Tidak ada perubahan pada Data Siswa!";
         }
     } else {
         $error_message = "Tidak dapat Memperbarui Data Siswa!";
@@ -129,9 +127,6 @@ if (isset($_GET['id_siswa'])) {
                         </div>
                         <div class="card-body">
                             <?php
-                            if (!empty($alert_message)) {
-                                echo '<div class="alert alert-primary" role="alert">' . $error_message . '</div>';
-                            }
                             if (!empty($error_message)) {
                                 echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
                             }

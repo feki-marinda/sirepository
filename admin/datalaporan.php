@@ -1,12 +1,15 @@
 <?php
+session_start();
 include 'conn.php';
 
+$error_message = $success_message = '';
 $query = "SELECT*FROM laporan_pkl JOIN siswa ON siswa.id_siswa=laporan_pkl.id_siswa";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
     die("Error in query: " . mysqli_error($koneksi));
 }
+
 
 if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $id_laporan = $_POST['id_laporan'];
@@ -19,26 +22,46 @@ if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $file_error = $_FILES['berkas']['error'];
 
     if ($file_error === 0) {
+        // Menangani unggahan berkas
         $file_destination = 'admin/Laporan PKL/' . $file_name;
         move_uploaded_file($file_tmp, $file_destination);
 
-        $old_file = mysqli_fetch_array(mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'"));
-        if (is_file($old_file['berkas'])) {
+        // Mengambil data berkas lama
+        $old_file_query = mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'");
+        $old_file = mysqli_fetch_array($old_file_query);
+
+        // Memeriksa dan menghapus berkas lama
+        if ($old_file && is_file($old_file['berkas'])) {
             unlink($old_file['berkas']);
         }
 
-        mysqli_query($koneksi, "UPDATE laporan_pkl 
-        SET id_siswa='$id_siswa', 
-            tanggal_kumpul='$tanggal_kumpul', 
-            berkas='$file_destination' 
-        WHERE id_laporan='$id_laporan'");
+        // Menggunakan prepared statements untuk mencegah SQL injection
+        $query = "UPDATE laporan_pkl 
+                  SET id_siswa=?, 
+                      tanggal_kumpul=?, 
+                      berkas=? 
+                  WHERE id_laporan=?";
+        $stmt = mysqli_prepare($koneksi, $query);
+        mysqli_stmt_bind_param($stmt, "isss", $id_siswa, $tanggal_kumpul, $file_destination, $id_laporan);
+        $result = mysqli_stmt_execute($stmt);
 
-
-        header("location:datalaporan.php");
+        // Memeriksa keberhasilan eksekusi query
+        if ($result) {
+            $rows_affected = mysqli_stmt_affected_rows($stmt);
+            if ($rows_affected > 0) {
+                $success_message = "Berhasil Memperbarui Data Laporan!";
+                header("location:datalaporan.php");
+            } else {
+                $error_message = "Tidak ada perubahan pada Data Laporan!";
+            }
+        } else {
+            $error_message = "Tidak dapat Memperbarui Data Laporan! Error: " . mysqli_error($koneksi);
+        }
     } else {
-        echo 'Error uploading file.';
+        $error_message = "Error uploading file. Error code: " . $file_error;
     }
 }
+
 
 if (isset($_GET['id_laporan'])) {
     $id_laporan = $_GET['id_laporan'];
@@ -84,6 +107,14 @@ if (isset($_GET['id_laporan'])) {
                         </div>
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-striped table-hover">
+                                <?php
+                                if (!empty($error_message)) {
+                                    echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
+                                }
+                                if (!empty($success_message)) {
+                                    echo '<div class="alert alert-success" role="alert">' . $success_message . '</div>';
+                                }
+                                ?>
                                 <thead>
                                     <tr>
                                         <th>No.</th>
@@ -145,9 +176,9 @@ if (isset($_GET['id_laporan'])) {
                                             </div>
                                         </div>
 
-                                        <div class='modal fade' id='edit<?= $row['id_laporan'] ?>' tabindex='-1'
-                                            aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                        <div class="modal fade" id="edit<?= $row['id_laporan'] ?>" tabindex="-1"
+                                            aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
@@ -183,14 +214,18 @@ if (isset($_GET['id_laporan'])) {
                                                                     value="<?= $row['tanggal_kumpul']; ?>"
                                                                     name="tanggal_kumpul" required>
                                                             </div>
-                                                            <div class="mb-3">
-                                                                <label for="berkas" class="col-form-label">Berkas
-                                                                    (Word/PDF):</label>
+                                                            <div class="form-group">
+                                                            <label for="berkas" class="col-form-label">Berkas (Word/PDF):</label>
+                                                                <?php
+                                                                echo "<p>Dokumen Saat Ini: {$row['berkas']}</p>";
+                                                                ?>
                                                                 <input type="file" class="form-control" id="berkas"
-                                                                    name="berkas" accept=".doc, .docx, .pdf" required>
+                                                                    name="berkas" accept=".doc, .docx, .pdf">
                                                                 <small class="form-text text-muted">Pilih file Word
-                                                                    (doc/docx) atau PDF.</small>
+                                                                    (doc/docx) atau PDF. Kosongkan jika tidak ingin
+                                                                    mengganti.</small>
                                                             </div>
+
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary"
                                                                     data-bs-dismiss="modal">Tutup</button>
@@ -228,7 +263,7 @@ if (isset($_GET['id_laporan'])) {
             </footer>
         </div>
     </div>
-    <?php include 'footer.php';?>
+    <?php include 'footer.php'; ?>
 
 </body>
 
