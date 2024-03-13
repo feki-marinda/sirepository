@@ -46,7 +46,7 @@ if (isset($_POST['register'])) {
         <div class="row">
             <div class="col-sm-6">
                 <div class="text-center">
-                    <img src="admin/gambar/R.png" alt="" class="mx-auto d-block">
+                    <img src="admin/assets/img/R.png" alt="" class="mx-auto d-block">
                     <h3>Sistem Informasi Repository Laporan PKL</h3>
                 </div><br>
                 <div style="text-align: center;">

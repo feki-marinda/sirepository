@@ -143,10 +143,20 @@ if (isset($_GET['id_laporan'])) {
                                         echo "<td>" . date('d-m-Y', strtotime($row['tanggal_kumpul'])) . "</td>";
                                         echo "<td><a href='" . 'Laporan PKL' . '/' . $row['berkas'] . "' target='_blank'>" . $row['berkas'] . "</a></td>";
                                         echo "<td>";
-                                        echo "<div class='btn-group'>";
-                                        echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_laporan'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
-                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_laporan'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
+
+                                        echo "<div class='d-flex'>";
+                                        echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_laporan'] . "' data-bs-whatever='@mdo'>";
+                                        echo "<i class='fas fa-pencil-alt'></i> Edit";
+                                        echo "</button>";
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_laporan'] . "'>";
+                                        echo "<i class='fas fa-trash'></i> Hapus";
+                                        echo "</button>";
                                         echo "</div>";
+
+                                        // echo "<div class='btn-group'>";
+                                        // echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_laporan'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
+                                        // echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_laporan'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
+                                        // echo "</div>";
                                         echo "</td>";
                                         echo "</tr>";
 

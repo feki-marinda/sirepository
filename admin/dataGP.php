@@ -65,7 +65,7 @@ if (isset($_POST['EditGP'])) {
         if (in_array($ekstensi, $ekstensi_diperbolehkan) === true) {
             $dt = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM guru_pamong WHERE id_guru='$id_guru'"));
             $gambarlama = $dt['Foto'];
-            
+
             if (is_file("gambar/" . $gambarlama)) {
                 unlink("gambar/" . $gambarlama);
             }
@@ -137,8 +137,10 @@ if (isset($_GET['id_guru'])) {
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Guru Pamong</button>
-                                <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
+                                    <button id="printButton">
+                                    <a href="cetak/dataguru.php" style="text-decoration: none; color: inherit;" target="_blank">
+                                        <i class="fas fa-print"></i> Cetak
+                                    </a>
                                 </button>
                             </div>
                         </div>
@@ -165,11 +167,11 @@ if (isset($_GET['id_guru'])) {
                                 <thead>
                                     <tr>
                                         <th>No.</th>
+                                        <th>Foto</th>
                                         <th>Nama Lengkap</th>
                                         <th>NIP</th>
                                         <th>Email</th>
                                         <th>Alamat</th>
-                                        <th>Foto</th>
                                         <th>No Hp</th>
                                         <th>Keterangan</th>
                                     </tr>
@@ -182,16 +184,20 @@ if (isset($_GET['id_guru'])) {
 
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
+                                        echo "<td><img src='gambar/" . $row['Foto'] . "' width='120' height='150'></td>";
                                         echo "<td>" . $row['nama'] . "</td>";
                                         echo "<td>" . $row['NIP'] . "</td>";
                                         echo "<td>" . $row['Email'] . "</td>";
                                         echo "<td>" . $row['Alamat'] . "</td>";
-                                        echo "<td><img src='gambar/" . $row['Foto'] . "' width='120' height='120'></td>";
                                         echo "<td>" . $row['no_telp'] . "</td>";
                                         echo "<td>";
-                                        echo "<div class='btn-group'>";
-                                        echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_guru'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
-                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_guru'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
+                                        echo "<div class='d-flex'>";
+                                        echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_guru'] . "' data-bs-whatever='@mdo'>";
+                                        echo "<i class='fas fa-pencil-alt'></i> Edit";
+                                        echo "</button>";
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_guru'] . "'>";
+                                        echo "<i class='fas fa-trash'></i> Hapus";
+                                        echo "</button>";
                                         echo "</div>";
                                         echo "</td>";
                                         echo "</tr>";
@@ -224,10 +230,10 @@ if (isset($_GET['id_guru'])) {
 
                                         <div class='modal fade' id='edit<?= $row['id_guru'] ?>' tabindex='-1'
                                             aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
+                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Guru Pamong
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -262,14 +268,22 @@ if (isset($_GET['id_guru'])) {
                                                                         value="<?= $row['Alamat']; ?>" name="Alamat"
                                                                         required>
                                                                 </div>
-                                                                <div class="form-group">
+                                                                <div class="form-group mt-3">
                                                                     <label for="Foto">Foto</label>
-                                                                    <img src="gambar/<?php echo $row['Foto']; ?>"
-                                                                        height="120" width="120">
+                                                                    <div class="mb-3">
+                                                                        <?php
+                                                                        $currentFoto = $row['Foto']; // Sesuaikan dengan nama kolom yang sesuai di database
+                                                                        if (!empty($currentFoto)) {
+                                                                            echo '<img src="gambar/' . $currentFoto . '" height="120" width="120" class="img-thumbnail" alt="Foto saat ini">';
+                                                                        }
+                                                                        ?>
+                                                                    </div>
                                                                     <input type="file" name="gambarnew"
                                                                         class="form-control-file">
-                                                                    <small>Abaikan jika tidak merubah gambar.</small>
+                                                                    <small class="form-text text-muted">Abaikan jika tidak
+                                                                        merubah gambar.</small>
                                                                 </div>
+
                                                                 <div class="form-group">
                                                                     <label for="no_telp">No Hp</label>
                                                                     <input type="text" class="form-control" id="no_telp"
@@ -301,12 +315,11 @@ if (isset($_GET['id_guru'])) {
 
 
             <!-- Modal tambah data-->
-            <div class="modal modal-fullscreen-xxl-down fade" id="tambah" tabindex="-1"
-                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen-xxl-down">
+            <div class="modal fade" id="tambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Tambah Data nilai</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Tambah Data Guru Pamong</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body ">

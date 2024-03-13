@@ -49,7 +49,7 @@ include 'head.html';
         <div class="row">
             <div class="col-sm-6">
                 <div>
-                    <img src="admin/gambar/R.png" alt="" class="mx-auto d-block" style="margin-top: 15%;">
+                    <img src="admin/assets/img/R.png" alt="" class="mx-auto d-block" style="margin-top: 15%;">
                     <h3 style="text-align: center;">Sistem Informasi Repository Laporan PKL</h3>
                 </div><br>
                 <form style="position: relative; margin: 50px;" action="" method="post">

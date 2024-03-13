@@ -13,6 +13,9 @@ function registrasi($data){
     $jenis_kelamin = mysqli_real_escape_string($koneksi, $data["jenis_kelamin"]);
     $alamat = mysqli_real_escape_string($koneksi, $data["alamat"]);
     $kelas = mysqli_real_escape_string($koneksi, $data["kelas"]);
+    $no_hp = mysqli_real_escape_string($koneksi, $data["no_hp"]);
+    $email = mysqli_real_escape_string($koneksi, $data["email"]);
+
 
     $result = mysqli_query($koneksi, "SELECT * FROM user WHERE username = '$username'");
     if(mysqli_fetch_assoc($result)){
@@ -30,7 +33,7 @@ function registrasi($data){
     if ($result_user) {
         $user_id = mysqli_insert_id($koneksi);
 
-        $result_siswa = mysqli_query($koneksi, "INSERT INTO siswa (id_user, Nama_siswa, NIS, tanggal_lahir, jenis_kelamin, alamat, kelas) VALUES ('$user_id', '$nama', '$NIS', '$tanggal_lahir', '$jenis_kelamin', '$alamat', '$kelas')");
+        $result_siswa = mysqli_query($koneksi, "INSERT INTO siswa (id_user, Nama_siswa, NIS, tanggal_lahir, jenis_kelamin, alamat, kelas, no_hp, email) VALUES ('$user_id', '$nama', '$NIS', '$tanggal_lahir', '$jenis_kelamin', '$alamat', '$kelas','$no_hp','$email')");
 
         if ($result_siswa) {
             return true;

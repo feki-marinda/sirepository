@@ -1,4 +1,5 @@
 <?php
+session_start();
 require '../vendor/autoload.php';
 include 'conn.php';
 require '../uploadsave.php';
@@ -16,13 +17,19 @@ if (!$result) {
     die("Error in query: " . mysqli_error($koneksi));
 }
 
+// Function to validate and sanitize file paths
+function sanitizeFilePath($path)
+{
+    // Implement additional path validation/sanitization logic if needed
+    return preg_replace('/[^a-zA-Z0-9_.\/]/', '', $path);
+}
 
 if (isset($_POST['TambahSertifikat'])) {
     $Nama_siswa = $_POST['Nama_siswa'];
 
     $file_sertifikat_name = $_FILES['file_sertifikat']['name'];
     $file_sertifikat_temp = $_FILES['file_sertifikat']['tmp_name'];
-    $file_sertifikat_path = "admin/Sertifikat/" . $file_sertifikat_name;
+    $file_sertifikat_path = "admin/Sertifikat/" . sanitizeFilePath($file_sertifikat_name);
 
     $query_get_id = "SELECT id_siswa FROM siswa WHERE Nama_siswa = ?";
     $stmt_get_id = $koneksi->prepare($query_get_id);
@@ -40,15 +47,15 @@ if (isset($_POST['TambahSertifikat'])) {
     $stmt_insert->bind_param("sss", $id_siswa, $file_sertifikat_path, $googleDriveFileId);
 
     if ($stmt_insert->execute()) {
-        header('Location: datasertifikat.php');
-        exit;
+        $_SESSION['success_message'] = "Data PKL Derhasil Ditambahkan!";
+        header("Location: datasertifikat.php");
+        exit();
     } else {
-        echo 'Error: ' . $stmt_insert->error;
+        $_SESSION['error_message'] = "Error: " . $koneksi->error;
+        header("Location: datasertifikat.php");
+        exit();
     }
-} else {
-    echo 'Error uploading file.';
 }
-
 
 if (isset($_POST['EditSertifikat'])) {
     $id_sertifikat = $_POST['id_sertifikat'];
@@ -59,18 +66,22 @@ if (isset($_POST['EditSertifikat'])) {
 
         $secure_file_name = strtolower(preg_replace('/[^a-zA-Z0-9_.]/', '_', $file_sertifikat_name));
 
-        $file_sertifikat_path = "../admin/Sertifikat/" . $secure_file_name;
+        $file_sertifikat_path = "../admin/Sertifikat/" . sanitizeFilePath($secure_file_name);
 
         move_uploaded_file($_FILES['file_sertifikat']['tmp_name'], $file_sertifikat_path);
 
         mysqli_query($koneksi, "UPDATE sertifikat SET 
                                  file_sertifikat='$secure_file_name'                                                                             
                                  WHERE id_sertifikat='$id_sertifikat'");
+        if ($result) {
+            $_SESSION['success_message'] = "Data Sertifikat Berhasil Diubah!";
+            header("Location: datasertifikat.php");
+            exit();
+        }
     } else {
-        // Jika tidak ada file baru diunggah, hanya mengupdate data lainnya
-        mysqli_query($koneksi, "SELECT sertifikat.*, siswa.Nama_siswa 
-        FROM sertifikat
-        INNER JOIN siswa ON sertifikat.id_siswa = siswa.id_siswa");
+        mysqli_query($koneksi, "UPDATE sertifikat SET 
+                                 Nama_siswa='$Nama_siswa'
+                                 WHERE id_sertifikat='$id_sertifikat'");
     }
 
     header("location: datasertifikat.php");
@@ -80,9 +91,14 @@ if (isset($_GET['id_sertifikat'])) {
     $id_sertifikat = $_GET['id_sertifikat'];
 
     mysqli_query($koneksi, "DELETE FROM sertifikat WHERE id_sertifikat='$id_sertifikat'");
-    header("location: datasertifikat.php");
+    if ($result) {
+        $_SESSION['success_message'] = "Data Sertifikat Berhasil Dihapus!";
+        header("Location: datasertifikat.php");
+        exit();
+    }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -107,8 +123,10 @@ if (isset($_GET['id_sertifikat'])) {
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Sertifikat</button>
-                                <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
+                                    <button id="printButton">
+                                    <a href="cetak/datasertifikat.php" style="text-decoration: none; color: inherit;" target="_blank">
+                                        <i class="fas fa-print"></i> Cetak
+                                    </a>
                                 </button>
                             </div>
                         </div>
@@ -120,6 +138,17 @@ if (isset($_GET['id_sertifikat'])) {
                             Data Sertifikat Siswa
                         </div>
                         <div class="card-body">
+                            <?php
+                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+                                unset($_SESSION['error_message']);
+                            }
+
+                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
+                                unset($_SESSION['success_message']);
+                            }
+                            ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
                                 <thead>
                                     <tr>
@@ -137,11 +166,15 @@ if (isset($_GET['id_sertifikat'])) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
-                                        echo "<td>" . $row['file_sertifikat'] . "</td>";
+                                        echo "<td><img src='Sertifikat/" . $row['file_sertifikat'] . "' width='150' height='130'></td>";
                                         echo "<td>";
-                                        echo "<div class='btn-group'>";
-                                        echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_sertifikat'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
-                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_sertifikat'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
+                                        echo "<div class='d-flex'>";
+                                        echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_sertifikat'] . "' data-bs-whatever='@mdo'>";
+                                        echo "<i class='fas fa-pencil-alt'></i> Edit";
+                                        echo "</button>";
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_sertifikat'] . "'>";
+                                        echo "<i class='fas fa-trash'></i> Hapus";
+                                        echo "</button>";
                                         echo "</div>";
                                         echo "</td>";
                                         echo "</tr>";
@@ -176,10 +209,10 @@ if (isset($_GET['id_sertifikat'])) {
                                         <!-- Modal edit data -->
                                         <div class='modal fade' id='edit<?= $row['id_sertifikat'] ?>' tabindex='-1'
                                             aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
+                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Sertifikat
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -197,7 +230,7 @@ if (isset($_GET['id_sertifikat'])) {
                                                                     <label for="Nama_siswa">Nama Siswa</label>
                                                                     <input type="text" class="form-control" id="Nama_siswa"
                                                                         value="<?= $row['Nama_siswa']; ?>" name="Nama_siswa"
-                                                                        required>
+                                                                        readonly>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="file_sertifikat">File</label>
@@ -232,12 +265,12 @@ if (isset($_GET['id_sertifikat'])) {
             </main>
 
             <!-- Modal tambah data-->
-            <div class="modal modal-fullscreen-xxl-down fade" id="tambah" tabindex="-1"
+            <div class="modal fade" id="tambah" tabindex="-1"
                 aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen-xxl-down">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Tambah Mitra PKL</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Tambah Sertifikat</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body ">

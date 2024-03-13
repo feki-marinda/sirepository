@@ -5,7 +5,7 @@ include 'conn.php';
 if (!$koneksi) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
-$error_message = $success_message ='';
+$error_message = $success_message = '';
 
 if (isset($_POST['TambahSiswa'])) {
     $Nama_siswa = $_POST['Nama_siswa'];
@@ -16,9 +16,10 @@ if (isset($_POST['TambahSiswa'])) {
     $tanggal_lahir = $_POST['tanggal_lahir'];
     $no_hp = $_POST['no_hp'];
     $id_user = $_POST['id_user'];
+    $email = $_POST['email'];
 
-    $query = "INSERT INTO siswa (id_user, Nama_siswa, NIS, kelas, jenis_kelamin, alamat, tanggal_lahir, no_hp) 
-              VALUES ('$id_user', '$Nama_siswa', '$NIS', '$kelas', '$jenis_kelamin', '$alamat', '$tanggal_lahir', '$no_hp')";
+    $query = "INSERT INTO siswa (id_user, Nama_siswa, NIS, kelas, jenis_kelamin, alamat, tanggal_lahir, no_hp, email) 
+              VALUES ('$id_user', '$Nama_siswa', '$NIS', '$kelas', '$jenis_kelamin', '$alamat', '$tanggal_lahir', '$no_hp','$email')";
 
     if ($koneksi->query($_query) === TRUE) {
         $_SESSION['success_message'] = "Berhasil Menambah Data User!";
@@ -42,6 +43,7 @@ if (isset($_POST['EditSiswa'])) {
     $alamat = $_POST['alamat'];
     $tanggal_lahir = $_POST['tanggal_lahir'];
     $no_hp = $_POST['no_hp'];
+    $email = $_POST['email'];
 
     $query = "UPDATE siswa SET 
                 Nama_siswa='$Nama_siswa',
@@ -50,7 +52,8 @@ if (isset($_POST['EditSiswa'])) {
                 jenis_kelamin='$jenis_kelamin',
                 alamat='$alamat',
                 tanggal_lahir='$tanggal_lahir',
-                no_hp='$no_hp'
+                no_hp='$no_hp',
+                email='$email'
                 WHERE id_siswa='$id_siswa'";
 
     $result = mysqli_query($koneksi, $query);
@@ -82,7 +85,7 @@ if (isset($_GET['id_siswa'])) {
     if ($affected_rows > 0) {
         $success_message = "Berhasil Menghapus data siswa!";
     } else {
-        $error_message = "Tidak dapat menghapus data siswa !";
+        $error_message = "Tidak Dapat Menghapus Data Siswa yang Terdaftar PKL !";
     }
 
     mysqli_stmt_close($stmt);
@@ -114,7 +117,9 @@ if (isset($_GET['id_siswa'])) {
                                     data-bs-target="#tambahsiswa" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data siswa PKL</button>
                                 <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
+                                    <a href="cetak/datasiswa.php" style="text-decoration: none; color: inherit;" target="_blank">
+                                        <i class="fas fa-print"></i> Cetak
+                                    </a>
                                 </button>
                             </div>
                         </div>
@@ -145,6 +150,7 @@ if (isset($_GET['id_siswa'])) {
                                         <th>Alamat</th>
                                         <th>Tanggal Lahir</th>
                                         <th>No Hp</th>
+                                        <th>Email</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
@@ -169,10 +175,15 @@ if (isset($_GET['id_siswa'])) {
                                         echo "<td>" . $row['alamat'] . "</td>";
                                         echo "<td>" . $row['tanggal_lahir'] . "</td>";
                                         echo "<td>" . $row['no_hp'] . "</td>";
+                                        echo "<td>" . $row['email'] . "</td>";
                                         echo "<td>";
-                                        echo "<div class='btn-group'>";
-                                        echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_siswa'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
-                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_siswa'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
+                                        echo "<div class='d-flex'>";
+                                        echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_siswa'] . "' data-bs-whatever='@mdo'>";
+                                        echo "<i class='fas fa-pencil-alt'></i> Edit";
+                                        echo "</button>";
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_siswa'] . "'>";
+                                        echo "<i class='fas fa-trash'></i> Hapus";
+                                        echo "</button>";
                                         echo "</div>";
                                         echo "</td>";
                                         echo "</tr>";
@@ -273,6 +284,11 @@ if (isset($_GET['id_siswa'])) {
                                                                     <input type="text" class="form-control" id="no_hp"
                                                                         value="<?= $row['no_hp']; ?>" name="no_hp" required>
                                                                 </div>
+                                                                <div class="form-group">
+                                                                    <label for="email">Email</label>
+                                                                    <input type="email" class="form-control" id="email"
+                                                                        value="<?= $row['email']; ?>" name="email" required>
+                                                                </div>
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary"
@@ -360,6 +376,10 @@ if (isset($_GET['id_siswa'])) {
                                 <div class="mb-2">
                                     <label for="no_hp" class="col-form-label">Nomor HP:</label>
                                     <input type="text" class="form-control" id="no_hp" name="no_hp" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="email" class="col-form-label">Email:</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"

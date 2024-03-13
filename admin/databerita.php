@@ -2,6 +2,8 @@
 session_start();
 include 'conn.php';
 
+
+
 $query = "SELECT * FROM berita";
 $result = $koneksi->query($query);
 
@@ -155,9 +157,7 @@ if (isset($_GET['id_berita'])) {
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Berita</button>
-                                <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
-                                </button>
+                                
                             </div>
                         </div>
                     </div>
@@ -276,10 +276,11 @@ if (isset($_GET['id_berita'])) {
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="isi_berita">Isi Berita</label>
-                                                                    <input type="longtext" class="form-control"
-                                                                        id="isi_berita" value="<?= $row['isi_berita']; ?>"
-                                                                        name="isi_berita" required>
+                                                                    <textarea class="form-control" id="isi_berita"
+                                                                        name="isi_berita"
+                                                                        required><?= $row['isi_berita']; ?></textarea>
                                                                 </div>
+
                                                                 <div class="form-group">
                                                                     <label for="tanggal">Tanggal</label>
                                                                     <input type="date" class="form-control" id="tanggal"
@@ -376,7 +377,10 @@ if (isset($_GET['id_berita'])) {
             </footer>
         </div>
     </div>
+    
     <?php include 'footer.php'; ?>
+    
+
 </body>
 
 </html>

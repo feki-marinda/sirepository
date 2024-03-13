@@ -11,34 +11,45 @@ if (empty($id_user)) {
 
 $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
-$query_get_id = "SELECT siswa.id_siswa FROM siswa
-                INNER JOIN user ON siswa.id_user = user.id_user
-                WHERE user.username = '$username' LIMIT 1";
+$query_get_id = "SELECT siswa.id_siswa, pkl.id_pkl FROM siswa 
+    INNER JOIN user ON siswa.id_user = user.id_user
+    INNER JOIN pkl ON siswa.id_siswa = pkl.id_siswa
+    WHERE user.username = ? LIMIT 1;";  // Menggunakan placeholder pada query
 
-$result_id = $koneksi->query($query_get_id);
+$id_result = $koneksi->prepare($query_get_id);
+$id_result->bind_param("s", $username);  // Mengikat variabel untuk keamanan
+$id_result->execute();
+$id_result->store_result();
 
-if ($result_id !== false && $result_id->num_rows > 0) {
-    $row_id = $result_id->fetch_assoc();
-    $id_siswa = $row_id['id_siswa'];
+if ($id_result->num_rows > 0) {
+    $id_result->bind_result($id_siswa, $id_pkl);
+    $id_result->fetch();
 
     $_SESSION['id_siswa'] = $id_siswa;
+    $_SESSION['id_pkl'] = $id_pkl;
 } else {
-    $id_siswa = 'ID Siswa Tidak Ditemukan';
+    $id_siswa = -1; // atau null, tergantung kebutuhan
 }
 
 $Nama_siswa = '';
 $id_siswa = isset($_SESSION['id_siswa']) ? $_SESSION['id_siswa'] : '';
+$id_pkl = isset($_SESSION['id_pkl']) ? $_SESSION['id_pkl'] : '';
 
-$query_get_nama = "SELECT siswa.Nama_siswa FROM logbook
-                    INNER JOIN siswa ON logbook.id_siswa = siswa.id_siswa
-                    WHERE logbook.id_siswa = '$id_siswa' LIMIT 1";
-$result_nama = $koneksi->query($query_get_nama);
+$query_get_nama = $koneksi->prepare("SELECT siswa.Nama_siswa FROM siswa WHERE siswa.id_siswa = ?");
+$query_get_nama->bind_param("s", $id_siswa);
 
-if ($result_nama !== false && $result_nama->num_rows > 0) {
-    $row_nama = $result_nama->fetch_assoc();
-    $Nama_siswa = $row_nama['Nama_siswa'];
+if ($query_get_nama->execute()) {
+    $result_nama = $query_get_nama->get_result();
+
+    if ($result_nama->num_rows > 0) {
+        $row_nama = $result_nama->fetch_assoc();
+        $Nama_siswa = $row_nama['Nama_siswa'];
+    } else {
+        $Nama_siswa = 'Nama Siswa Tidak Ditemukan';
+    }
 } else {
-    $Nama_siswa = 'Nama Siswa Tidak Ditemukan';
+    echo "Error executing query: " . $query_get_nama->error;
+    exit();
 }
 
 $show_modal = false;
@@ -46,31 +57,39 @@ $show_modal = false;
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tanggal = $_POST['tanggal'];
     $aktivitas = $_POST['aktivitas'];
-    $id_siswa = $_POST['id_siswa'];
 
-    $check_query = "SELECT * FROM logbook WHERE tanggal = '$tanggal' AND id_siswa = '$id_siswa'";
-    $result = $koneksi->query($check_query);
+    // Query untuk memeriksa logbook pada tanggal tertentu
+    $check_query = $koneksi->prepare("SELECT * FROM logbook WHERE tanggal = ? AND id_siswa = ? AND id_pkl = ?");
+    $check_query->bind_param("sss", $tanggal, $id_siswa, $id_pkl);
+    $check_query->execute();
+    $result = $check_query->get_result();
+    
 
+    // Periksa hasil query
     if ($result !== false) {
         if ($result->num_rows > 0) {
             $show_modal = true;
         } else {
-            $insert_query = "INSERT INTO logbook (tanggal, aktivitas, id_siswa) VALUES ('$tanggal', '$aktivitas', '$id_siswa')";
+            $insert_query = $koneksi->prepare("INSERT INTO logbook (tanggal, aktivitas, id_siswa, id_pkl) VALUES (?, ?, ?, ?)");
+            $insert_query->bind_param("ssss", $tanggal, $aktivitas, $id_siswa, $id_pkl);
 
-            if ($koneksi->query($insert_query) === TRUE) {
+            // Eksekusi query INSERT
+            if ($insert_query->execute()) {
                 header("Location: logbook.php");
                 exit();
             } else {
-                echo "Error: " . $insert_query . "<br>" . $koneksi->error;
+                echo "Error: Anda Belum Daftar PKL ! Daftar Terlebih Dahulu ";
+                exit();
             }
         }
     } else {
         echo "Error executing query: " . $koneksi->error;
+        exit();
     }
 }
-
-$koneksi->close();
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -155,8 +174,8 @@ $koneksi->close();
 
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
             <form action="#" method="post" class="form-container">
-    <input type="hidden" name="id_siswa" value="<?php echo $_SESSION['id_siswa']; ?>">
-
+    <input type="readonly" name="id_siswa" value="<?php echo $_SESSION['id_siswa']; ?>">
+    <input type="readonly" name="id_pkl" value="<?php echo $_SESSION['id_pkl']; ?>">
     <div class="col-3 mb-3">
         <label for="exampleFormControlInput1" class="form-label fw-bold">Tanggal Kegiatan</label>
         <input type="date" class="form-control" id="exampleFormControlInput1" name="tanggal" required>

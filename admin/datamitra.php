@@ -1,5 +1,7 @@
 <?php
+session_start();
 include 'conn.php';
+
 
 $query = "SELECT * FROM mitra";
 $result = mysqli_query($koneksi, $query);
@@ -9,48 +11,103 @@ if (!$result) {
 }
 
 if (isset($_POST['TambahMitra'])) {
-    $nama = $_POST['nama'];
+    $nama_perusahaan = $_POST['nama'];
     $alamat = $_POST['alamat'];
     $kontak = $_POST['kontak'];
-    $kategori = $_POST['kategori'];    
 
-    $query = "INSERT INTO mitra (nama, alamat, kontak, kategori) 
-          VALUES ('$nama', '$alamat', '$kontak', '$kategori')";
+    // File upload handling
+    $foto_nama = $_FILES['foto']['name'];
+    $foto_tmp = $_FILES['foto']['tmp_name'];
+    $foto_path = "../gambar/" . $foto_nama;
 
-    if ($koneksi->query($query) === TRUE) {
-        header('Location: datamitra.php');
-        exit;
+    move_uploaded_file($foto_tmp, $foto_path);
+
+    $query_insert = "INSERT INTO mitra (nama, alamat, kontak, foto) 
+              VALUES ('$nama_perusahaan', '$alamat', '$kontak', '$foto_path')";
+
+    if ($koneksi->query($query_insert) === TRUE) {
+        $_SESSION['success_message'] = "Data Mitra berhasil ditambahkan!";
+        header("Location: datamitra.php");
+        exit();
     } else {
-        echo 'Error: ' . $koneksi->error;
+        $_SESSION['error_message'] = "Error: " . $koneksi->error;
+        header("Location: datamitra.php");
+        exit();
     }
-
-    $koneksi->close();
-
 }
+
 if (isset($_POST['EditMitra'])) {
     $id_mitra = $_POST['id_mitra'];
     $nama = $_POST['nama'];
     $alamat = $_POST['alamat'];
     $kontak = $_POST['kontak'];
-    $kategori = $_POST['kategori'];
 
-    mysqli_query($koneksi, "UPDATE mitra SET 
+    // Inisialisasi pesan error
+    $error_message = "";
+
+    // Periksa apakah file foto baru diunggah
+    if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
+        $foto_nama = $_FILES['foto']['name'];
+        $foto_tmp = $_FILES['foto']['tmp_name'];
+        $foto_path = "../gambar/" . $foto_nama;
+
+        // Pindahkan file ke direktori yang diinginkan
+        if (move_uploaded_file($foto_tmp, $foto_path)) {
+            // Update query dengan foto
+            $query = "UPDATE mitra SET 
                          nama='$nama',
                          alamat='$alamat',
                          kontak='$kontak',
-                         kategori='$kategori'                                                     
-                         WHERE id_mitra='$id_mitra'");
-    header("location:datamitra.php");
+                         foto='$foto_path'                                                     
+                         WHERE id_mitra='$id_mitra'";
+        } else {
+            $error_message = "Gagal mengunggah foto.";
+        }
+    } else {
+        // Update query tanpa foto
+        $query = "UPDATE mitra SET 
+                         nama='$nama',
+                         alamat='$alamat',
+                         kontak='$kontak'                                                     
+                         WHERE id_mitra='$id_mitra'";
+    }
+
+    if (empty($error_message)) {
+        // Eksekusi query
+        $result = mysqli_query($koneksi, $query);
+
+        if ($result) {
+            $rows_affected = mysqli_affected_rows($koneksi);
+            if ($rows_affected > 0) {
+                $_SESSION['success_message'] = "Data Mitra berhasil diubah!";
+            } else {
+                $_SESSION['error_message'] = "Tidak ada perubahan pada Data Mitra!";
+            }
+        } else {
+            $_SESSION['error_message'] = "Error: " . mysqli_error($koneksi);
+        }
+    } else {
+        $_SESSION['error_message'] = $error_message;
+    }
+
+    header("Location: datamitra.php");
+    exit();
 }
 
 if (isset($_GET['id_mitra'])) {
     $id_mitra = $_GET['id_mitra'];
 
     mysqli_query($koneksi, "DELETE FROM mitra WHERE id_mitra='$id_mitra'");
-    header("location:datamitra.php");
+    if ($result) {
+        $_SESSION['success_message'] = "Data mitra Pamong berhasil dihapus!";
+        header("Location: datamitra.php");
+        exit();
+    }
+
 }
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -74,29 +131,42 @@ if (isset($_GET['id_mitra'])) {
                             <div class="spacer"></div>
                             <div class="buttons-right">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
-                                    Tambah Data Mitra</button>
+                                    data-bs-target="#tambah" data-bs-whatever="@mdo">
+                                    <i class="fas fa-plus"></i> Tambah Data Mitra
+                                </button>
                                 <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
+                                    <a href="cetak/datamitra.php" style="text-decoration: none; color: inherit;" target="_blank">
+                                        <i class="fas fa-print"></i> Cetak
+                                    </a>
                                 </button>
                             </div>
                         </div>
                     </div>
-
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
                             Data Mitra SMK AL-Muhajirin
                         </div>
                         <div class="card-body">
+                        <?php
+                        if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
+                            echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+                            unset($_SESSION['error_message']);
+                        }
+
+                        if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
+                            echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
+                            unset($_SESSION['success_message']);
+                        }
+                        ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
+
                                 <thead>
                                     <tr>
                                         <th>No.</th>
                                         <th>Nama Perusahaan</th>
                                         <th>Alamat</th>
                                         <th>Kontak</th>
-                                        <th>Kategori</th>
                                         <th>Foto</th>
                                         <th>Keterangan</th>
                                     </tr>
@@ -111,12 +181,15 @@ if (isset($_GET['id_mitra'])) {
                                         echo "<td>" . $row['nama'] . "</td>";
                                         echo "<td>" . $row['alamat'] . "</td>";
                                         echo "<td>" . $row['kontak'] . "</td>";
-                                        echo "<td>" . $row['kategori'] . "</td>";
-                                        echo "<td>" . $row['foto'] . "</td>";
+                                        echo '<td><img src="../gambar/' . $row['foto'] . '" width="125" height="130"></td>';
                                         echo "<td>";
-                                        echo "<div class='btn-group'>";
-                                        echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_mitra'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
-                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_mitra'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
+                                        echo "<div class='d-flex'>";
+                                        echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_mitra'] . "' data-bs-whatever='@mdo'>";
+                                        echo "<i class='fas fa-pencil-alt'></i> Edit";
+                                        echo "</button>";
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_mitra'] . "'>";
+                                        echo "<i class='fas fa-trash'></i> Hapus";
+                                        echo "</button>";
                                         echo "</div>";
                                         echo "</td>";
                                         echo "</tr>";
@@ -151,10 +224,10 @@ if (isset($_GET['id_mitra'])) {
                                         <!-- Modal edit data -->
                                         <div class='modal fade' id='edit<?= $row['id_mitra'] ?>' tabindex='-1'
                                             aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
+                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Dokumen
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -162,39 +235,41 @@ if (isset($_GET['id_mitra'])) {
                                                     <div class="modal-body">
                                                         <form method="post" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
-                                                                <div class="form-group">
-                                                                    <label for="id_mitra">ID</label>
-                                                                    <input type="text" class="form-control" id="id_mitra"
-                                                                        value="<?= $row['id_mitra']; ?>" name="id_mitra"
-                                                                        readonly>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="nama">Nama Perusahaan</label>
-                                                                    <input type="date" class="form-control" id="nama"
-                                                                        value="<?= $row['nama']; ?>" name="nama"
-                                                                        required>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="alamat">Alamat</label>
-                                                                    <input type="text" class="form-control" id="alamat"
-                                                                        value="<?= $row['alamat']; ?>" name="alamat"
-                                                                        required>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="kontak">Telp</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="kontak"
-                                                                        value="<?= $row['kontak']; ?>"
-                                                                        name="kontak" required>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="kategori">Kategori</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="kategori"
-                                                                        value="<?= $row['kategori']; ?>"
-                                                                        name="kategori" required>
-                                                                </div>
+                                                                <label for="id_mitra">ID</label>
+                                                                <input type="text" class="form-control" id="id_mitra"
+                                                                    value="<?= $row['id_mitra']; ?>" name="id_mitra" hidden>
                                                             </div>
+
+                                                            <div class="form-group">
+                                                                <label for="nama">Nama Perusahaan</label>
+                                                                <input type="text" class="form-control" id="nama"
+                                                                    value="<?= $row['nama']; ?>" name="nama" required>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="alamat">Alamat</label>
+                                                                <input type="text" class="form-control" id="alamat"
+                                                                    value="<?= $row['alamat']; ?>" name="alamat" required>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label for="kontak">Telp</label>
+                                                                <input type="text" class="form-control" id="kontak"
+                                                                    value="<?= $row['kontak']; ?>" name="kontak" required>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label for="foto" class="col-form-label">Foto:</label>
+                                                                <input type="file" class="form-control" id="foto"
+                                                                    name="foto" accept="image/*">
+                                                                <small class="text-muted">Abaikan jika tidak mengedit
+                                                                    gambar</small>
+                                                                <input type="hidden" id="foto_lama" name="foto_lama"
+                                                                    value="<?= $row['foto']; ?>">
+                                                            </div>
+
+
+
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary"
                                                                     data-bs-dismiss="modal">Close</button>
@@ -206,6 +281,7 @@ if (isset($_GET['id_mitra'])) {
                                                 </div>
                                             </div>
                                         </div>
+
                                         <?php
                                     }
                                     ?>
@@ -217,9 +293,8 @@ if (isset($_GET['id_mitra'])) {
             </main>
 
             <!-- Modal tambah data-->
-            <div class="modal modal-fullscreen-xxl-down fade" id="tambah" tabindex="-1"
-                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen-xxl-down">
+            <div class="modal fade" id="tambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="exampleModalLabel">Tambah Mitra PKL</h5>
@@ -229,7 +304,7 @@ if (isset($_GET['id_mitra'])) {
                             <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
                                 <div class="mb-3">
                                     <label for="nama" class="col-form-label">Nama Perusahaan :</label>
-                                    <input type="date" class="form-control" id="nama" name="nama" required>
+                                    <input type="text" class="form-control" id="nama" name="nama" required>
                                 </div>
                                 <div class="mb-3">
                                     <label for="alamat" class="col-form-label">Alamat :</label>
@@ -237,12 +312,11 @@ if (isset($_GET['id_mitra'])) {
                                 </div>
                                 <div class="mb-3">
                                     <label for="kontak" class="col-form-label">Telp :</label>
-                                    <input type="text" class="form-control" id="kontak" name="kontak"
-                                        required>
+                                    <input type="text" class="form-control" id="kontak" name="kontak" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="kategori" class="col-form-label">Kategori :</label>
-                                    <input type="text" class="form-control" id="kategori" name="kategori"
+                                    <label for="foto" class="col-form-label">Foto:</label>
+                                    <input type="file" class="form-control" id="foto" name="foto" accept="image/*"
                                         required>
                                 </div>
                                 <div class="modal-footer">
@@ -252,11 +326,11 @@ if (isset($_GET['id_mitra'])) {
                                         id="submit">Submit</button>
                                 </div>
                             </form>
-
                         </div>
                     </div>
                 </div>
             </div>
+
 
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
@@ -272,7 +346,7 @@ if (isset($_GET['id_mitra'])) {
             </footer>
         </div>
     </div>
-    <?php include 'footer.php';?>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

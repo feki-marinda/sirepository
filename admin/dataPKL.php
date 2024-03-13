@@ -23,16 +23,20 @@ if (isset($_POST['Tambahpkl'])) {
     $tahun_pelajaran = escapeString($koneksi, $_POST['tahun_pelajaran']);
 
     $query = "INSERT INTO pkl (id_siswa, tgl_mulai, tgl_selesai, kelas, nama_perusahaan, tahun_pelajaran) 
-          VALUES ('$id_siswa', '$tgl_mulai', '$tgl_selesai', '$kelas', '$nama_perusahaan', '$tahun_pelajaran')";
+              VALUES ('$id_siswa', '$tgl_mulai', '$tgl_selesai', '$kelas', '$nama_perusahaan', '$tahun_pelajaran')";
+
+    // Eksekusi query dan cek hasilnya
+    $result = $koneksi->query($query);
 
     if ($result) {
-        $_SESSION['success_message'] = "Data Guru Pamong berhasil ditambahkan!";
-        header("Location: dataGP.php");
+        $_SESSION['success_message'] = "Data PKL berhasil ditambahkan!";
+        header("Location: dataPKL.php");
+        exit();
+    } else {
+        $_SESSION['error_message'] = "Error: " . $koneksi->error;
+        header("Location: dataPKL.php");
         exit();
     }
-
-
-    $koneksi->close();
 }
 
 if (isset($_POST['Editpkl'])) {
@@ -57,7 +61,7 @@ if (isset($_POST['Editpkl'])) {
     if ($result) {
         $rows_affected = mysqli_affected_rows($koneksi);
         if ($rows_affected > 0) {
-            $_SESSION['success_message'] = "Data Guru Pamong berhasil diubah!";
+            $_SESSION['success_message'] = "Data PKL berhasil diubah!";
         } else {
             $_SESSION['error_message'] = "Tidak ada perubahan pada Data Pamong!";
         }
@@ -75,8 +79,8 @@ if (isset($_GET['id_pkl'])) {
 
     mysqli_query($koneksi, "DELETE FROM pkl WHERE id_pkl='$id_pkl'");
     if ($result) {
-        $_SESSION['success_message'] = "Data Guru Pamong berhasil dihapus!";
-        header("Location: dataGP.php");
+        $_SESSION['success_message'] = "Data PKL berhasil dihapus!";
+        header("Location: dataPKL.php");
         exit();
     }
 
@@ -108,8 +112,10 @@ if (isset($_GET['id_pkl'])) {
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data PKL</button>
-                                <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
+                                    <button id="printButton">
+                                    <a href="cetak/datapkl.php" style="text-decoration: none; color: inherit;" target="_blank">
+                                        <i class="fas fa-print"></i> Cetak
+                                    </a>
                                 </button>
                             </div>
                         </div>
@@ -118,7 +124,7 @@ if (isset($_GET['id_pkl'])) {
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            Data Praktik Kerja Lapangan Siswa <br> SMK AL-Muhajirin
+                            Data Praktik Kerja Lapangan Siswa
                         </div>
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -139,7 +145,7 @@ if (isset($_GET['id_pkl'])) {
                                         <th>Nama Lengkap</th>
                                         <th>Tanggal Mulai</th>
                                         <th>Tanggal Selesai</th>
-                                        <th>kelas</th>
+                                        <th>Kelas</th>
                                         <th>Nama Perusahaan</th>
                                         <th>Tahun Pelajaran</th>
                                         <th>Keterangan</th>
@@ -160,9 +166,13 @@ if (isset($_GET['id_pkl'])) {
                                         echo "<td>" . $row['nama_perusahaan'] . "</td>";
                                         echo "<td>" . $row['tahun_pelajaran'] . "</td>";
                                         echo "<td>";
-                                        echo "<div class='btn-group'>";
-                                        echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_pkl'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
-                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_pkl'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
+                                        echo "<div class='d-flex'>";
+                                        echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_pkl'] . "' data-bs-whatever='@mdo'>";
+                                        echo "<i class='fas fa-pencil-alt'></i> Edit";
+                                        echo "</button>";
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_pkl'] . "'>";
+                                        echo "<i class='fas fa-trash'></i> Hapus";
+                                        echo "</button>";
                                         echo "</div>";
                                         echo "</td>";
                                         echo "</tr>";
@@ -175,7 +185,8 @@ if (isset($_GET['id_pkl'])) {
                                             <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data dokumen
+                                                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data Praktek
+                                                            Kerja Lapangan
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -312,7 +323,10 @@ if (isset($_GET['id_pkl'])) {
                                 </div>
                                 <div class="form-group">
                                     <label for="kelas">Kelas:</label>
-                                    <input type="text" class="form-control" id="kelas" name="kelas" required>
+                                    <select class="form-control" id="kelas" name="kelas" required>
+                                        <option value="XI A">XI A</option>
+                                        <option value="XI B">XI B</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="nama_perusahaan">Nama Perusahaan:</label>
