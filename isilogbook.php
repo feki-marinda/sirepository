@@ -14,10 +14,10 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 $query_get_id = "SELECT siswa.id_siswa, pkl.id_pkl FROM siswa 
     INNER JOIN user ON siswa.id_user = user.id_user
     INNER JOIN pkl ON siswa.id_siswa = pkl.id_siswa
-    WHERE user.username = ? LIMIT 1;";  // Menggunakan placeholder pada query
+    WHERE user.username = ? LIMIT 1;"; // Menggunakan placeholder pada query
 
 $id_result = $koneksi->prepare($query_get_id);
-$id_result->bind_param("s", $username);  // Mengikat variabel untuk keamanan
+$id_result->bind_param("s", $username); // Mengikat variabel untuk keamanan
 $id_result->execute();
 $id_result->store_result();
 
@@ -63,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $check_query->bind_param("sss", $tanggal, $id_siswa, $id_pkl);
     $check_query->execute();
     $result = $check_query->get_result();
-    
+
 
     // Periksa hasil query
     if ($result !== false) {
@@ -173,19 +173,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div><br>
 
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
-            <form action="#" method="post" class="form-container">
-    <input type="readonly" name="id_siswa" value="<?php echo $_SESSION['id_siswa']; ?>">
-    <input type="readonly" name="id_pkl" value="<?php echo $_SESSION['id_pkl']; ?>">
-    <div class="col-3 mb-3">
-        <label for="exampleFormControlInput1" class="form-label fw-bold">Tanggal Kegiatan</label>
-        <input type="date" class="form-control" id="exampleFormControlInput1" name="tanggal" required>
-    </div>
-    <div class="mb-3">
-        <label for="exampleFormControlTextarea1" class="form-label fw-bold">Deskripsikan Aktivitasmu</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" placeholder="Deskripsikan Kegiatanmu" name="aktivitas" required></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+                <form action="#" method="post" class="form-container">
+                    <input type="hidden" name="id_siswa" value="<?php echo $_SESSION['id_siswa']; ?>">
+                    <input type="hidden" name="id_pkl" value="<?php echo $_SESSION['id_pkl']; ?>">
+                    <div class="col-3 mb-3">
+                        <label for="exampleFormControlInput1" class="form-label fw-bold">Tanggal Kegiatan</label>
+                        <input type="date" class="form-control" id="exampleFormControlInput1" name="tanggal" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="exampleFormControlTextarea1" class="form-label fw-bold">Deskripsikan
+                            Aktivitasmu</label>
+                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"
+                            placeholder="Deskripsikan Kegiatanmu" name="aktivitas" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
 
             </div>
 

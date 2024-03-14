@@ -58,8 +58,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <div class="nav">
                     <div class="sb-sidenav-menu-heading">Core</div>
                     <a class="nav-link <?php echo ($current_page === 'index.php') ? 'active' : ''; ?>" href="index.php">
-                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                    Dashboard
+                    <div class="sb-nav-link-icon"><i class="fa-solid fa-user"></i></div>
+                    Hallo, Admin <br> Sirepository
                 </a>
                     <div class="sb-sidenav-menu-heading">Menu</div>
                     <a class="nav-link <?php echo ($current_page === 'datauser.php') ? 'active' : ''; ?>" href="datauser.php">

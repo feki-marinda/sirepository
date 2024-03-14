@@ -29,7 +29,7 @@ if (isset($_POST['TambahSertifikat'])) {
 
     $file_sertifikat_name = $_FILES['file_sertifikat']['name'];
     $file_sertifikat_temp = $_FILES['file_sertifikat']['tmp_name'];
-    $file_sertifikat_path = "admin/Sertifikat/" . sanitizeFilePath($file_sertifikat_name);
+    $file_sertifikat_path = "" . sanitizeFilePath($file_sertifikat_name);
 
     $query_get_id = "SELECT id_siswa FROM siswa WHERE Nama_siswa = ?";
     $stmt_get_id = $koneksi->prepare($query_get_id);
@@ -123,11 +123,7 @@ if (isset($_GET['id_sertifikat'])) {
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Sertifikat</button>
-                                    <button id="printButton">
-                                    <a href="cetak/datasertifikat.php" style="text-decoration: none; color: inherit;" target="_blank">
-                                        <i class="fas fa-print"></i> Cetak
-                                    </a>
-                                </button>
+                                    
                             </div>
                         </div>
                     </div>
