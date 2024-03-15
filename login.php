@@ -15,6 +15,7 @@ function registrasi($data){
     $kelas = mysqli_real_escape_string($koneksi, $data["kelas"]);
     $no_hp = mysqli_real_escape_string($koneksi, $data["no_hp"]);
     $email = mysqli_real_escape_string($koneksi, $data["email"]);
+    $status = mysqli_real_escape_string($koneksi, $data["status"]);
 
 
     $result = mysqli_query($koneksi, "SELECT * FROM user WHERE username = '$username'");
@@ -28,7 +29,7 @@ function registrasi($data){
         return false;
     }
 
-    $result_user = mysqli_query($koneksi, "INSERT INTO user (username, password) VALUES ('$username', '$password')");
+    $result_user = mysqli_query($koneksi, "INSERT INTO user (username, password, status) VALUES ('$username', '$password','$status')");
 
     if ($result_user) {
         $user_id = mysqli_insert_id($koneksi);

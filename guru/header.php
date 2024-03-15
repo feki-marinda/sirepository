@@ -60,7 +60,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <div class="sb-sidenav-menu-heading">Core</div>
                     <a class="nav-link <?php echo ($current_page === 'index.php') ? 'active' : ''; ?>" href="index.php">
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                    Dashboard
+                    Dashboard <br> Guru Pamong
                 </a>
                     <div class="sb-sidenav-menu-heading">Menu</div>
                     <a class="nav-link <?php echo ($current_page === 'dataPKL.php') ? 'active' : ''; ?>" href="dataPKL.php">
@@ -70,11 +70,6 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <a class="nav-link <?php echo ($current_page === 'datalaporan.php') ? 'active' : ''; ?>" href="datalaporan.php">
                     <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                     Data Laporan PKL
-                </a>
-                
-                <a class="nav-link <?php echo ($current_page === 'datadokumen.php') ? 'active' : ''; ?>" href="datadokumen.php">
-                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                    Data Dokumen
                 </a>
                 <a class="nav-link <?php echo ($current_page === 'datalogbook.php') ? 'active' : ''; ?>" href="datalogbook.php">
                     <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
@@ -87,6 +82,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <a class="nav-link <?php echo ($current_page === 'datasertifikat.php') ? 'active' : ''; ?>" href="datasertifikat.php">
                     <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                     Data Sertifikat
+                </a>
+                <a class="nav-link <?php echo ($current_page === 'datadokumen.php') ? 'active' : ''; ?>" href="datadokumen.php">
+                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                    Data Dokumen
                 </a>
                 </div>
             </div>

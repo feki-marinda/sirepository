@@ -66,7 +66,7 @@ if (isset($_GET['id_user'])) {
         header("Location: datauser.php");
         exit();
     } else {
-        $_SESSION['error_message'] = "Error: " . mysqli_error($koneksi);
+        $_SESSION['error_message'] = "Error: Tidak Dapat Menghapus Data User yang terdaftar PKL !";
         header("Location: datauser.php");
         exit();
     }

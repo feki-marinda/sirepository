@@ -136,10 +136,21 @@ if (isset($_GET['id_nilai'])) {
                                         echo "<td>" . $row['grade'] . "</td>";
                                         echo "<td>" . $row['file'] . "</td>";
                                         echo "<td>";
-                                        echo "<div class='btn-group'>";
+                                        // Tombol Detail
+                                        echo "<div class='btn-group me-2'>";
+                                        echo "<button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_nilai'] . "'><i class='fa-solid fa-eye'></i> Detail</button>";
+                                        echo "</div>";
+
+                                        // Tombol Edit
+                                        echo "<div class='btn-group me-2'>";
                                         echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_nilai'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
+                                        echo "</div>";
+
+                                        // Tombol Hapus
+                                        echo "<div class='btn-group mt-2'>";
                                         echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_nilai'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
                                         echo "</div>";
+
                                         echo "</td>";
                                         echo "</tr>";
                                         ?>

@@ -1,7 +1,8 @@
 <?php
 include 'conn.php';
 
-function escapeString($koneksi, $string) {
+function escapeString($koneksi, $string)
+{
     return mysqli_real_escape_string($koneksi, $string);
 }
 
@@ -85,21 +86,21 @@ if (isset($_GET['id_pkl'])) {
                     <div class="card mb-4">
                         <div class="button-container">
                             <div class="spacer"></div>
-                            <div class="buttons-right">
+                            <!-- <div class="buttons-right">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data PKL</button>
                                 <button id="printButton">
                                     <i class="fas fa-print"></i> Cetak
                                 </button>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
 
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            Data Praktik Kerja Lapangan Siswa <br> SMK AL-Muhajirin
+                            Data Praktik Kerja Lapangan Siswa SMK AL-Muhajirin
                         </div>
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -111,6 +112,8 @@ if (isset($_GET['id_pkl'])) {
                                         <th>Tanggal Selesai</th>
                                         <th>Nama Perusahaan</th>
                                         <th>Tahun Pelajaran</th>
+                                        <th>No Hp</th>
+                                        <th>Email</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
@@ -127,11 +130,24 @@ if (isset($_GET['id_pkl'])) {
                                         echo "<td>" . $row['tgl_selesai'] . "</td>";
                                         echo "<td>" . $row['nama_perusahaan'] . "</td>";
                                         echo "<td>" . $row['tahun_pelajaran'] . "</td>";
+                                        echo "<td>" . $row['no_hp'] . "</td>";
+                                        echo "<td>" . $row['email'] . "</td>";
                                         echo "<td>";
-                                        echo "<div class='btn-group'>";
+                                        // Tombol Detail
+                                        echo "<div class='btn-group me-2'>";
+                                        echo "<button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_pkl'] . "'><i class='fa-solid fa-eye'></i> Detail</button>";
+                                        echo "</div>";
+
+                                        // Tombol Edit
+                                        echo "<div class='btn-group me-2'>";
                                         echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_pkl'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
+                                        echo "</div>";
+
+                                        // Tombol Hapus
+                                        echo "<div class='btn-group mt-2'>";
                                         echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_pkl'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
                                         echo "</div>";
+
                                         echo "</td>";
                                         echo "</tr>";
 
@@ -164,7 +180,7 @@ if (isset($_GET['id_pkl'])) {
                                         <!-- Modal edit data -->
                                         <div class='modal fade' id='edit<?= $row['id_pkl'] ?>' tabindex='-1'
                                             aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
@@ -179,8 +195,7 @@ if (isset($_GET['id_pkl'])) {
                                                         <form method="post" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
                                                                 <div class="form-group">
-                                                                    <label for="id_pkl">ID</label>
-                                                                    <input type="text" class="form-control" id="id_pkl"
+                                                                    <input type="hidden" class="form-control" id="id_pkl"
                                                                         value="<?= $row['id_pkl']; ?>" name="id_pkl"
                                                                         readonly>
                                                                 </div>
@@ -203,10 +218,11 @@ if (isset($_GET['id_pkl'])) {
                                                                         name="tgl_selesai" required>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="angkatan">angkatan</label>
-                                                                    <input type="text" class="form-control" id="angkatan"
-                                                                        value="<?= $row['angkatan']; ?>" name="angkatan"
-                                                                        required>
+                                                                    <label for="tahun_pelajaran">tahun_pelajaran</label>
+                                                                    <input type="text" class="form-control"
+                                                                        id="tahun_pelajaran"
+                                                                        value="<?= $row['tahun_pelajaran']; ?>"
+                                                                        name="tahun_pelajaran" required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="nama_perusahaan">Nama Perusahaan</label>
@@ -221,6 +237,16 @@ if (isset($_GET['id_pkl'])) {
                                                                         class="form-control" id="tahun_pelajaran"
                                                                         value="<?= $row['tahun_pelajaran']; ?>"
                                                                         name="tahun_pelajaran" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="no_hp">No Hp</label><input type="text"
+                                                                        class="form-control" id="no_hp"
+                                                                        value="<?= $row['no_hp']; ?>" name="no_hp" required>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="email">Email</label><input type="text"
+                                                                        class="form-control" id="email"
+                                                                        value="<?= $row['email']; ?>" name="email" required>
                                                                 </div>
                                                             </div>
                                                             <div class="modal-footer">
@@ -317,7 +343,7 @@ if (isset($_GET['id_pkl'])) {
             </footer>
         </div>
     </div>
-    <?php include 'footer.php';?>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

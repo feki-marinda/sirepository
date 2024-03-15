@@ -1,7 +1,7 @@
 <?php
 include 'conn.php';
 
-$query = "SELECT * FROM sertifikat";
+$query = "SELECT * FROM sertifikat INNER JOIN siswa";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
@@ -105,7 +105,7 @@ if (isset($_GET['id_sertifikat'])) {
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
-                                        echo "<td>" . $row['nama_siswa'] . "</td>";
+                                        echo "<td>" . $row['Nama_siswa'] . "</td>";
                                         echo "<td>" . $row['file_sertifikat'] . "</td>";                                        
                                         echo "<td>";
                                         echo "<div class='btn-group'>";

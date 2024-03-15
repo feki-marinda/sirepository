@@ -60,5 +60,5 @@ $html = '
 </html>';
 
 $mpdf->WriteHTML($html);
-$mpdf->Output('Daftar-PKL-Siswa.pdf', 'D');
+$mpdf->Output('Daftar-PKL-Siswa.pdf', 'I');
 

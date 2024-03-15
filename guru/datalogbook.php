@@ -107,7 +107,17 @@ if (isset($_GET['id_logbook'])) {
                                         echo "<td>" . $row['Nama_siswa']. "</td>";
                                         echo "<td>" . $row['tanggal'] . "</td>";
                                         echo "<td>" . $row['aktivitas'] . "</td>";
-                                        echo "<td>" . $row['status_logbook'] . "</td>";
+                                        echo "<td>";
+                                        // Tombol Terima
+                                        echo "<div class='btn-group me-2'>";
+                                        echo "<button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_logbook'] . "'><i class='fa-solid fa-check'></i> Terima</button>";
+                                        echo "</div>";
+
+                                        // Tombol Tolak
+                                        echo "<div class='btn-group me-2'>";
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_logbook'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-times'></i> Tolak</button>";
+                                        echo "</div>";
+                                        echo "</td>";
                                         echo "<td>";
                                         echo "<div class='btn-group'>";
                                         echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_logbook'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";

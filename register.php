@@ -78,6 +78,7 @@ if (isset($_POST['register'])) {
                             }
                             ?>
                             <form method="post" action="">
+                            <input type="text" class="form-control" id="status" name="status" value="siswa" hidden>
                                 <div class="mb-3">
                                     <label for="username">Username</label>
                                     <input type="text" class="form-control" id="username" name="username"

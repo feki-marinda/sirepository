@@ -80,7 +80,7 @@ if (isset($_GET['id_laporan'])) {
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            DataTable Example
+                            Data Laporan PKL Siswa
                         </div>
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -89,17 +89,11 @@ if (isset($_GET['id_laporan'])) {
                                         <th>No.</th>
                                         <th>Nama Lengkap</th>
                                         <th>Tanggal Pengupulan</th>
-                                        <th>file</th>
+                                        <th>File</th>
+                                        <th>Status</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
-                                <tfoot>
-                                    <th>No.</th>
-                                    <th>Nama Lengkap</th>
-                                    <th>Tanggal Pengupulan</th>
-                                    <th>file</th>
-                                    <th>Keterangan</th>
-                                </tfoot>
                                 <tbody>
                                     <?php
                                     include 'conn.php';
@@ -111,6 +105,18 @@ if (isset($_GET['id_laporan'])) {
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
                                         echo "<td>" . date('d-m-Y', strtotime($row['tanggal_kumpul'])) . "</td>";
                                         echo "<td><a href='" . 'Laporan PKL' . '/' . $row['berkas'] . "' target='_blank'>" . $row['berkas'] . "</a></td>";
+                                        echo "<td>";
+                                        // Tombol Terima
+                                        echo "<div class='btn-group me-2'>";
+                                        echo "<button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_laporan'] . "'><i class='fa-solid fa-check'></i> Terima</button>";
+                                        echo "</div>";
+
+                                        // Tombol Tolak
+                                        echo "<div class='btn-group me-2'>";
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_laporan'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-times'></i> Tolak</button>";
+                                        echo "</div>";
+                                        echo "</td>";
+
                                         echo "<td>";
                                         echo "<div class='btn-group'>";
                                         echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_laporan'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
@@ -228,7 +234,7 @@ if (isset($_GET['id_laporan'])) {
             </footer>
         </div>
     </div>
-    <?php include 'footer.php';?>
+    <?php include 'footer.php'; ?>
 
 </body>
 
