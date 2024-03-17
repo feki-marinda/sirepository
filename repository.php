@@ -76,7 +76,11 @@ if (empty($id_user)) {
                     <tbody>
                         <?php
                         $no = 1;
-                        $query = "SELECT * FROM laporan_pkl LEFT JOIN siswa ON laporan_pkl.id_siswa = siswa.id_siswa";
+                        $query = "SELECT * 
+                        FROM laporan_pkl 
+                        LEFT JOIN siswa ON laporan_pkl.id_siswa = siswa.id_siswa 
+                        WHERE status = 'Diterima' OR status = 'Terkirim';
+                        ";
                         $result = mysqli_query($koneksi, $query);
                         
                         if (!$result) {

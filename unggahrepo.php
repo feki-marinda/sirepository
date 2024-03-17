@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result_id_siswa = $stmt_get_id_siswa->get_result();
     $row_id_siswa = $result_id_siswa->fetch_assoc();
     $emailPenerima = $row_id_siswa['email'];
+    $status = $row_id_siswa['status'];
 
     $id_siswa = $row_id_siswa['id_siswa'];
 
@@ -51,8 +52,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 try {
                     $googleDriveFileId = uploadToGoogleDrive('admin/Laporan PKL/' . $file_name, $file_name);
 
-                    $query_insert = "INSERT INTO laporan_pkl (id_siswa, tanggal_kumpul, berkas, judul_laporan, google_drive_file_id) 
-                                    VALUES (?, ?, ?, ?, ?)";
+                    $query_insert = "INSERT INTO laporan_pkl (id_siswa, tanggal_kumpul, berkas, judul_laporan, google_drive_file_id, status) 
+                                     VALUES (?, ?, ?, ?, ?, 'Terkirim')";
                     $stmt_insert = $koneksi->prepare($query_insert);
                     $stmt_insert->bind_param("sssss", $id_siswa, $tanggal_kumpul, $file_name, $judul_laporan, $googleDriveFileId);
 
@@ -65,7 +66,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         require_once "library/POP3.php";
                         require_once "library/SMTP.php";
 
-                        // Pengiriman email hanya saat laporan pertama kali diunggah
                         if (isset($_POST['send']) && $_POST['send'] == "uploadLaporan") {
                             $mail = new PHPMailer();
 
@@ -95,7 +95,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $mail->Body = "Selamat, laporan praktik kerja lapangan Anda berhasil diunggah. Berikut detailnya:<br>"
                                 . "Nama Siswa: " . $_POST['Nama_siswa'] . "<br>"
                                 . "Tanggal Kumpul: " . $_POST['tanggal_kumpul'] . "<br>"
-                                . "Judul Laporan: " . $_POST['judul_laporan'] . "<br>";
+                                . "Judul Laporan: " . $_POST['judul_laporan'] . "<br>"
+                                . "Status: " . $_POST['status'] . "<br>";
 
                             if (!$mail->send()) {
                                 echo "mailer eror" . $mail->ErrorInfo;
@@ -109,8 +110,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 exit;
 
                             }
-
-
                         }
                     } else {
                         throw new Exception('Error executing query: ' . $stmt_insert->error);
@@ -168,7 +167,6 @@ $koneksi->close();
             form {
                 font-family: Arial, sans-serif;
             }
-            
         </style>
 
         <div class="container">
@@ -183,7 +181,8 @@ $koneksi->close();
 
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded d-flex" style="box-shadow: 10px 10px 20px 12px lightblue;">
                 <?php if ($showForm) { ?>
-                    <form action="#" method="post" enctype="multipart/form-data" id="uploadForm" >
+                    <form action="#" method="post" enctype="multipart/form-data" id="uploadForm">
+                        <input type="hidden" value="Terkirim" name="status">
                         <div class="mb-3">
                             <label for="Nama_siswa" class="form-label fw-bold">Nama Lengkap :</label>
                             <input type="text" class="form-control" id="Nama_siswa" name="Nama_siswa" required
@@ -204,7 +203,7 @@ $koneksi->close();
                             <input class="form-control" type="file" id="fileLaporan" name="fileLaporan" required>
                         </div>
                         <div class="d-grid gap-2">
-                            <button class="btn btn-primary" type="button" id="modalSubmitBtn">Unggah</button>
+                            <button class="btn btn-primary" type="submit">Unggah</button>
                         </div>
                         <input type="hidden" value="uploadLaporan" name="send">
                     </form>
@@ -212,44 +211,11 @@ $koneksi->close();
                     <p>Laporan PKL sudah pernah diunggah untuk siswa ini.</p>
                 <?php } ?>
             </div>
-
-            <!-- Modal -->
-            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-                aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="staticBackdropLabel">Apakah anda yakin ingin mengunggah laporan
-                                ? </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            Laporan yang sudah diunggah tidak dapat diedit kembali !
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button class="btn btn-primary" type="button" id="modalSubmitBtn">Unggah</button>
-                        </div>
-                    </div>
-                </div>
-            </div>            
         </div>
 
         <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
                 class="bi bi-arrow-up-short"></i></a>
 
-        <script>
-            document.getElementById("uploadForm").addEventListener("submit", function (event) {
-                document.getElementById("modalSubmitBtn").setAttribute("disabled", "true");
-
-                event.preventDefault();
-                $('#staticBackdrop').modal('show');
-            });
-
-            document.getElementById("modalSubmitBtn").addEventListener("click", function () {
-                document.getElementById("uploadForm").submit();
-            });
-        </script>
         <script src="assets/js/main.js"></script>
 
     </main>

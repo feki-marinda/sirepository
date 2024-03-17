@@ -15,6 +15,7 @@ $query = "SELECT
             laporan_pkl.judul_laporan,
             laporan_pkl.google_drive_file_id,
             laporan_pkl.berkas,
+            laporan_pkl.status,
             siswa.Nama_siswa
           FROM
             laporan_pkl
@@ -49,41 +50,50 @@ if (isset($_POST['EditLaporan'])) {
             // Edit file di Google Drive
             $googleDriveFileId = editGoogleDriveFile('admin/Laporan PKL/' . $berkas, $berkas);
 
-            // Update entri dalam database dengan informasi terbaru
+            // Update entri dalam database dengan informasi terbaru dan ubah status menjadi "Terkirim"
             $query_update = "UPDATE laporan_pkl 
                             INNER JOIN siswa ON laporan_pkl.id_siswa = siswa.id_siswa
-                            SET laporan_pkl.tanggal_kumpul = ?, laporan_pkl.judul_laporan = ?, laporan_pkl.berkas = ?, laporan_pkl.google_drive_file_id = ?
+                            SET laporan_pkl.tanggal_kumpul = ?, laporan_pkl.judul_laporan = ?, laporan_pkl.berkas = ?, laporan_pkl.google_drive_file_id = ?, laporan_pkl.status = 'Terkirim'
                             WHERE laporan_pkl.id_laporan = ? AND siswa.Nama_siswa = ?";
 
-            $stmt = $koneksi->prepare($query_update);
-            if ($stmt) {
-                $stmt->bind_param("ssssss", $tanggal_kumpul, $judul, $berkas, $googleDriveFileId, $id_laporan, $Nama_siswa);
-                if ($stmt->execute()) {
-                    // Redirect ke halaman riwayatrepo.php setelah update
-                    header("location:riwayatrepo.php");
-                    exit(); // Hentikan eksekusi script setelah redirect
+            $stmt_update = $koneksi->prepare($query_update);
+            if ($stmt_update) {
+                $stmt_update->bind_param("ssssss", $tanggal_kumpul, $judul, $berkas, $googleDriveFileId, $id_laporan, $Nama_siswa);
+                if ($stmt_update->execute()) {
+                    $_SESSION['success_message'] = "Berhasil mengedit laporan!";
+                    header("Location: riwayatrepo.php");
+                    exit();
                 } else {
-                    throw new Exception("Error executing query: " . $stmt->error);
+                    $_SESSION['error_message'] = "Error saat mengedit laporan: " . $stmt_update->error;
+                    header("Location: riwayatrepo.php");
+                    exit();
                 }
             } else {
-                throw new Exception("Error preparing query: " . $koneksi->error);
+                $_SESSION['error_message'] = "Error saat menyiapkan statement update: " . $koneksi->error;
+                header("Location: riwayatrepo.php");
+                exit();
             }
         } catch (Exception $e) {
-            echo "Error: " . $e->getMessage();
+            $_SESSION['error_message'] = "Terjadi kesalahan: " . $e->getMessage();
+            header("Location: riwayatrepo.php");
+            exit();
         }
-    } 
-    else {
-        
-        echo "Tidak ada file yang di ubah !";
+    } else {
+        $_SESSION['error_message'] = "Terjadi kesalahan saat mengunggah berkas.";
+        header("Location: riwayatrepo.php");
+        exit();
     }
 }
+
 ?>
+
+
 <style>
-            table {
-                font-family: Arial, sans-serif;
-            }
-            
-        </style>
+    table,
+    form {
+        font-family: Arial, sans-serif;
+    }
+</style>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -108,54 +118,73 @@ if (isset($_POST['EditLaporan'])) {
 
         <section id="blog" class="blog">
             <div class="container">
-
                 <div class="row">
-
                     <div class="entries">
-                        <div>
-                            <table class="table table-bordered">
-                                <thead class="table-primary">
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Nama Lengkap</th>
-                                        <th>Tanggal Pengumpulan</th>
-                                        <th>Judul</th>
-                                        <th>File</th>
-                                        <th>Status</th>
-                                        <th>Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    $no = 1;
-                                    while ($row = mysqli_fetch_assoc($result)) {
-                                        echo "<tr>";
-                                        echo "<td>" . $no++ . "</td>";
-                                        echo "<td>" . $row['Nama_siswa'] . "</td>";
-                                        echo "<td>" . $row['tanggal_kumpul'] . "</td>";
-                                        echo "<td>" . $row['judul_laporan'] . "</td>";
-                                        echo "<td><a href='https://drive.google.com/uc?id=" . $row['google_drive_file_id'] . "' target='_blank' rel='noopener noreferrer'>" . $row['google_drive_file_id'] . "</a></td>";
-                                        echo "<td>" . $row['berkas'] . "</td>";
-                                        echo "<td>";
-                                        echo "<div class='d-flex'>";
-                                        echo '<button class="btn btn-sm btn-success me-1" type="button" data-bs-toggle="modal" data-bs-target="#edit' . $row['id_laporan'] . '"><i class="bi bi-pencil-fill"></i> Edit</button>';
-                                        echo '<button class="btn btn-sm btn-info" type="button" data-bs-toggle="modal" data-bs-target="#detail' . $row['id_laporan'] . '"><i class="bi bi-info-circle-fill"></i> Detail</button>';
-                                        echo "</div>";
-                                        echo "</td>";
+                        <?php
+                        if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
+                            echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+                            unset($_SESSION['error_message']);
+                        }
+
+                        if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
+                            echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
+                            unset($_SESSION['success_message']);
+                        }
+                        ?>
+                        <table class="table table-bordered">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Nama Lengkap</th>
+                                    <th>Tanggal Pengumpulan</th>
+                                    <th>Judul</th>
+                                    <th>File</th>
+                                    <th>Status</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                $no = 1;
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    echo "<tr>";
+                                    echo "<td>" . $no++ . "</td>";
+                                    echo "<td>" . $row['Nama_siswa'] . "</td>";
+                                    echo "<td>" . date('d F Y', strtotime($row['tanggal_kumpul'])) . "</td>";
+                                    echo "<td>" . $row['judul_laporan'] . "</td>";
+                                    echo "<td><a href='https://drive.google.com/uc?id=" . $row['google_drive_file_id'] . "' target='_blank' rel='noopener noreferrer'>" . $row['google_drive_file_id'] . "</a></td>";
+
+                                    echo "<td>";
+                                    if ($row['status'] == 'Terkirim') {
+                                        echo "<button class='btn btn-sm btn-primary' type='button'><i class='fa-solid fa-envelope-circle-check'></i> Terkirim</button>";
+                                    } elseif ($row['status'] == 'Diterima') {
+                                        echo "<button class='btn btn-sm btn-success' type='button'><i class='fa-solid fa-circle-check'></i></i> Diterima</button>";
+                                    } elseif ($row['status'] == 'Ditolak') {
+                                        echo "<button class='btn btn-sm btn-danger' type='button'><i class='fa-solid fa-circle-xmark'></i> Ditolak</button>";
+                                    }
+                                    echo "</td>";
 
 
-                                        echo "</tr>";
 
+                                    echo "<td>";
+                                    echo "<div class='d-flex'>";
+                                    if ($row['status'] != 'Diterima' && $row['status'] != 'Terkirim') {
                                         ?>
-                                    </tbody>
-                                </table>
-                            </div>
+                                        <button class="btn btn-sm btn-success me-1" type="button" data-bs-toggle="modal"
+                                            data-bs-target="#edit<?= $row['id_laporan']; ?>"><i class="bi bi-pencil-fill"></i>
+                                            Edit</button>
+                                        <?php
+                                    }                                    
+                                    echo '<button class="btn btn-sm btn-info" type="button" data-bs-toggle="modal" data-bs-target="#detail' . $row['id_laporan'] . '"><i class="bi bi-info-circle-fill"></i> Detail</button>';
+                                    echo "</div>";
+                                    echo "</td>";
+                                    echo "</tr>";
+
+                                    ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-
-                    <!-- Modal -->
-                    <!--  -->
-
                     <!-- modal edit -->
                     <div class='modal fade' id='edit<?= $row['id_laporan']; ?>' tabindex='-1'
                         aria-labelledby='exampleModalLabel' aria-hidden='true'>
@@ -167,48 +196,56 @@ if (isset($_POST['EditLaporan'])) {
                                         aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                <form method="post" action="#" enctype="multipart/form-data">
-    <div class="form-group">
-        <label for="id_laporan">ID</label>
-        <input type="text" class="form-control" id="id_laporan" value="<?= $row['id_laporan']; ?>" name="id_laporan" readonly>
-    </div>
-    <div class="form-group">
-        <label for="google_drive_file_id">Google Drive File ID</label>
-        <input type="text" class="form-control" id="google_drive_file_id" value="<?= $row['google_drive_file_id']; ?>" name="google_drive_file_id" readonly>
-    </div>
-    <div class="form-group">
-        <label for="Nama_siswa">Nama Lengkap</label>
-        <input type="text" class="form-control" id="Nama_siswa" value="<?= $row['Nama_siswa']; ?>" name="Nama_siswa" required>
-    </div>
-    <div class="form-group">
-        <label for="tanggal_kumpul">Tanggal Pengumpulan</label>
-        <input type="text" class="form-control" id="tanggal_kumpul" value="<?= $row['tanggal_kumpul']; ?>" name="tanggal_kumpul" required>
-    </div>
-    <div class="form-group">
-        <label for="judul_laporan">Judul Laporan</label>
-        <input type="text" class="form-control" id="judul_laporan" value="<?= $row['judul_laporan']; ?>" name="judul_laporan" required>
-    </div>
-    <div class="mb-3">
-        <label for="berkas" class="col-form-label">Dokumen : <small>(Abaikan Jika Tidak Merubah Dokumen.)</small></label>
-        <input type="file" class="form-control" id="berkas" name="berkas" accept=".doc, .docx, .pdf">
-        <small>
-            <?php
-            $currentDocument = $row['berkas'];
-            if (!empty($currentDocument)) {
-                echo '<p>Dokumen Saat Ini: <a href="Laporan PKL/' . $currentDocument . '" target="_blank">' . $currentDocument . '</a></p>';
-            }
-            ?>
-        </small>
-    </div>
-    <div class="modal-footer">
-        <button type="submit" class="btn btn-primary" name="EditLaporan" value="Submit">Submit</button>
-    </div>
-</form>
+                                    <form method="post" action="#" enctype="multipart/form-data">
+                                        <input type="text" class="form-control" id="status" name="status" readonly>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="id_laporan"
+                                                value="<?= $row['id_laporan']; ?>" name="id_laporan" hidden>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="google_drive_file_id"
+                                                value="<?= $row['google_drive_file_id']; ?>" name="google_drive_file_id"
+                                                hidden>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label for="Nama_siswa"><strong>Nama Lengkap</strong></label>
+                                            <input type="text" class="form-control" id="Nama_siswa"
+                                                value="<?= $row['Nama_siswa']; ?>" name="Nama_siswa" readonly>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label for="tanggal_kumpul"><strong>Tanggal Pengumpulan</strong></label>
+                                            <input type="date" class="form-control" id="tanggal_kumpul"
+                                                name="tanggal_kumpul" required>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label for="judul_laporan"><strong>Judul Laporan</strong></label>
+                                            <input type="text" class="form-control" id="judul_laporan" name="judul_laporan"
+                                                required>
+                                        </div>
+                                        <div class="row">
+                                            <label for="berkas" class="col-form-label"><strong>Dokumen :</strong>
+                                                <input type="file" class="form-control" id="berkas" name="berkas"
+                                                    accept=".doc, .docx, .pdf">
+                                                <small>
+                                                    <?php
+                                                    $currentDocument = $row['berkas'];
+                                                    if (!empty($currentDocument)) {
+                                                        echo '<p>Dokumen Saat Ini: <a href="Laporan PKL/' . $currentDocument . '" target="_blank">' . $currentDocument . '</a></p>';
+                                                    }
+                                                    ?>
+                                                </small>
+                                        </div>
+                                        <div class="modal-footer row">
+                                            <button type="submit" class="btn btn-primary" name="EditLaporan"
+                                                value="Submit">Submit</button>
+                                        </div>
+                                    </form>
 
                                 </div>
                             </div>
                         </div>
                     </div>
+
 
                 <?php } ?>
 

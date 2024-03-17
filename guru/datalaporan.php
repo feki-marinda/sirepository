@@ -1,7 +1,9 @@
 <?php
+session_start();
 include 'conn.php';
 
-$query = "SELECT*FROM laporan_pkl JOIN siswa ON siswa.id_siswa=laporan_pkl.id_siswa";
+$error_message = $success_message = '';
+$query = "SELECT * FROM laporan_pkl JOIN siswa ON siswa.id_siswa=laporan_pkl.id_siswa";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
@@ -12,31 +14,53 @@ if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $id_laporan = $_POST['id_laporan'];
     $id_siswa = $_POST['Nama_siswa'];
     $tanggal_kumpul = $_POST['tanggal_kumpul'];
+    $status = $_POST['status'];
 
-    $file_name = $_FILES['berkas']['name'];
-    $file_tmp = $_FILES['berkas']['tmp_name'];
-    $file_size = $_FILES['berkas']['size'];
-    $file_error = $_FILES['berkas']['error'];
+    // Mengambil data berkas lama
+    $old_file_query = mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'");
+    $old_file = mysqli_fetch_array($old_file_query);
 
-    if ($file_error === 0) {
+    if ($_FILES['berkas']['error'] === 0 && !empty($_FILES['berkas']['name'])) {
+        // Pengguna memilih untuk mengunggah berkas baru
+        $file_name = $_FILES['berkas']['name'];
+        $file_tmp = $_FILES['berkas']['tmp_name'];
         $file_destination = 'admin/Laporan PKL/' . $file_name;
+
+        // Pindahkan berkas yang diunggah ke lokasi yang ditentukan
         move_uploaded_file($file_tmp, $file_destination);
 
-        $old_file = mysqli_fetch_array(mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'"));
-        if (is_file($old_file['berkas'])) {
+        // Memeriksa dan menghapus berkas lama
+        if ($old_file && is_file($old_file['berkas'])) {
             unlink($old_file['berkas']);
         }
-
-        mysqli_query($koneksi, "UPDATE laporan_pkl 
-        SET id_siswa='$id_siswa', 
-            tanggal_kumpul='$tanggal_kumpul', 
-            berkas='$file_destination' 
-        WHERE id_laporan='$id_laporan'");
-
-
-        header("location:datalaporan.php");
     } else {
-        echo 'Error uploading file.';
+        // Pengguna tidak memilih untuk mengunggah berkas baru
+        // Tetap gunakan berkas yang sudah ada
+        $file_destination = $old_file['berkas']; // Gunakan berkas lama
+    }
+
+    // Menggunakan prepared statements untuk mencegah SQL injection
+    $query = "UPDATE laporan_pkl 
+              SET id_siswa=?, 
+                  tanggal_kumpul=?, 
+                  berkas=?, 
+                  status=? 
+              WHERE id_laporan=?";
+    $stmt = mysqli_prepare($koneksi, $query);
+    mysqli_stmt_bind_param($stmt, "isssi", $id_siswa, $tanggal_kumpul, $file_destination, $status, $id_laporan);
+    $result = mysqli_stmt_execute($stmt);
+
+    // Memeriksa keberhasilan eksekusi query
+    if ($result) {
+        $rows_affected = mysqli_stmt_affected_rows($stmt);
+        if ($rows_affected > 0) {
+            $success_message = "Berhasil Memperbarui Data Laporan!";
+            header("location:datalaporan.php");
+        } else {
+            $error_message = "Tidak ada perubahan pada Data Laporan!";
+        }
+    } else {
+        $error_message = "Tidak dapat Memperbarui Data Laporan! Error: " . mysqli_error($koneksi);
     }
 }
 
@@ -46,8 +70,9 @@ if (isset($_GET['id_laporan'])) {
     mysqli_query($koneksi, "DELETE FROM laporan_pkl WHERE id_laporan='$id_laporan'");
     header("location:datalaporan.php");
 }
-
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -80,47 +105,48 @@ if (isset($_GET['id_laporan'])) {
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            Data Laporan PKL Siswa
+                            DataTable Example
                         </div>
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-striped table-hover">
+                                <?php
+                                if (!empty($error_message)) {
+                                    echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
+                                }
+                                if (!empty($success_message)) {
+                                    echo '<div class="alert alert-success" role="alert">' . $success_message . '</div>';
+                                }
+                                ?>
                                 <thead>
                                     <tr>
                                         <th>No.</th>
                                         <th>Nama Lengkap</th>
                                         <th>Tanggal Pengupulan</th>
-                                        <th>File</th>
-                                        <th>Status</th>
+                                        <th>file</th>
+                                        <th>status</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-                                    include 'conn.php';
-                                    $row = mysqli_query($koneksi, "SELECT * FROM laporan_pkl");
                                     $no = 1;
+                                    $query = "SELECT * FROM laporan_pkl JOIN siswa ON siswa.id_siswa=laporan_pkl.id_siswa";
+                                    $result = mysqli_query($koneksi, $query);
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
                                         echo "<td>" . date('d-m-Y', strtotime($row['tanggal_kumpul'])) . "</td>";
                                         echo "<td><a href='" . 'Laporan PKL' . '/' . $row['berkas'] . "' target='_blank'>" . $row['berkas'] . "</a></td>";
+                                        echo "<td>" . $row['status'] . "</td>";
                                         echo "<td>";
-                                        // Tombol Terima
-                                        echo "<div class='btn-group me-2'>";
-                                        echo "<button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_laporan'] . "'><i class='fa-solid fa-check'></i> Terima</button>";
-                                        echo "</div>";
-
-                                        // Tombol Tolak
-                                        echo "<div class='btn-group me-2'>";
-                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_laporan'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-times'></i> Tolak</button>";
-                                        echo "</div>";
-                                        echo "</td>";
-
-                                        echo "<td>";
-                                        echo "<div class='btn-group'>";
-                                        echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_laporan'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
-                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_laporan'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
+                                        echo "<div class='d-flex'>";
+                                        echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_laporan'] . "' data-bs-whatever='@mdo'>";
+                                        echo "<i class='fas fa-pencil-alt'></i> Edit";
+                                        echo "</button>";
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_laporan'] . "'>";
+                                        echo "<i class='fas fa-trash'></i> Hapus";
+                                        echo "</button>";
                                         echo "</div>";
                                         echo "</td>";
                                         echo "</tr>";
@@ -151,9 +177,9 @@ if (isset($_GET['id_laporan'])) {
                                             </div>
                                         </div>
 
-                                        <div class='modal fade' id='edit<?= $row['id_laporan'] ?>' tabindex='-1'
-                                            aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                        <div class="modal fade" id="edit<?= $row['id_laporan'] ?>" tabindex="-1"
+                                            aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
@@ -164,6 +190,17 @@ if (isset($_GET['id_laporan'])) {
                                                     <div class="modal-body">
                                                         <form method="post" action="datalaporan.php"
                                                             enctype="multipart/form-data">
+                                                            <div class="form-group">
+                                                                <label for="status">Status</label>
+                                                                <select class="form-control" id="status" name="status"
+                                                                    required>
+                                                                    <option value="" disabled selected>Pilih status</option>
+                                                                    <option value="Diterima" <?php echo ($row['status'] == 'Diterima') ? 'selected' : ''; ?>>
+                                                                        Diterima</option>
+                                                                    <option value="Ditolak" <?php echo ($row['status'] == 'Ditolak') ? 'selected' : ''; ?>>
+                                                                        Ditolak</option>
+                                                                </select>
+                                                            </div>
                                                             <div class="form-group">
                                                                 <label for="id_laporan">ID</label>
                                                                 <input type="text" class="form-control" id="id_laporan"
@@ -189,14 +226,19 @@ if (isset($_GET['id_laporan'])) {
                                                                     value="<?= $row['tanggal_kumpul']; ?>"
                                                                     name="tanggal_kumpul" required>
                                                             </div>
-                                                            <div class="mb-3">
+                                                            <div class="form-group">
                                                                 <label for="berkas" class="col-form-label">Berkas
                                                                     (Word/PDF):</label>
+                                                                <?php
+                                                                echo "<p>Dokumen Saat Ini: {$row['berkas']}</p>";
+                                                                ?>
                                                                 <input type="file" class="form-control" id="berkas"
-                                                                    name="berkas" accept=".doc, .docx, .pdf" required>
+                                                                    name="berkas" accept=".doc, .docx, .pdf">
                                                                 <small class="form-text text-muted">Pilih file Word
-                                                                    (doc/docx) atau PDF.</small>
+                                                                    (doc/docx) atau PDF. Kosongkan jika tidak ingin
+                                                                    mengganti.</small>
                                                             </div>
+
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary"
                                                                     data-bs-dismiss="modal">Tutup</button>
@@ -208,7 +250,6 @@ if (isset($_GET['id_laporan'])) {
                                                 </div>
                                             </div>
                                         </div>
-
 
 
                                         <?php
