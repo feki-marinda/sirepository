@@ -19,6 +19,15 @@ if (empty($id_user)) {
 <body>
 <div class="">
 
+<style>
+            table {
+                font-family: Arial, sans-serif;
+            }
+            th, td {
+                font-family: Arial, sans-serif;
+            }
+        </style>
+
 <div class="tab-content" id="v-pills-tabContent">
   <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
     aria-labelledby="v-pills-home-tab">

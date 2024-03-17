@@ -23,9 +23,8 @@ if (empty($id_user)) {
 
         <section class="breadcrumbs">
             <div class="container">
-
                 <ol>
-                    <li><a href="index.php">Home</a></li>
+                    <li><a href="index.php">Beranda</a></li>
                     <li><a href="about.php">Repository</a></li>
                     <li>Repository</li>
                 </ol>
@@ -39,9 +38,18 @@ if (empty($id_user)) {
                     }
                     ?>
                 </h2>
-
             </div>
         </section>
+        
+        <style>
+            table {
+                font-family: Arial, sans-serif;
+            }
+            th, td {
+                font-family: Arial, sans-serif;
+            }
+        </style>
+
         <div class="container">
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
                 <div class="col-md-9">
@@ -72,7 +80,7 @@ if (empty($id_user)) {
                         $result = mysqli_query($koneksi, $query);
                         
                         if (!$result) {
-                            die("Query failed: " . mysqli_error($koneksi));
+                            die("Query gagal: " . mysqli_error($koneksi));
                         }
                         
                         while ($row = mysqli_fetch_assoc($result)) {
@@ -97,7 +105,6 @@ if (empty($id_user)) {
                 </script>
             </div>
         </div>
-
        
         <script src="assets/js/main.js"></script>
 

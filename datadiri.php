@@ -49,6 +49,15 @@ $result = mysqli_query($koneksi, $query);
       </div>
     </section>
     
+    <style>
+            table {
+                font-family: Arial, sans-serif;
+            }
+           ul,li {
+                font-family: Arial, sans-serif;
+            }
+        </style>
+    
     <div class="container mt-3 card shadow">
             <div class="row">
             <div class="col-md-2 border-end rounded" style="background: #012970;">

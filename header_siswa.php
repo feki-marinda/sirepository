@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>SiRepository</title>
 </head>
 
 <body>
@@ -34,6 +34,8 @@
                     class="fa-solid fa-cloud-arrow-up"></i></a></li>
               <li><a href="unggahrepo.php" class="<?php echo isActivePage('unggahrepo.php'); ?>">Unggah Laporan <i
                     class="fa-solid fa-upload"></i></a></li>
+              <li><a href="riwayatrepo.php" class="<?php echo isActivePage('unggahrepo.php'); ?>">Riwayat<i
+                    class="fa-solid fa-clock-rotate-left"></i></a></li>
             </ul>
           </li>
           <li><a class="nav-link scrollto <?php echo isActivePage('logbook.php'); ?>" href="logbook.php">Logbook</a>

@@ -112,7 +112,7 @@ if (empty($id_user)) {
       <div class="row">
         <div class="col-lg-10 d-flex flex-column align-items-center">
           <h1 style="text-align: center;" data-aos="fade-up" data-aos-duration="1000">Selamat Datang Di Sistem Informasi
-            Repository Laporan Praktek Kerja Lapangan Siswa <br> SMK AL - MUHAJIRIN</h1>
+            Repository Laporan Praktek Kerja Lapangan <br> SMK AL - MUHAJIRIN</h1>
           <h2 data-aos="fade-up" data-aos-delay="400" data-aos-duration="1000" class="justify-content-center">Anda dapat
             <span style="font-weight: bold; color: #FF8C00;">menemukan</span> dan <span
               style="font-weight: bold; color: #FF8C00;">menyimpan</span> semua dokumen <span

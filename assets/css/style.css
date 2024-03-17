@@ -4,7 +4,7 @@
 
 body {
   font-family: "Open Sans", sans-serif;
-  color: #444444;
+  color: #000000;
 }
 
 a {
@@ -22,8 +22,10 @@ h2,
 h3,
 h4,
 h5,
-h6 {
-  font-family: "Nunito", sans-serif;
+h6,
+p {
+  font-family: 'Open Sans', sans-serif;
+  color: #000000;
 }
 
 /*--------------------------------------------------------------

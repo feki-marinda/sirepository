@@ -1,6 +1,6 @@
 <?php
 require 'vendor/autoload.php';
-include 'admin/conn.php';
+include 'conn.php';
 include 'functions.php';
 require 'uploadscript.php';
 
@@ -93,8 +93,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                             $mail->Subject = $nama_siswa;
                             $mail->Body = "Selamat, laporan praktik kerja lapangan Anda berhasil diunggah. Berikut detailnya:<br>"
-                            . "Nama Siswa: " . $_POST['Nama_siswa'] . "<br>"    
-                            . "Tanggal Kumpul: " . $_POST['tanggal_kumpul'] . "<br>"
+                                . "Nama Siswa: " . $_POST['Nama_siswa'] . "<br>"
+                                . "Tanggal Kumpul: " . $_POST['tanggal_kumpul'] . "<br>"
                                 . "Judul Laporan: " . $_POST['judul_laporan'] . "<br>";
 
                             if (!$mail->send()) {
@@ -107,9 +107,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         }, 5000); // Redirect setelah 5 detik
                                       </script>";
                                 exit;
-                                
+
                             }
-                            
+
 
                         }
                     } else {
@@ -164,26 +164,30 @@ $koneksi->close();
             </div>
         </section>
 
+        <style>
+            form {
+                font-family: Arial, sans-serif;
+            }
+            
+        </style>
+
         <div class="container">
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
-                <div class="col-md-9">
-                    <h1 class="font-weight-bold text-left" style="font-size: 2.5rem; color: #333;">
+                <div class="col-12">
+                    <h2 class="font-weight-bold text-left" style="font-size: 2.5rem; color: #333;">
                         Simpan <span style="color: #FFD700;">Laporan</span> Praktik Kerja Lapanganmu
                         <span style="color: #FFD700; font-weight: bold;">Disini</span> yaa<br>
-                    </h1>
-                </div>
-                <div class="col-md-3 d-flex align-items-center justify-content-end">
-                    <img src="assets/img/hero-img.png" alt="" style="max-height: 150px; width: auto;" class="img-fluid">
+                    </h2>
                 </div>
             </div><br>
 
-            <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
+            <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded d-flex" style="box-shadow: 10px 10px 20px 12px lightblue;">
                 <?php if ($showForm) { ?>
-                    <form action="#" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <form action="#" method="post" enctype="multipart/form-data" id="uploadForm" >
                         <div class="mb-3">
                             <label for="Nama_siswa" class="form-label fw-bold">Nama Lengkap :</label>
                             <input type="text" class="form-control" id="Nama_siswa" name="Nama_siswa" required
-                            placeholder="Masukkan Nama Lengkap Anda">
+                                placeholder="Masukkan Nama Lengkap Anda">
                         </div>
                         <div class="mb-3">
                             <label for="tanggal_kumpul" class="form-label fw-bold">Tanggal Pengumpulan</label>
@@ -193,7 +197,7 @@ $koneksi->close();
                             <label for="judul_laporan" class="form-label fw-bold">Judul Laporan</label>
                             <small>Format Judul : Laporan Praktik Kerja Lapangan di (Nama Perusahaan)</small>
                             <input type="text" class="form-control" id="judul_laporan" name="judul_laporan" required
-                            placeholder="Masukkan Judul Dokumen">
+                                placeholder="Masukkan Judul Dokumen">
                         </div>
                         <div class="mb-3">
                             <label for="fileLaporan" class="form-label fw-bold">File Laporan</label><br>
@@ -228,7 +232,7 @@ $koneksi->close();
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>            
         </div>
 
         <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i

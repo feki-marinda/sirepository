@@ -125,6 +125,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </section>
 
+        <style>
+            form {
+                font-family: Arial, sans-serif;
+            }
+        </style>
+
         <div class="container">
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
                 <div class="col-md-9">

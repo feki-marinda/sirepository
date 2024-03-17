@@ -64,8 +64,9 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
         </div>
     </div>
 
-    <?php include 'footer.html'; ?>
+    
 
     <script src="assets/js/main.js"></script>
+    
 </body>
 </html>

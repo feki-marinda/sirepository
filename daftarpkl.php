@@ -37,7 +37,7 @@ if (isset($_SESSION['id_user'])) {
 }
 
 if (isset($_POST['daftar'])) {
-    $id_siswa = $_SESSION['id_siswa']; 
+    $id_siswa = $_SESSION['id_siswa'];
     $tgl_mulai = $_POST['tgl_mulai'];
     $tgl_selesai = $_POST['tgl_selesai'];
     $kelas = $_POST['kelas'];
@@ -84,24 +84,58 @@ if (isset($_POST['daftar'])) {
 
         <!-- ======= Blog Single Section ======= -->
         <section id="blog" class="blog">
-            <div class="container">
 
-                <div class="row">
-                    <div class=" entries">
-                        <article class="entry">
-                            <h1 class="entry-title">
-                                <a href="sejarah.php">Daftar Praktek Kerja Lapangan</a><br>
-                            </h1>
-                            <div class="entry-content" style="text-align:justify">
+            <div class="container entries">
+                <div class="text-center mb-3 entry shadow">
+                    <h2 class="entry-title"><strong style="color:#012970;">Riwayat Pendaftaran Praktek Kerja Lapangan</strong></h2>
+                    <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-primary">
+                            <tr>
+                                <th>Nama</th>
+                                <th>Kelas</th>
+                                <th>Tanggal Mulai</th>
+                                <th>Tanggal Selesai</th>
+                                <th>Tempat Magang</th>
+                                <th>Tahun Pelajaran</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                             <?php
-                            if (!empty($error_message)) {
-                                echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
-                            }
-
-                            if (!empty($success_message)) {
-                                echo '<div class="alert alert-success" role="alert">' . $success_message . '</div>';
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                echo "<tr>";
+                                echo "<td>" . $row['Nama_siswa'] . "</td>";
+                                echo "<td>" . $row['kelas'] . "</td>";
+                                echo "<td>" . $row['tgl_mulai'] . "</td>";
+                                echo "<td>" . $row['tgl_selesai'] . "</td>";
+                                echo "<td>" . $row['nama_perusahaan'] . "</td>";
+                                echo "<td>" . $row['tahun_pelajaran'] . "</td>";
+                                echo "</tr>";
                             }
                             ?>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="row">
+                    <div class=" entries">
+                        <article class="entry" style="box-shadow: 10px 10px 20px 12px lightblue;">
+                            <h1 class="entry-title">
+                                <a href="daftarpkl.php">Daftar Praktek Kerja Lapangan</a><br>
+                            </h1>
+                            <div class="entry-content" style="text-align:justify">
+                                <?php
+                                if (!empty($error_message)) {
+                                    echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
+                                }
+
+                                if (!empty($success_message)) {
+                                    echo '<div class="alert alert-success" role="alert">' . $success_message . '</div>';
+                                }
+                                ?>
                                 <form method="post" action="">
                                     <div class="mb-3">
                                         <input type="text" class="form-control"
@@ -109,78 +143,47 @@ if (isset($_POST['daftar'])) {
                                             hidden>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="Nama_Siswa" class="form-label">Nama Siswa :</label>
+                                        <label for="Nama_Siswa" class="form-label"><strong>Nama Siswa :</strong></label>
                                         <input type="text" class="form-control">
                                     </div>
+
                                     <div class="mb-3">
-                                        <label for="kelas" class="form-label">Kelas :</label>
+                                        <label for="kelas" class="form-label"><strong>Kelas :</strong></label>
                                         <input type="text" class="form-control" id="kelas" name="kelas">
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label for="tgl_mulai" class="form-label">Tanggal Mulai :</label>
+                                            <label for="tgl_mulai" class="form-label"><strong>Tanggal Mulai
+                                                    :</strong></label>
                                             <input type="date" class="form-control" id="tgl_mulai" name="tgl_mulai">
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label for="tgl_selesai" class="form-label">Tanggal Selesai :</label>
+                                            <label for="tgl_selesai" class="form-label"><strong>Tanggal Selesai
+                                                    :</strong></label>
                                             <input type="date" class="form-control" id="tgl_selesai" name="tgl_selesai">
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="nama_perusahaan" class="form-label">Tempat PKL :</label>
+                                        <label for="nama_perusahaan" class="form-label"><strong>Tempat PKL
+                                                :</strong></label>
                                         <input type="text" class="form-control" id="nama_perusahaan"
                                             name="nama_perusahaan">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="tahun_pelajaran" class="form-label">Tahun Pelajaran :</label>
+                                        <label for="tahun_pelajaran" class="form-label"><strong>Tahun Pelajaran
+                                                :</strong></label>
                                         <input type="text" class="form-control" id="tahun_pelajaran"
                                             name="tahun_pelajaran">
                                     </div>
-                                    <button type="submit" name="daftar" class="btn btn-primary">Submit</button>
+                                    <div class="row">
+                                    <button type="submit" name="daftar" class="btn btn-primary"><h5>Submit</h5></button>
+                                    </div>
                                 </form>
                             </div>
                         </article>
     </main>
 
-    <div class="container">
-        <div class="center text-center mb-3">
-            <h3><strong>Riwayat Pendaftaran Praktek Kerja Lapangan</strong></h3>
-        </div>
-        <div class="div">
-    <table class="table">
-        <thead class="table-primary">
-            <tr>
-                <td>Nama</td>
-                <td>Kelas</td>
-                <td>Tanggal Mulai</td>
-                <td>Tanggal Selesai</td>
-                <td>Tempat Magang</td>
-                <td>Tahun Pelajaran</td>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $query = "SELECT siswa.Nama_siswa, siswa.id_siswa, pkl.*
-            FROM pkl
-            INNER JOIN siswa ON siswa.id_siswa = pkl.id_siswa
-            WHERE siswa.id_siswa = " . $_SESSION['id_siswa'];
-  $result = mysqli_query($koneksi, $query);
-            while ($row = mysqli_fetch_assoc($result)) {
-                echo "<tr>";
-                echo "<td>" . $row['Nama_siswa'] . "</td>";
-                echo "<td>" . $row['kelas'] . "</td>"; 
-                echo "<td>" . $row['tgl_mulai'] . "</td>";
-                echo "<td>" . $row['tgl_selesai'] . "</td>";
-                echo "<td>" . $row['nama_perusahaan'] . "</td>";
-                echo "<td>" . $row['tahun_pelajaran'] . "</td>";
-                echo "</tr>";
-            }
-            ?>
-        </tbody>
-    </table>
-</div>
 
-    </div><br><br><br>
 
     <?php include 'footer.html' ?>
 
