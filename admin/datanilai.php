@@ -2,7 +2,7 @@
 session_start();
 require_once 'conn.php';
 
-$success_message = ''; // Ambil data nilai dari tabel nilai_PKL dan siswa 
+$success_message = ''; 
 $query = "SELECT siswa.id_siswa, nilai_pkl.id_nilai, siswa.Nama_siswa, nilai_pkl.nilai, nilai_pkl.grade, nilai_pkl.file FROM nilai_PKL INNER JOIN siswa ON nilai_pkl.id_siswa = siswa.id_siswa";
 $result = $koneksi->query($query);
 if (!$result) {

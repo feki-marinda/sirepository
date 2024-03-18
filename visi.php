@@ -51,22 +51,22 @@ if (empty($id_user)) {
                                     <img src="assets/img/smk.png" alt="" class="img-fluid rounded">
                                 </div><br>
                                 <h3>Visi SMK Al-Muhajirin</h3>
-                                <p>
+                                <h5>
                                     Terbentuknya SMK Al-Muhajirin yang dinamis dan berwawasan global serta memiliki
                                     kompetensi yang berstandar Nasional
-                                </p>
+</h5>
 
                                 <h3>Misi</h3>
                                 <ul>
-                                    <li>Membentuk tenaga-tenaga trampil dan profesional yang menyesuaikan dengan
+                                    <li><h6>Membentuk tenaga-tenaga trampil dan profesional yang menyesuaikan dengan
                                         kebutuhan dan perkembangan ilmu pengetahuan dan teknologi guna menjawab
-                                        tantangan masa depan.</li>
-                                    <li>Memberikan pelayanan prima kepada masyarakat dalam upaya pemberdayaan peserta
-                                        didik SMK Al-Muhajirin</li>
-                                    <li>Mewujudkan Unit Produksi dan Jasa (UPJ) yang berstandar Dunia Industri (DUDI)
-                                    </li>
-                                    <li>Menjalin hubungan yang baik dan rasa kekeluargaan yang kuat di dalam warga SMK
-                                        Al-Muhajirin.</li>
+                                        tantangan masa depan.</h6></li>
+                                    <li><h6>Memberikan pelayanan prima kepada masyarakat dalam upaya pemberdayaan peserta
+                                        didik SMK Al-Muhajirin</h6></li>
+                                    <li><h6>Mewujudkan Unit Produksi dan Jasa (UPJ) yang berstandar Dunia Industri (DUDI)
+                                    </h6></li>
+                                    <li><h6>Menjalin hubungan yang baik dan rasa kekeluargaan yang kuat di dalam warga SMK
+                                        Al-Muhajirin.</h6></li>
                                 </ul>
 
                             </div>

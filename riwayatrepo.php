@@ -16,6 +16,7 @@ $query = "SELECT
             laporan_pkl.google_drive_file_id,
             laporan_pkl.berkas,
             laporan_pkl.status,
+            siswa.id_siswa,
             siswa.Nama_siswa
           FROM
             laporan_pkl
@@ -36,7 +37,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if (isset($_POST['EditLaporan'])) {
-    // Ambil data dari form
+    $id_siswa = $_POST['id_siswa'];
     $id_laporan = $_POST['id_laporan'];
     $Nama_siswa = $_POST['Nama_siswa'];
     $tanggal_kumpul = $_POST['tanggal_kumpul'];
@@ -175,8 +176,7 @@ if (isset($_POST['EditLaporan'])) {
                                             Edit</button>
                                         <?php
                                     }                                    
-                                    echo '<button class="btn btn-sm btn-info" type="button" data-bs-toggle="modal" data-bs-target="#detail' . $row['id_laporan'] . '"><i class="bi bi-info-circle-fill"></i> Detail</button>';
-                                    echo "</div>";
+                                    echo "<button class='btn btn-sm btn-info' type='button' data-bs-toggle='modal' onclick=\"window.location.href='detailsiswa.php?id_siswa={$row['id_siswa']}'\"><i class='fa-solid fa-eye'></i> Detail</button>";
                                     echo "</td>";
                                     echo "</tr>";
 

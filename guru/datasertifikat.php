@@ -52,6 +52,16 @@ if (isset($_GET['id_sertifikat'])) {
 }
 
 ?>
+
+<style>
+    body, table{
+        font-family: "Poppins", sans-serif;
+    }
+    .form,label,input{
+        font-family: "Poppins", sans-serif;
+    }
+</style>
+
 <!DOCTYPE html>
 <html lang="en">
 

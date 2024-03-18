@@ -132,11 +132,11 @@ if (isset($_GET['id_berita'])) {
 }
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <?php include 'head.html' ?>
-
 <body class="sb-nav-fixed">
     <?php include 'header.php' ?>
     <div id="layoutSidenav" style="width: 100%">

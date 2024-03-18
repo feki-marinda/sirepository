@@ -14,6 +14,17 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 include 'conn.php';
 
 ?>
+
+<style>
+            table {
+                font-family: Arial, sans-serif;
+            }
+
+            th,
+            td{
+                font-family: Arial, sans-serif;
+            }
+        </style>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -27,11 +38,11 @@ include 'conn.php';
 
         <section class="breadcrumbs">
             <div class="container">
-
                 <ol>
                     <li><a href="index.php">Home</a></li>
-                    <li><a href="about.php">Logbook</a></li>
+                    <li><a href="Logbook.php">Logbook</a></li>
                 </ol>
+
                 <h2>
                     <?php
                     if (isset($_SESSION['username'])) {
@@ -46,28 +57,15 @@ include 'conn.php';
             </div>
         </section>
 
-        <style>
-            table {
-                font-family: Arial, sans-serif;
-            }
-            th, td {
-                font-family: Arial, sans-serif;
-            }
-        </style>
 
         <div class="container">
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
-                <div class="col-md-9">
-                    <h1 class="font-weight-bold text-left" style="font-size: 2.5rem; color: #333;">
-                        Bagaimana <span style="color: #FFD700;">Kegiatanmu</span> hari ini? Jangan lupa isi
-                        <span style="color: #FFD700; font-weight: bold;">logbook</span> yaa dan Ekspresikan kegiatanmu
-                        di <span style="color: #FFD700;">Logbook</span>
-                    </h1>
-                </div>
-                <div class="col-md-3 d-flex align-items-center justify-content-end">
-                    <img src="assets/img/features-2.png" alt="" style="max-height: 150px; width: auto;"
-                        class="img-fluid">
-                </div>
+
+                <h1 class="font-weight-bold text-left" style="font-size: 2.5rem; color: #333;">
+                    Bagaimana <span style="color: #FFD700;">Kegiatanmu</span> hari ini? Jangan lupa isi
+                    <span style="color: #FFD700; font-weight: bold;">logbook</span> yaa dan Ekspresikan kegiatanmu
+                    di <span style="color: #FFD700;">Logbook</span>
+                </h1>
             </div>
             <br>
             <div class="ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow" style="height: 100%; max-width: 100%;">
@@ -121,31 +119,31 @@ include 'conn.php';
                                             <?php echo $row['status_logbook']; ?>
                                         </td>
                                     </tr>
-                                <?php
+                                    <?php
+                                }
+                            } else {
+                                echo "Error executing query: " . $koneksi->error;
                             }
-                        } else {
-                            echo "Error executing query: " . $koneksi->error;
-                        }
 
-                        $koneksi->close();
-                        ?>
+                            $koneksi->close();
+                            ?>
 
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
 
-                <script>
-                    $(document).ready(function () {
-                        $('#example').DataTable();
-                    });
-                </script>
+                    <script>
+                        $(document).ready(function () {
+                            $('#example').DataTable();
+                        });
+                    </script>
+                </div>
             </div>
         </div>
-    </div>
 
-    <script src="assets/js/main.js"></script>
+        <script src="assets/js/main.js"></script>
 
     </main>
 
-    </body>
+</body>
 
-    </html>
+</html>

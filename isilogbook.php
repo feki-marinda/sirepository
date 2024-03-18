@@ -134,9 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="container">
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
                 <div class="col-md-9">
-                    <h3>Hallo
-                        <?php echo $Nama_siswa; ?>
-                    </h3>
+                    
                     <h1 class="font-weight-bold text-left" style="font-size: 2.5rem; color: #333;">
                         Bagaimana <span style="color: #FFD700;">Kegiatanmu</span> Hari ini ?
                     </h1><br>
@@ -182,9 +180,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <form action="#" method="post" class="form-container">
                     <input type="hidden" name="id_siswa" value="<?php echo $_SESSION['id_siswa']; ?>">
                     <input type="hidden" name="id_pkl" value="<?php echo $_SESSION['id_pkl']; ?>">
-                    <div class="col-3 mb-3">
+                    <div class="d-flex">
+                    <div class="col-6 mb-3 me-3">
                         <label for="exampleFormControlInput1" class="form-label fw-bold">Tanggal Kegiatan</label>
                         <input type="date" class="form-control" id="exampleFormControlInput1" name="tanggal" required>
+                    </div>
+                    <div class="col-6 mb-3 ">
+                        <label for="exampleFormControlInput1" class="form-label fw-bold">Foto</label>
+                        <input type="file" class="form-control" id="exampleFormControlInput1" name="tanggal" required>
+                    </div>
                     </div>
                     <div class="mb-3">
                         <label for="exampleFormControlTextarea1" class="form-label fw-bold">Deskripsikan

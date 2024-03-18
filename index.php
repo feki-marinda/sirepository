@@ -35,7 +35,11 @@ include 'head.html';
 ?>
 <style>
     body {
-        font-family: 'Poppins', sans-serif;
+        font-family: 'Open Sans', sans-serif;
+    }
+
+    form,label{
+        font-family: 'Arial', serif;
     }
 
     h3 {

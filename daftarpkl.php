@@ -106,8 +106,8 @@ if (isset($_POST['daftar'])) {
                                 echo "<tr>";
                                 echo "<td>" . $row['Nama_siswa'] . "</td>";
                                 echo "<td>" . $row['kelas'] . "</td>";
-                                echo "<td>" . $row['tgl_mulai'] . "</td>";
-                                echo "<td>" . $row['tgl_selesai'] . "</td>";
+                                echo "<td>" . date('d F Y', strtotime($row['tgl_mulai'])) . "</td>";
+                                echo "<td>" . date('d F Y', strtotime($row['tgl_selesai'])) . "</td>";
                                 echo "<td>" . $row['nama_perusahaan'] . "</td>";
                                 echo "<td>" . $row['tahun_pelajaran'] . "</td>";
                                 echo "</tr>";

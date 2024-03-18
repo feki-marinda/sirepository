@@ -112,6 +112,8 @@ if (isset($_GET['id_guru'])) {
 }
 
 ?>
+</style>
+
 <!DOCTYPE html>
 <html lang="en">
 

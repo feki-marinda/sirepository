@@ -66,7 +66,7 @@ $koneksi->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
+    <link rel="stylesheet" href="font.css">
 <?php include 'head.html' ?>
 
 <body class="sb-nav-fixed">

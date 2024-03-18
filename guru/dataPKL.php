@@ -64,7 +64,18 @@ if (isset($_GET['id_pkl'])) {
     header("location:dataPKL.php");
 }
 ?>
+<style>
+    body,
+    table {
+        font-family: "Poppins", sans-serif;
+    }
 
+    .form,
+    label,
+    input {
+        font-family: "Poppins", sans-serif;
+    }
+</style>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -86,14 +97,14 @@ if (isset($_GET['id_pkl'])) {
                     <div class="card mb-4">
                         <div class="button-container">
                             <div class="spacer"></div>
-                            <!-- <div class="buttons-right">
+                            <div class="buttons-right">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data PKL</button>
                                 <button id="printButton">
                                     <i class="fas fa-print"></i> Cetak
                                 </button>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
 
@@ -106,6 +117,7 @@ if (isset($_GET['id_pkl'])) {
                             <table id="datatablesSimple" class="table table-striped table-hover">
                                 <thead>
                                     <tr>
+
                                         <th>No.</th>
                                         <th>Nama Lengkap</th>
                                         <th>Tanggal Mulai</th>
@@ -135,8 +147,10 @@ if (isset($_GET['id_pkl'])) {
                                         echo "<td>";
                                         // Tombol Detail
                                         echo "<div class='btn-group me-2'>";
-                                        echo "<button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_pkl'] . "'><i class='fa-solid fa-eye'></i> Detail</button>";
+                                        echo "<button type='button' class='btn btn-success' data-bs-toggle='modal' onclick=\"window.location.href='detail/pkl.php?id_siswa={$row['id_siswa']}'\"><i class='fa-solid fa-eye'></i> Detail</button>";
                                         echo "</div>";
+
+
 
                                         // Tombol Edit
                                         echo "<div class='btn-group me-2'>";
@@ -156,7 +170,7 @@ if (isset($_GET['id_pkl'])) {
                                         <!-- Modal hapus data -->
                                         <div class="modal fade" id='hapus<?= $row['id_pkl'] ?>' tabindex="-1" role="dialog"
                                             aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Hapus Data dokumen

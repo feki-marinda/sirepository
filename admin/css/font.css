@@ -1,0 +1,8 @@
+body, table{
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    }
+    .form,label,input{
+        font-family: 'Open Sans', sans-serif;
+    }

@@ -115,8 +115,7 @@ if (isset($_GET['id_dokumen'])) {
 }
 
 ?>
-
-
+</style>
 
 <!DOCTYPE html>
 <html lang="en">
