@@ -50,10 +50,14 @@ if (isset($_GET['id_logbook'])) {
 ?>
 
 <style>
-    body, table{
+    body,
+    table {
         font-family: "Poppins", sans-serif;
     }
-    .form,label,input{
+
+    .form,
+    label,
+    input {
         font-family: "Poppins", sans-serif;
     }
 </style>
@@ -79,13 +83,8 @@ if (isset($_GET['id_logbook'])) {
                     <div class="card mb-4">
                         <div class="button-container">
                             <div class="spacer"></div>
-                            <div class="buttons-right">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
-                                    Tambah Data Logbook</button>
-                                <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
-                                </button>
+                            <div class="buttons-right"><button id="printButton">
+                                    <i class="fas fa-print"></i> Cetak</button>
                             </div>
                         </div>
                     </div>
@@ -96,15 +95,16 @@ if (isset($_GET['id_logbook'])) {
                             Data Logbook Praktik Kerja Lapangan Siswa SMK AL-Muhajirin
                         </div>
                         <div class="card-body">
-                            <table id="datatablesSimple" class="table table-striped table-hover">
+                            <table id="datatablesSimple" class="table table-striped table-hover table-responsiv">
                                 <thead>
-                                    <tr>
-                                        <th>No.</th>
-                                        <th>Nama</th>
-                                        <th>Tanggal</th>
-                                        <th>Aktivitas</th>
-                                        <th>Status</th>
-                                        <th>Keterangan</th>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Nama Siswa</th>
+                                    <th>Tanggal</th>
+                                    <th>Aktivitas</th>
+                                    <th>Dokumentasi</th>
+                                    <th>Status</th>
+                                    <th>Keterangan</th>
                                     </tr>
                                 </thead>
 
@@ -114,20 +114,13 @@ if (isset($_GET['id_logbook'])) {
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
-                                        echo "<td>" . $row['Nama_siswa']. "</td>";
-                                        echo "<td>" . $row['tanggal'] . "</td>";
-                                        echo "<td>" . $row['aktivitas'] . "</td>";
+                                        echo "<td>" . $row['Nama_siswa'] . "</td>";
+                                        echo "<td>" . date('d-m-Y', strtotime($row['tanggal'])) . "</td>";
                                         echo "<td>";
-                                        // Tombol Terima
-                                        echo "<div class='btn-group me-2'>";
-                                        echo "<button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_logbook'] . "'><i class='fa-solid fa-check'></i> Terima</button>";
-                                        echo "</div>";
-
-                                        // Tombol Tolak
-                                        echo "<div class='btn-group me-2'>";
-                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_logbook'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-times'></i> Tolak</button>";
-                                        echo "</div>";
+                                        echo "<div class='text-justify'>" . $row['aktivitas'] . "</div>";
                                         echo "</td>";
+                                        echo "<td><img src='../Logbook/" . $row['dokumentasi'] . "' style='max-width: 30%; height: auto;' class='img-responsive'></td>";
+                                        echo "<td>" . $row['status_logbook'] . "</td>";
                                         echo "<td>";
                                         echo "<div class='btn-group'>";
                                         echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_logbook'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
@@ -138,9 +131,7 @@ if (isset($_GET['id_logbook'])) {
 
                                         ?>
 
-                                        <!-- Modal hapus data -->
-                                        <div class="modal fade" id='hapus<?= $row['id_logbook'] ?>' tabindex="-1"
-                                            role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal fade" id='hapus<?= $row['id_logbook'] ?>' tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -163,9 +154,7 @@ if (isset($_GET['id_logbook'])) {
                                             </div>
                                         </div>
 
-                                        <!-- Modal edit data -->
-                                        <div class='modal fade' id='edit<?= $row['id_logbook'] ?>' tabindex='-1'
-                                            aria-labelledby='exampleModalLabel' aria-hidden='true'>
+                                        <div class='modal fade' id='edit<?= $row['id_logbook'] ?>' tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true'>
                                             <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
@@ -176,13 +165,24 @@ if (isset($_GET['id_logbook'])) {
                                                     </div>
                                                     <div class="modal-body">
                                                         <form method="post" action="#" enctype="multipart/form-data">
-                                                            <div class="form-group">
-                                                                <div class="form-group">
-                                                                    <label for="id_logbook">ID</label>
-                                                                    <input type="text" class="form-control" id="id_logbook"
+                                                        <input class="form-control" id="id_logbook"
                                                                         value="<?= $row['id_logbook']; ?>" name="id_logbook"
+                                                                        hidden>
+                                                                <div class="form-group">
+                                                                    <label for="Nama_siswa">Nama Siswa</label>
+                                                                    <input type="text" class="form-control" id="Nama_siswa"
+                                                                        value="<?= $row['Nama_siswa']; ?>" name="Nama_siswa"
                                                                         readonly>
-                                                                </div>
+                                                                </div>          
+                                                                <div class="form-group">
+                                                                <label for="status_logbook">status_logbook</label>
+                                                                <select class="form-control" id="status_logbook" name="status_logbook"
+                                                                    required>
+                                                                    <option value="" disabled selected>Pilih status_logbook</option>
+                                                                    <option value="Diterima" <?php echo ($row['status_logbook'] == 'Diterima') ? 'selected' : ''; ?>>
+                                                                        Diterima</option>                                                                    
+                                                                </select>
+                                                            </div>                                                 
                                                                 <div class="form-group">
                                                                     <label for="tanggal">Tanggal Logbook</label>
                                                                     <input type="date" class="form-control" id="tanggal"
@@ -191,18 +191,9 @@ if (isset($_GET['id_logbook'])) {
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="aktivitas">Aktivitas</label>
-                                                                    <input type="text" class="form-control" id="aktivitas"
-                                                                        value="<?= $row['aktivitas']; ?>" name="aktivitas"
-                                                                        required>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="status_logbook">Status</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="status_logbook"
-                                                                        value="<?= $row['status_logbook']; ?>"
-                                                                        name="status_logbook" required>
-                                                                </div>
-                                                            </div>
+                                                                    <textarea class="form-control text-justify" id="aktivitas" name="aktivitas" required><?= $row['aktivitas']; ?></textarea>
+                                                                    </div>
+                                                                
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary"
                                                                     data-bs-dismiss="modal">Close</button>
@@ -224,9 +215,7 @@ if (isset($_GET['id_logbook'])) {
                 </div>
             </main>
 
-            <!-- Modal tambah data-->
-            <div class="modal modal-fullscreen-xxl-down fade" id="tambah" tabindex="-1"
-                aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal modal-fullscreen-xxl-down fade" id="tambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-fullscreen-xxl-down">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -261,9 +250,7 @@ if (isset($_GET['id_logbook'])) {
                 </div>
             </div>
 
-
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
+            <footer class="py-4 bg-light mt-auto"><div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
                         <div class="text-muted">Copyright &copy; Your Website 2023</div>
                         <div>
@@ -275,7 +262,8 @@ if (isset($_GET['id_logbook'])) {
                 </div>
             </footer>
         </div>
-    </div><?php include 'footer.php';?>
+    </div>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

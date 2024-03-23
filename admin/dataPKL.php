@@ -160,8 +160,8 @@ if (isset($_GET['id_pkl'])) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
-                                        echo "<td>" . $row['tgl_mulai'] . "</td>";
-                                        echo "<td>" . $row['tgl_selesai'] . "</td>";
+                                        echo "<td>" . date('d-m-Y', strtotime($row['tgl_mulai'])) . "</td>";
+                                        echo "<td>" . date('d-m-Y', strtotime($row['tgl_selesai'])) . "</td>";
                                         echo "<td>" . $row['kelas'] . "</td>";
                                         echo "<td>" . $row['nama_perusahaan'] . "</td>";
                                         echo "<td>" . $row['tahun_pelajaran'] . "</td>";

@@ -20,16 +20,13 @@ if (isset($_POST['TambahDokumen'])) {
     $ukuran_dokumen = $_FILES['Dokumen']['size'];
     $ext_dokumen = pathinfo($filename_dokumen, PATHINFO_EXTENSION);
 
-    // Pastikan array $ekstensi_dokumen telah didefinisikan sebelumnya
     if (!in_array($ext_dokumen, $ekstensi_dokumen)) {
         echo "Error: Ekstensi dokumen tidak diizinkan";
     } else {
-        // Sesuaikan ukuran file maksimal sesuai kebutuhan Anda
         if ($ukuran_dokumen < 208815000) {
             $file_dokumen = $rand . '_' . $filename_dokumen;
             $upload_dir = 'Dokumen/';
 
-            // Pastikan direktori tujuan untuk mengunggah file tersedia
             if (move_uploaded_file($_FILES['Dokumen']['tmp_name'], $upload_dir . $file_dokumen)) {
                 $query = "INSERT INTO dokumen (judul_dokumen, Dokumen) 
                           VALUES ('$judul_dokumen', '$file_dokumen')";
@@ -56,14 +53,12 @@ if (isset($_POST['EditDokumen'])) {
     $id_dokumen = $_POST['id_dokumen'];
     $judul_dokumen = $_POST['judul_dokumen'];
 
-    // Cek apakah ada file baru diunggah
     if (!empty($_FILES['Dokumen']['name'])) {
         $rand = rand();
         $filename_dokumen = $_FILES['Dokumen']['name'];
         $ukuran_dokumen = $_FILES['Dokumen']['size'];
         $ext_dokumen = pathinfo($filename_dokumen, PATHINFO_EXTENSION);
 
-        // Lakukan validasi dan penanganan unggah file
         if (
             !in_array($ext_dokumen, $ekstensi_dokumen) || $ukuran_dokumen >= 208815000 ||
             !move_uploaded_file($_FILES['Dokumen']['tmp_name'], 'Dokumen/' . ($file_dokumen = $rand . '_' . $filename_dokumen))
@@ -72,21 +67,26 @@ if (isset($_POST['EditDokumen'])) {
             header("Location: datadokumen.php");
             exit();
         }
+
+        $query = "UPDATE dokumen SET judul_dokumen = '$judul_dokumen', Dokumen = '$file_dokumen' WHERE id_dokumen = $id_dokumen";
+        if ($koneksi->query($query) === TRUE) {
+            $_SESSION['success_message'] = "Dokumen berhasil diubah!";
+        } else {
+            $_SESSION['error_message'] = "Error: " . $koneksi->error;
+        }
     } else {
-        $queryCheck = "SELECT judul_dokumen, Dokumen FROM dokumen WHERE id_dokumen = $id_dokumen";
+        $queryCheck = "SELECT judul_dokumen FROM dokumen WHERE id_dokumen = $id_dokumen";
         $resultCheck = $koneksi->query($queryCheck);
 
         if ($resultCheck->num_rows > 0) {
             $dataDokumen = $resultCheck->fetch_assoc();
 
-            // Cek apakah ada perubahan pada judul dokumen
             if ($dataDokumen['judul_dokumen'] === $judul_dokumen) {
                 $_SESSION['success_message'] = "Tidak ada perubahan data yang dilakukan.";
                 header("Location: datadokumen.php");
                 exit();
             }
 
-            // Perbarui basis data hanya jika ada perubahan pada judul dokumen
             $query = "UPDATE dokumen SET judul_dokumen = '$judul_dokumen' WHERE id_dokumen = $id_dokumen";
             if ($koneksi->query($query) === TRUE) {
                 $_SESSION['success_message'] = "Judul dokumen berhasil diubah!";
@@ -96,9 +96,10 @@ if (isset($_POST['EditDokumen'])) {
         } else {
             $_SESSION['error_message'] = "Error: Dokumen tidak ditemukan.";
         }
-        header("Location: datadokumen.php");
-        exit();
     }
+
+    header("Location: datadokumen.php");
+    exit();
 }
 
 

@@ -1,6 +1,11 @@
 <?php
-session_start();
+require '../vendor/autoload.php';
 include 'conn.php';
+require '../uploadscript.php';
+session_start();
+
+use Google\Client;
+use Google\Service\Drive;
 
 $error_message = $success_message = '';
 $query = "SELECT*FROM laporan_pkl JOIN siswa ON siswa.id_siswa=laporan_pkl.id_siswa";
@@ -8,6 +13,49 @@ $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
     die("Error in query: " . mysqli_error($koneksi));
+}
+
+$ekstensi_dokumen = array('pdf', 'doc', 'docx');
+
+if (isset($_POST['TambahLaporan'])) {
+    $id_laporan = $_POST['id_laporan'];
+    $id_siswa = $_POST['id_siswa'];
+    $tanggal_kumpul = $_POST['tanggal_kumpul'];
+    $rand = rand();
+    $file_name = $_FILES['berkas']['name'];
+    $file_tmp = $_FILES['berkas']['tmp_name'];
+    $ukuran_file = $_FILES['berkas']['size'];
+    $ext_file = pathinfo($file_name, PATHINFO_EXTENSION);
+
+    if (!in_array($ext_file, $ekstensi_dokumen)) {
+        echo "Error : Ekstensi file tidak sesuai !";
+    } else {
+        if ($ukuran_file < 208815000) {
+            $file_dokumen = $rand . '_' . $file_name;
+            $upload_dir = 'Laporan PKL/';
+
+            $googleDriveFileId = uploadToGoogleDrive('admin/Laporan PKL/' . $file_name, $file_name);
+
+            if (move_uploaded_file($_FILES['berkas']['tmp_name'], $upload_dir . $file_dokumen)) {
+                $query = "INSERT INTO laporan_pkl (id_siswa, tanggal_kumpul,berkas, google_drive_file_id) 
+                          VALUES ('$id_siswa', '$tanggal_kumpul', '$file_dokumen','$googleDriveFileId')";
+
+                if ($koneksi->query($query) === TRUE) {
+                    $_SESSION['success_message'] = "Laporan berhasil ditambahkan!";
+                    header("Location: datalaporan.php");
+                    exit();
+                } else {
+                    $_SESSION['error_message'] = "Error: " . $koneksi->error;
+                    header("Location: datalaporan.php");
+                    exit();
+                }
+            } else {
+                echo 'Error saat mengunggah file.';
+            }
+        } else {
+            echo 'Error: Ukuran dokumen melebihi batas maksimal';
+        }
+    }
 }
 
 
@@ -42,7 +90,7 @@ if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
                       berkas=? 
                   WHERE id_laporan=?";
         $stmt = mysqli_prepare($koneksi, $query);
-        mysqli_stmt_bind_param($stmt, "isss", $id_siswa, $tanggal_kumpul, $file_destination, $id_laporan);
+        mysqli_stmt_bind_param($stmt, "isss", $id_siswa, $tanggal_kumpul, $file_name, $id_laporan);
         $result = mysqli_stmt_execute($stmt);
 
         // Memeriksa keberhasilan eksekusi query
@@ -91,7 +139,13 @@ if (isset($_GET['id_laporan'])) {
 
                     <div class="card mb-4">
                         <div class="button-container">
-                            <div class="spacer"></div>
+                            <div class="spacer d-flex"></div>
+                            <div class="buttons-right">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
+                                    Tambah Data Dokumen</button>
+
+                            </div>
                             <div class="buttons-right">
                                 <button id="printButton">
                                     <i class="fas fa-print"></i> Cetak
@@ -124,13 +178,6 @@ if (isset($_GET['id_laporan'])) {
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
-                                <tfoot>
-                                    <th>No.</th>
-                                    <th>Nama Lengkap</th>
-                                    <th>Tanggal Pengupulan</th>
-                                    <th>file</th>
-                                    <th>Keterangan</th>
-                                </tfoot>
                                 <tbody>
                                     <?php
                                     include 'conn.php';
@@ -219,7 +266,8 @@ if (isset($_GET['id_laporan'])) {
                                                                     name="tanggal_kumpul" required>
                                                             </div>
                                                             <div class="form-group">
-                                                            <label for="berkas" class="col-form-label">Berkas (Word/PDF):</label>
+                                                                <label for="berkas" class="col-form-label">Berkas
+                                                                    (Word/PDF):</label>
                                                                 <?php
                                                                 echo "<p>Dokumen Saat Ini: {$row['berkas']}</p>";
                                                                 ?>
@@ -241,9 +289,6 @@ if (isset($_GET['id_laporan'])) {
                                                 </div>
                                             </div>
                                         </div>
-
-
-
                                         <?php
                                     }
                                     ?>
@@ -252,6 +297,53 @@ if (isset($_GET['id_laporan'])) {
                         </div>
                     </div>
             </main>
+
+            <div class="modal fade" id="tambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="exampleModalLabel">Tambah Laporan Praktek Kerja Lapangan</h3>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body ">
+                            <form action="#" method="post" id="formTambahData" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="id_siswa" class="col-form-label">Pilih Siswa:</label>
+                                    <select class="form-select" id="id_siswa" name="id_siswa" required>
+                                        <option value="" disabled selected>Pilih Siswa</option>
+                                        <?php
+                                        $result_siswa = mysqli_query($koneksi, "SELECT siswa.Nama_siswa, siswa.id_siswa
+                                        FROM siswa
+                                        INNER JOIN pkl ON pkl.id_siswa = siswa.id_siswa 
+                                        ORDER BY siswa.Nama_siswa DESC;
+                                        ");
+                                        while ($row_siswa = mysqli_fetch_assoc($result_siswa)) {
+                                            echo "<option value='" . $row_siswa['id_siswa'] . "'>" . $row_siswa['Nama_siswa'] . "</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tanggal_kumpul" class="col-form-label">Tanggal Pengumpulan:</label>
+                                    <input type="date" class="form-control" id="tanggal_kumpul" name="tanggal_kumpul"
+                                        required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="berkas" class="col-form-label">berkas Laporan :</label>
+                                    <input type="file" class="form-control" id="berkas" name="berkas" required>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary" name="TambahLaporan" value="Submit"
+                                        id="submit">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">

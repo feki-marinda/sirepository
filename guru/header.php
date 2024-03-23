@@ -11,7 +11,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 </style>
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
     <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="index.php">SiRepository</a>
+    <a class="navbar-brand ps-3" href="index.php"><img src="../admin/assets/img/r.png" alt="" style="width: 200px; height: 40px;"></a>
     <!-- Sidebar Toggle-->
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
             class="fas fa-bars"></i></button>

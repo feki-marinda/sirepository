@@ -69,45 +69,8 @@
                     </div>
                 </div>
                 <div class="row">
-                    <h1 class="text-center">Data Guru Pamong</h1>
-                    <div class="container mt-5">
-                        <div class="row">
-                            <div class="col-md-4 d-flex align-items-center justify-content-center mb-4 mb-md-0">
-                                <div class="profile">
-                                    <img src="assets/img/admin.jpeg" alt="Foto Profil">
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <table class="table profile-table table-striped">
-                                    <tbody>
-                                        <tr>
-                                            <th>Nama</th>
-                                            <td>John Doe</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Umur</th>
-                                            <td>30 tahun</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Alamat</th>
-                                            <td>Jl. Contoh No. 123</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Email</th>
-                                            <td>john@example.com</td>
-                                        </tr>
-                                        <tr>
-                                            <th>No. Telepon</th>
-                                            <td>08123456789</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <div class="d-grid">
-                                    <button type="button" class="btn btn-primary btn-block">Edit Data</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <h1 class="text-center">Selamat Datang Admin <br> Sistem Informasi Repository Laporan PKL Siswa</h1>
+
                 </div>
             </div>
         </main>

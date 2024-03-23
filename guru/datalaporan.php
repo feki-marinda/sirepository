@@ -103,8 +103,10 @@ if (isset($_GET['id_laporan'])) {
                         <div class="button-container">
                             <div class="spacer"></div>
                             <div class="buttons-right">
-                                <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
+                            <button id="printButton">
+                                    <a href="../admin/cetak/datalaporan.php" style="text-decoration: none; color: inherit;" target="_blank">
+                                        <i class="fas fa-print"></i> Cetak
+                                    </a>
                                 </button>
                             </div>
                         </div>

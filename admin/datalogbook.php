@@ -13,43 +13,103 @@ if (!$result) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["TambahLogbook"])) {
-    // Mendapatkan data dari formulir
     $id_siswa = $_POST["id_siswa"];
     $tanggal = $_POST["tanggal"];
     $aktivitas = $_POST["aktivitas"];
-    $status_logbook = $_POST["status_logbook"];
-
-    // Mendapatkan id_pkl dari formulir (data-id_pkl pada dropdown)
     $id_pkl = $_POST["id_pkl"];
 
-    // Insert logbook entry ke tabel logbook
-    $insert_query = "INSERT INTO logbook (id_siswa, id_pkl, tanggal, aktivitas, status_logbook) VALUES ('$id_siswa', '$id_pkl', '$tanggal', '$aktivitas', '$status_logbook')";
-    $insert_result = mysqli_query($koneksi, $insert_query);
+    if (isset($_FILES['dokumentasi'])) {
+        $rand = uniqid();
+        $ekstensi = array('png', 'jpg', 'jpeg', 'gif', 'webp');
+        $filename = $_FILES['dokumentasi']['name'];
+        $ukuran = $_FILES['dokumentasi']['size'];
+        $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-    if ($insert_result) {
-        $_SESSION['success_message'] = "Data logbook berhasil ditambahkan!";
-        header("Location: datalogbook.php");
-        exit();
+        if (!in_array($ext, $ekstensi)) {
+            $_SESSION['error_message'] = "Error: Ekstensi file tidak sesuai!";
+        } else {
+            if ($ukuran < 208815000) {
+                $xx = $rand . '_' . $filename;
+                move_uploaded_file($_FILES['dokumentasi']['tmp_name'], '../Logbook/' . $xx);
+
+                // Perbaikan pada query
+                $insert_query = "INSERT INTO logbook (id_siswa, id_pkl, tanggal, aktivitas, dokumentasi) 
+                VALUES ('$id_siswa', '$id_pkl', '$tanggal', '$aktivitas', '$xx')";
+                $insert_result = mysqli_query($koneksi, $insert_query);
+
+                if ($insert_result) {
+                    // Pesan sukses jika query berhasil dieksekusi
+                    $_SESSION['success_message'] = "Data logbook berhasil ditambahkan!";
+                } else {
+                    // Pesan kesalahan jika query gagal dieksekusi
+                    $_SESSION['error_message'] = "Error: " . mysqli_error($koneksi);
+                }
+            } else {
+                // Pesan kesalahan jika ukuran file terlalu besar
+                $_SESSION['error_message'] = "Error: Ukuran file terlalu besar!";
+            }
+        }
     } else {
-        $_SESSION['error_message'] = "Error: " . $koneksi->error;
-        header("Location: datalogbook.php");
-        exit();
+        // Pesan kesalahan jika file belum dipilih
+        $_SESSION['error_message'] = "Error: File belum dipilih!";
     }
+
+    header("Location: datalogbook.php");
+    exit();
 }
 
 if (isset($_POST['EditLogbook'])) {
-    $id_logbook = $_POST['id_logbook'];
-    $tanggal = $_POST['tanggal'];
-    $aktivitas = $_POST['aktivitas'];
-    $status_logbook = $_POST['status_logbook'];
+    $id_siswa = $_POST["id_siswa"];
+    $id_logbook = $_POST["id_logbook"];
+    $tanggal = $_POST["tanggal"];
+    $aktivitas = $_POST["aktivitas"];
+    $id_pkl = $_POST["id_pkl"];
+    $foto_baru = $_FILES['gambarnew']['name'];
 
-    mysqli_query($koneksi, "UPDATE logbook SET 
-                         tanggal='$tanggal',
-                         aktivitas='$aktivitas',
-                         status_logbook='$status_logbook'                                                     
-                         WHERE id_logbook='$id_logbook'");
-    header("location:datalogbook.php");
+    if ($foto_baru != "") {
+        $ekstensi_diperbolehkan = array('png', 'jpg', 'jpeg');
+        $x = explode('.', $foto_baru);
+        $ekstensi = strtolower(end($x));
+        $file_tmp = $_FILES['gambarnew']['tmp_name'];
+        $angka_acak = rand(1, 999);
+        $nama_gambar_baru = $angka_acak . '-' . $foto_baru;
+
+        if (in_array($ekstensi, $ekstensi_diperbolehkan) === true) {
+            $dt = mysqli_fetch_array(mysqli_query($koneksi, "SELECT * FROM logbook WHERE id_logbook='$id_logbook'"));
+            $gambarlama = $dt['dokumentasi'];
+
+            if (is_file("../Logbook/" . $gambarlama)) {
+                unlink("../Logbook/" . $gambarlama);
+            }
+            move_uploaded_file($_FILES['gambarnew']['tmp_name'], '../Logbook/' . $nama_gambar_baru);
+            $query = "UPDATE logbook SET id_siswa = '$id_siswa', id_pkl = '$id_pkl', tanggal='$tanggal', aktivitas='$aktivitas', dokumentasi='$nama_gambar_baru' 
+            WHERE id_logbook='$id_logbook'";
+        } else {
+            $_SESSION['error_message'] = "Ekstensi gambar yang diizinkan hanya jpg, png, atau jpeg.";
+            header("Location: datalogbook.php");
+            exit();
+        }
+    } else {
+        $query = "UPDATE logbook SET id_siswa = '$id_siswa', id_pkl = '$id_pkl', tanggal='$tanggal', aktivitas='$aktivitas'
+        WHERE id_logbook='$id_logbook'";
+    }
+    $result = mysqli_query($koneksi, $query);
+
+    if ($result) {
+        $rows_affected = mysqli_affected_rows($koneksi);
+        if ($rows_affected > 0) {
+            $_SESSION['success_message'] = "Data berhasil diubah!";
+        } else {
+            $_SESSION['error_message'] = "Tidak ada perubahan pada data!";
+        }
+    } else {
+        $_SESSION['error_message'] = "Error: " . mysqli_error($koneksi);
+    }
+
+    header("Location: datalogbook.php");
+    exit();
 }
+
 
 if (isset($_GET['id_logbook'])) {
     $id_logbook = $_GET['id_logbook'];
@@ -66,7 +126,7 @@ $koneksi->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
-    <link rel="stylesheet" href="font.css">
+<link rel="stylesheet" href="font.css">
 <?php include 'head.html' ?>
 
 <body class="sb-nav-fixed">
@@ -89,9 +149,10 @@ $koneksi->close();
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Logbook</button>
-                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-    <i class="fas fa-print"></i> Cetak
-</button>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                    data-bs-target="#staticBackdrop">
+                                    <i class="fas fa-print"></i> Cetak
+                                </button>
 
                             </div>
                         </div>
@@ -116,7 +177,7 @@ $koneksi->close();
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Tutup</button>
-                                            <button type="submit" class="btn btn-primary" >Cetak</button>
+                                            <button type="submit" class="btn btn-primary">Cetak</button>
                                         </div>
                                     </form>
 
@@ -132,11 +193,14 @@ $koneksi->close();
                         </div>
                         <div class="card-body">
                             <?php
-                            if (!empty($error_message)) {
-                                echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
+                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+                                unset($_SESSION['error_message']);
                             }
-                            if (!empty($success_message)) {
-                                echo '<div class="alert alert-success" role="alert">' . $success_message . '</div>';
+
+                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
+                                unset($_SESSION['success_message']);
                             }
                             ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -145,8 +209,8 @@ $koneksi->close();
                                         <th>No.</th>
                                         <th>Nama</th>
                                         <th>Tanggal Kegiatan</th>
+                                        <th>Dokumentasi</th>
                                         <th>Aktivitas</th>
-                                        <th>Status</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
@@ -155,20 +219,21 @@ $koneksi->close();
                                     <?php
                                     $no = 1;
                                     include 'conn.php';
-                                    $query_table = "SELECT * FROM logbook INNER JOIN siswa on logbook.id_siswa = siswa.id_siswa";
+                                    $query_table = "SELECT * 
+                                    FROM logbook 
+                                    INNER JOIN siswa ON logbook.id_siswa = siswa.id_siswa 
+                                    ORDER BY tanggal ASC;
+                                    ";
                                     $result_table = mysqli_query($koneksi, $query_table);
                                     while ($row = mysqli_fetch_assoc($result_table)) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
-
-                                        $formattedDate = date('d/m/Y', strtotime($row['tanggal']));
-                                        echo "<td>" . $formattedDate . "</td>";
-
+                                        echo "<td>" . date('d/m/Y', strtotime($row['tanggal'])) . "</td>";
+                                        echo "<td ><img src='../Logbook/" . $row['dokumentasi'] . "' style='width : 200px; height : 10px; max-width: auto; height: auto;' class='img-responsive'></td>";
                                         echo "<td>" . $row['aktivitas'] . "</td>";
-                                        echo "<td>" . $row['status_logbook'] . "</td>";
                                         echo "<td>";
-                                        echo "<div class='d-flex'>";
+                                        echo "<div class='d-flex' >";
                                         echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_logbook'] . "' data-bs-whatever='@mdo'>";
                                         echo "<i class='fas fa-pencil-alt'></i> Edit";
                                         echo "</button>";
@@ -221,10 +286,25 @@ $koneksi->close();
                                                         <form method="post" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
                                                                 <div class="form-group">
-                                                                    <label for="id_logbook">ID</label>
                                                                     <input type="text" class="form-control" id="id_logbook"
                                                                         value="<?= $row['id_logbook']; ?>" name="id_logbook"
-                                                                        readonly>
+                                                                        hidden>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-control" id="id_siswa"
+                                                                        value="<?= $row['id_siswa']; ?>" name="id_siswa"
+                                                                        hidden>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-control" id="id_pkl"
+                                                                        value="<?= $row['id_pkl']; ?>" name="id_pkl"
+                                                                        hidden>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="Nama_siswa">Nama_siswa</label>
+                                                                    <input type="text" class="form-control" id="Nama_siswa"
+                                                                        value="<?= $row['Nama_siswa']; ?>" name="Nama_siswa"
+                                                                        required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="tanggal">Tanggal Logbook</label>
@@ -238,12 +318,10 @@ $koneksi->close();
                                                                         value="<?= $row['aktivitas']; ?>" name="aktivitas"
                                                                         required>
                                                                 </div>
-                                                                <div class="form-group">
-                                                                    <label for="status_logbook">Status</label>
-                                                                    <input type="text" class="form-control"
-                                                                        id="status_logbook"
-                                                                        value="<?= $row['status_logbook']; ?>"
-                                                                        name="status_logbook" required>
+                                                                <div class="form-group mt-3">
+                                                                    <label for="dokumentasi">Dokumentasi</label>
+                                                                    <input type="file" name="gambarnew"
+                                                                        class="form-control-file">
                                                                 </div>
                                                             </div>
                                                             <div class="modal-footer">
@@ -276,43 +354,51 @@ $koneksi->close();
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form action="#" method="post" enctype="multipart/form-data" id="formTambahData"
+                            <form action="#" method="POST" enctype="multipart/form-data" id="formTambahData"
                                 autocomplete="off">
                                 <div class="form-group">
-                                    <label for="id_siswa">Nama siswa - ID PKL</label>
+                                    <label for="id_siswa">Nama siswa</label>
                                     <select class="form-control" id="id_siswa" name="id_siswa" required>
                                         <?php
                                         $siswaQuery = "SELECT siswa.id_siswa, siswa.Nama_siswa, pkl.id_pkl FROM siswa INNER JOIN pkl ON siswa.id_siswa = pkl.id_siswa;";
                                         $siswaResult = mysqli_query($koneksi, $siswaQuery);
 
                                         while ($siswa = mysqli_fetch_assoc($siswaResult)) {
-                                            $siswaOptionText = "{$siswa['Nama_siswa']} - ID PKL: {$siswa['id_pkl']}";
-                                            echo "<option value='{$siswa['id_siswa']}' data-id_pkl='{$siswa['id_pkl']}'>$siswaOptionText</option>";
+                                            $siswaOptionText = "{$siswa['Nama_siswa']} ";
+                                            echo "<option value='{$siswa['id_siswa']}' data-id_siswa='{$siswa['id_siswa']}'>$siswaOptionText</option>";
                                         }
                                         ?>
                                     </select>
                                 </div>
+                                <div class="form-group">
+                                    <label for="id_pkl">NIS</label>
+                                    <select class="form-control" id="id_pkl" name="id_pkl" required>
+                                        <?php
+                                        $siswaQuery = "SELECT siswa.id_siswa, siswa.Nama_siswa,siswa.NIS, pkl.id_pkl FROM siswa INNER JOIN pkl ON siswa.id_siswa = pkl.id_siswa;";
+                                        $siswaResult = mysqli_query($koneksi, $siswaQuery);
 
-                                <div class="mb-3">
-                                    <label for="tanggal" class="col-form-label">Tanggal Logbook:</label>
+                                        while ($siswa = mysqli_fetch_assoc($siswaResult)) {
+                                            $siswaOptionText = "{$siswa['NIS']} - {$siswa['Nama_siswa']}";
+                                            echo "<option value='{$siswa['id_pkl']}' data-id_pkl='{$siswa['id_pkl']}'>$siswaOptionText</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="tanggal">Tanggal Logbook:</label>
                                     <input type="date" class="form-control" id="tanggal" name="tanggal" required>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="aktivitas" class="col-form-label">Aktivitas:</label>
+
+                                <div class="form-group">
+                                    <label for="aktivitas">Aktivitas:</label>
                                     <input type="text" class="form-control" id="aktivitas" name="aktivitas" required>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="status_logbook" class="col-form-label">Status Logbook:</label>
-                                    <input type="text" class="form-control" id="status_logbook" name="status_logbook"
+
+                                <div class="form-group">
+                                    <label for="dokumentasi">Dokumentasi Kegiatan:</label>
+                                    <input type="file" class="form-control" id="dokumentasi" name="dokumentasi"
                                         required>
                                 </div>
-
-                                <!-- Input tersembunyi untuk menyimpan id_logbook -->
-                                <input type="int" id="id_logbook" name="id_logbook" value="">
-                                <!-- Input tersembunyi untuk menyimpan id_siswa -->
-                                <input type="int" id="id_siswa" name="id_siswa" value="">
-                                <!-- Input tersembunyi untuk menyimpan id_pkl -->
-                                <input type="int" id="id_pkl" name="id_pkl" value="">
 
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
@@ -321,14 +407,10 @@ $koneksi->close();
                                         id="submit">Submit</button>
                                 </div>
                             </form>
-
                         </div>
                     </div>
                 </div>
             </div>
-
-
-
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">

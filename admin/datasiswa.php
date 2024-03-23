@@ -173,7 +173,7 @@ if (isset($_GET['id_siswa'])) {
                                         echo "<td>" . $row['kelas'] . "</td>";
                                         echo "<td>" . $row['jenis_kelamin'] . "</td>";
                                         echo "<td>" . $row['alamat'] . "</td>";
-                                        echo "<td>" . $row['tanggal_lahir'] . "</td>";
+                                        echo "<td>" . date('d-m-Y', strtotime($row['tanggal_lahir'])) . "</td>";
                                         echo "<td>" . $row['no_hp'] . "</td>";
                                         echo "<td>" . $row['email'] . "</td>";
                                         echo "<td>";

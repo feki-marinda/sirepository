@@ -8,8 +8,10 @@ use Google\Client;
 use Google\Service\Drive;
 
 $query = "SELECT sertifikat.*, siswa.Nama_siswa 
-          FROM sertifikat
-          INNER JOIN siswa ON sertifikat.id_siswa = siswa.id_siswa";
+FROM sertifikat
+INNER JOIN siswa ON sertifikat.id_siswa = siswa.id_siswa
+INNER JOIN pkl ON pkl.id_siswa = siswa.id_siswa 
+ORDER BY siswa.Nama_siswa DESC";
 
 $result = mysqli_query($koneksi, $query);
 
@@ -17,19 +19,14 @@ if (!$result) {
     die("Error in query: " . mysqli_error($koneksi));
 }
 
-// Function to validate and sanitize file paths
-function sanitizeFilePath($path)
-{
-    // Implement additional path validation/sanitization logic if needed
-    return preg_replace('/[^a-zA-Z0-9_.\/]/', '', $path);
-}
-
 if (isset($_POST['TambahSertifikat'])) {
     $Nama_siswa = $_POST['Nama_siswa'];
 
     $file_sertifikat_name = $_FILES['file_sertifikat']['name'];
     $file_sertifikat_temp = $_FILES['file_sertifikat']['tmp_name'];
-    $file_sertifikat_path = "" . sanitizeFilePath($file_sertifikat_name);
+    $secure_file_name = strtolower(preg_replace('/[^a-zA-Z0-9_.]/', '_', $file_sertifikat_name));
+
+    $file_sertifikat_path = $secure_file_name;
 
     $query_get_id = "SELECT id_siswa FROM siswa WHERE Nama_siswa = ?";
     $stmt_get_id = $koneksi->prepare($query_get_id);
@@ -39,7 +36,7 @@ if (isset($_POST['TambahSertifikat'])) {
     $stmt_get_id->fetch();
     $stmt_get_id->close();
 
-    $googleDriveFileId = uploadToGoogleDrive($file_sertifikat_path, $file_sertifikat_name);
+    $googleDriveFileId = uploadToGoogleDrive($file_sertifikat_temp, $file_sertifikat_path);
 
     $query_insert = "INSERT INTO sertifikat (id_siswa, file_sertifikat, google_drive) 
                     VALUES (?, ?, ?)";
@@ -47,7 +44,7 @@ if (isset($_POST['TambahSertifikat'])) {
     $stmt_insert->bind_param("sss", $id_siswa, $file_sertifikat_path, $googleDriveFileId);
 
     if ($stmt_insert->execute()) {
-        $_SESSION['success_message'] = "Data PKL Derhasil Ditambahkan!";
+        $_SESSION['success_message'] = "Sertifikat Berhasil Ditambahkan!";
         header("Location: datasertifikat.php");
         exit();
     } else {
@@ -66,12 +63,17 @@ if (isset($_POST['EditSertifikat'])) {
 
         $secure_file_name = strtolower(preg_replace('/[^a-zA-Z0-9_.]/', '_', $file_sertifikat_name));
 
-        $file_sertifikat_path = "../admin/Sertifikat/" . sanitizeFilePath($secure_file_name);
+        $file_sertifikat_path = "Sertifikat/" . $secure_file_name;
 
         move_uploaded_file($_FILES['file_sertifikat']['tmp_name'], $file_sertifikat_path);
 
+        // Upload file ke Google Drive
+        $googleDriveFileId = uploadToGoogleDrive($file_sertifikat_path, $secure_file_name);
+
+        // Update database dengan ID file di Google Drive
         mysqli_query($koneksi, "UPDATE sertifikat SET 
-                                 file_sertifikat='$secure_file_name'                                                                             
+                                 file_sertifikat='$secure_file_name',
+                                 google_drive='$googleDriveFileId'                                                                             
                                  WHERE id_sertifikat='$id_sertifikat'");
         if ($result) {
             $_SESSION['success_message'] = "Data Sertifikat Berhasil Diubah!";
@@ -123,7 +125,7 @@ if (isset($_GET['id_sertifikat'])) {
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Sertifikat</button>
-                                    
+
                             </div>
                         </div>
                     </div>
@@ -261,8 +263,7 @@ if (isset($_GET['id_sertifikat'])) {
             </main>
 
             <!-- Modal tambah data-->
-            <div class="modal fade" id="tambah" tabindex="-1"
-                aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal fade" id="tambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -276,7 +277,11 @@ if (isset($_GET['id_sertifikat'])) {
                                     <select class="form-select" id="Nama_siswa" name="Nama_siswa" required>
                                         <option value="" disabled selected>Pilih Siswa</option>
                                         <?php
-                                        $result_siswa = mysqli_query($koneksi, "SELECT * FROM siswa");
+                                        $result_siswa = mysqli_query($koneksi, "SELECT siswa.Nama_siswa 
+                                        FROM siswa
+                                        INNER JOIN pkl ON pkl.id_siswa = siswa.id_siswa 
+                                        ORDER BY siswa.Nama_siswa DESC;
+                                        ");
                                         while ($row_siswa = mysqli_fetch_assoc($result_siswa)) {
                                             echo "<option value='" . $row_siswa['Nama_siswa'] . "'>" . $row_siswa['Nama_siswa'] . "</option>";
                                         }

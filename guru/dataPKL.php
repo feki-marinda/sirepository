@@ -98,11 +98,10 @@ if (isset($_GET['id_pkl'])) {
                         <div class="button-container">
                             <div class="spacer"></div>
                             <div class="buttons-right">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
-                                    Tambah Data PKL</button>
                                 <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
+                                    <a href="../admin/cetak/datapkl.php" style="text-decoration: none; color: inherit;" target="_blank">
+                                        <i class="fas fa-print"></i> Cetak
+                                    </a>
                                 </button>
                             </div>
                         </div>
@@ -138,8 +137,8 @@ if (isset($_GET['id_pkl'])) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
-                                        echo "<td>" . $row['tgl_mulai'] . "</td>";
-                                        echo "<td>" . $row['tgl_selesai'] . "</td>";
+                                        echo "<td>" . date('d-m-Y', strtotime($row['tgl_mulai'])) . "</td>";
+                                        echo "<td>" . date('d-m-Y', strtotime($row['tgl_selesai'])) . "</td>";
                                         echo "<td>" . $row['nama_perusahaan'] . "</td>";
                                         echo "<td>" . $row['tahun_pelajaran'] . "</td>";
                                         echo "<td>" . $row['no_hp'] . "</td>";
@@ -147,16 +146,12 @@ if (isset($_GET['id_pkl'])) {
                                         echo "<td>";
                                         // Tombol Detail
                                         echo "<div class='btn-group me-2'>";
-                                        echo "<button type='button' class='btn btn-success' data-bs-toggle='modal' onclick=\"window.location.href='detail/pkl.php?id_siswa={$row['id_siswa']}'\"><i class='fa-solid fa-eye'></i> Detail</button>";
+                                        echo "<button type='button' class='btn btn-success' onclick=\"window.open('detail/pkl.php?id_siswa={$row['id_siswa']}', '_blank')\"><i class='fa-solid fa-eye'></i> Detail</button>";
                                         echo "</div>";
-
-
-
                                         // Tombol Edit
                                         echo "<div class='btn-group me-2'>";
                                         echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_pkl'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
                                         echo "</div>";
-
                                         // Tombol Hapus
                                         echo "<div class='btn-group mt-2'>";
                                         echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_pkl'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";

@@ -197,7 +197,7 @@ if (isset($_POST['EditLaporan'])) {
                                 </div>
                                 <div class="modal-body">
                                     <form method="post" action="#" enctype="multipart/form-data">
-                                        <input type="text" class="form-control" id="status" name="status" readonly>
+                                        <input type="text" class="form-control" id="status" name="status" hidden>
                                         <div class="form-group">
                                             <input type="text" class="form-control" id="id_laporan"
                                                 value="<?= $row['id_laporan']; ?>" name="id_laporan" hidden>

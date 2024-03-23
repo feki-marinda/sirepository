@@ -211,7 +211,7 @@ if (isset($_GET['id_berita'])) {
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['judul'] . "</td>";
                                         echo "<td>" . $row['isi_berita'] . "</td>";
-                                        echo "<td>" . $row['tanggal'] . "</td>";
+                                        echo "<td>" . date('d-m-Y', strtotime($row['tanggal'])) . "</td>";
                                         echo "<td> <img src='gambar/siswa/" . $row['foto'] . "' width='120' height='120'></td>";
                                         echo "<td>";
                                         echo "<div class='d-flex'>";

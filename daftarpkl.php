@@ -4,6 +4,7 @@ include('conn.php');
 
 $id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
 
+$error_message = $success_message = '';
 if (empty($id_user)) {
     header("Location: index.php");
     exit;
@@ -50,10 +51,16 @@ if (isset($_POST['daftar'])) {
     $result_daftar = mysqli_query($koneksi, $query_daftar);
 
     if ($result_daftar) {
-        $success_message = "Pendaftaran Berhasil. Cek di bagian riwayat.";
+        $_SESSION['success_message'] = "Pendaftaran Berhasil. Cek di bagian riwayat.";
+        header("Location: daftarpkl.php");
+    exit();
+
     } else {
-        $error_message = "Pendaftaran Gagal. Anda Sudah Mendaftar Praktik Kerja Lapangan, Cek Riwayat Pendaftar !";
+        $_SESSION['error_message'] = "Pendaftaran Gagal. Anda Sudah Mendaftar Praktik Kerja Lapangan, Cek Riwayat Pendaftar !";
+        header("Location: daftarpkl.php");
+        exit();
     }
+    
 }
 
 ?>
@@ -87,35 +94,36 @@ if (isset($_POST['daftar'])) {
 
             <div class="container entries">
                 <div class="text-center mb-3 entry shadow">
-                    <h2 class="entry-title"><strong style="color:#012970;">Riwayat Pendaftaran Praktek Kerja Lapangan</strong></h2>
+                    <h2 class="entry-title"><strong style="color:#012970;">Riwayat Pendaftaran Praktek Kerja
+                            Lapangan</strong></h2>
                     <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead class="table-primary">
-                            <tr>
-                                <th>Nama</th>
-                                <th>Kelas</th>
-                                <th>Tanggal Mulai</th>
-                                <th>Tanggal Selesai</th>
-                                <th>Tempat Magang</th>
-                                <th>Tahun Pelajaran</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                echo "<tr>";
-                                echo "<td>" . $row['Nama_siswa'] . "</td>";
-                                echo "<td>" . $row['kelas'] . "</td>";
-                                echo "<td>" . date('d F Y', strtotime($row['tgl_mulai'])) . "</td>";
-                                echo "<td>" . date('d F Y', strtotime($row['tgl_selesai'])) . "</td>";
-                                echo "<td>" . $row['nama_perusahaan'] . "</td>";
-                                echo "<td>" . $row['tahun_pelajaran'] . "</td>";
-                                echo "</tr>";
-                            }
-                            ?>
-                        </tbody>
-                    </table>
-                </div>
+                        <table class="table table-bordered">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Nama</th>
+                                    <th>Kelas</th>
+                                    <th>Tanggal Mulai</th>
+                                    <th>Tanggal Selesai</th>
+                                    <th>Tempat Magang</th>
+                                    <th>Tahun Pelajaran</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                while ($row = mysqli_fetch_assoc($result)) {
+                                    echo "<tr>";
+                                    echo "<td>" . $row['Nama_siswa'] . "</td>";
+                                    echo "<td>" . $row['kelas'] . "</td>";
+                                    echo "<td>" . date('d F Y', strtotime($row['tgl_mulai'])) . "</td>";
+                                    echo "<td>" . date('d F Y', strtotime($row['tgl_selesai'])) . "</td>";
+                                    echo "<td>" . $row['nama_perusahaan'] . "</td>";
+                                    echo "<td>" . $row['tahun_pelajaran'] . "</td>";
+                                    echo "</tr>";
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -146,11 +154,15 @@ if (isset($_POST['daftar'])) {
                                         <label for="Nama_Siswa" class="form-label"><strong>Nama Siswa :</strong></label>
                                         <input type="text" class="form-control">
                                     </div>
-
                                     <div class="mb-3">
                                         <label for="kelas" class="form-label"><strong>Kelas :</strong></label>
-                                        <input type="text" class="form-control" id="kelas" name="kelas">
+                                        <select class="form-select" id="kelas" name="kelas">
+                                            <option value="" require selected disabled>Pilih Kelas</option>
+                                            <option value="XI A">XI A</option>
+                                            <option value="XI B">XI B</option>
+                                        </select>
                                     </div>
+
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="tgl_mulai" class="form-label"><strong>Tanggal Mulai
@@ -176,7 +188,9 @@ if (isset($_POST['daftar'])) {
                                             name="tahun_pelajaran">
                                     </div>
                                     <div class="row">
-                                    <button type="submit" name="daftar" class="btn btn-primary"><h5>Submit</h5></button>
+                                        <button type="submit" name="daftar" class="btn btn-primary">
+                                            <h5>Submit</h5>
+                                        </button>
                                     </div>
                                 </form>
                             </div>
