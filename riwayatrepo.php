@@ -16,6 +16,7 @@ $query = "SELECT
             laporan_pkl.google_drive_file_id,
             laporan_pkl.berkas,
             laporan_pkl.status,
+            laporan_pkl.catatan,
             siswa.id_siswa,
             siswa.Nama_siswa
           FROM
@@ -29,7 +30,7 @@ $query = "SELECT
 
 $stmt = $koneksi->prepare($query);
 if (!$stmt) {
-    die("Query failed: " . $koneksi->error); // Menampilkan pesan kesalahan jika query gagal
+    die("Query failed: " . $koneksi->error); 
 }
 
 $stmt->bind_param("s", $username);
@@ -45,13 +46,10 @@ if (isset($_POST['EditLaporan'])) {
     $berkas = $_FILES['berkas']['name'];
     $berkas_tmp = $_FILES['berkas']['tmp_name'];
 
-    // Pindahkan file yang diunggah ke folder lokal di server
     if (move_uploaded_file($berkas_tmp, 'admin/Laporan PKL/' . $berkas)) {
         try {
-            // Edit file di Google Drive
             $googleDriveFileId = editGoogleDriveFile('admin/Laporan PKL/' . $berkas, $berkas);
 
-            // Update entri dalam database dengan informasi terbaru dan ubah status menjadi "Terkirim"
             $query_update = "UPDATE laporan_pkl 
                             INNER JOIN siswa ON laporan_pkl.id_siswa = siswa.id_siswa
                             SET laporan_pkl.tanggal_kumpul = ?, laporan_pkl.judul_laporan = ?, laporan_pkl.berkas = ?, laporan_pkl.google_drive_file_id = ?, laporan_pkl.status = 'Terkirim'
@@ -61,11 +59,9 @@ if (isset($_POST['EditLaporan'])) {
             if ($stmt_update) {
                 $stmt_update->bind_param("ssssss", $tanggal_kumpul, $judul, $berkas, $googleDriveFileId, $id_laporan, $Nama_siswa);
                 if ($stmt_update->execute()) {
-                    $_SESSION['success_message'] = "Berhasil mengedit laporan!";
                     header("Location: riwayatrepo.php");
                     exit();
                 } else {
-                    $_SESSION['error_message'] = "Error saat mengedit laporan: " . $stmt_update->error;
                     header("Location: riwayatrepo.php");
                     exit();
                 }
@@ -141,6 +137,7 @@ if (isset($_POST['EditLaporan'])) {
                                     <th>Judul</th>
                                     <th>File</th>
                                     <th>Status</th>
+                                    <th>Catatan Revisi</th>
                                     <th>Keterangan</th>
                                 </tr>
                             </thead>
@@ -164,9 +161,16 @@ if (isset($_POST['EditLaporan'])) {
                                         echo "<button class='btn btn-sm btn-danger' type='button'><i class='fa-solid fa-circle-xmark'></i> Ditolak</button>";
                                     }
                                     echo "</td>";
-
-
-
+                                    echo "<td>";
+                                    if ($row['status'] == 'Terkirim' || $row['status'] == 'Diterima') {
+                                        // Jika status terkirim atau diterima, sembunyikan kolom catatan
+                                        echo "<span style='display: none;'>" . $row['catatan'] . "</span>";
+                                    } else {
+                                        // Jika tidak, tampilkan kolom catatan
+                                        echo $row['catatan'];
+                                    }
+                                    echo "</td>";
+                                                                       
                                     echo "<td>";
                                     echo "<div class='d-flex'>";
                                     if ($row['status'] != 'Diterima' && $row['status'] != 'Terkirim') {

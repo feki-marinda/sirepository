@@ -42,7 +42,7 @@
                     </div>
                     <div class="col-xl-3 col-md-6">
                         <div class="card bg-warning text-white mb-4">
-                            <div class="card-body">Warning Card</div>
+                            <div class="card-body">Data Repository</div>
                             <div class="card-footer d-flex align-items-center justify-content-between">
                                 <a class="small text-white stretched-link" href="#">View Details</a>
                                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
@@ -51,7 +51,7 @@
                     </div>
                     <div class="col-xl-3 col-md-6">
                         <div class="card bg-success text-white mb-4">
-                            <div class="card-body">Success Card</div>
+                            <div class="card-body">Data Guru Pamong</div>
                             <div class="card-footer d-flex align-items-center justify-content-between">
                                 <a class="small text-white stretched-link" href="#">View Details</a>
                                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
@@ -60,7 +60,7 @@
                     </div>
                     <div class="col-xl-3 col-md-6">
                         <div class="card bg-danger text-white mb-4">
-                            <div class="card-body">Danger Card</div>
+                            <div class="card-body">Data Mitra</div>
                             <div class="card-footer d-flex align-items-center justify-content-between">
                                 <a class="small text-white stretched-link" href="#">View Details</a>
                                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
@@ -68,10 +68,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <h1 class="text-center">Selamat Datang Admin <br> Sistem Informasi Repository Laporan PKL Siswa</h1>
-
+                <div class="row text-center">
+                    <h2 class=""><strong>Selamat Datang Admin <br> Sistem Informasi Repository Laporan PKL Siswa</strong></h2>
+                    <h2><strong>SMK Al - Muhajirin</strong></h2>
                 </div>
+                <div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <img src="assets/img/smk.png" alt="" style="width: 50%; height: 100%; display: block; margin: 0 auto;">
+    </div>
+</div>
+
             </div>
         </main>
         <footer class="py-4 bg-light mt-auto">
@@ -88,7 +94,7 @@
         </footer>
     </div>
     </div>
-    <?php include 'footer.php';?>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

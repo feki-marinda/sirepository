@@ -1,8 +1,16 @@
 <?php
 session_start();
+require '../vendor/autoload.php';
 include 'conn.php';
+require '../scriptedit.php';
+
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 $error_message = $success_message = '';
+
+// Ambil data laporan PKL dan siswa dari database
 $query = "SELECT * FROM laporan_pkl JOIN siswa ON siswa.id_siswa=laporan_pkl.id_siswa";
 $result = mysqli_query($koneksi, $query);
 
@@ -10,73 +18,114 @@ if (!$result) {
     die("Error in query: " . mysqli_error($koneksi));
 }
 
+// Jika form EditLaporan disubmit dan metode adalah POST
 if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $id_laporan = $_POST['id_laporan'];
     $id_siswa = $_POST['Nama_siswa'];
     $tanggal_kumpul = $_POST['tanggal_kumpul'];
     $status = $_POST['status'];
+    $catatan = $_POST['catatan']; // Ambil nilai catatan dari input form
 
-    // Mengambil data berkas lama
-    $old_file_query = mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'");
-    $old_file = mysqli_fetch_array($old_file_query);
+    $query_email_penerima = mysqli_query($koneksi, "SELECT email FROM siswa WHERE id_siswa='$id_siswa'");
+    $row_email_penerima = mysqli_fetch_array($query_email_penerima);
+    $emailPenerima = $row_email_penerima['email'];
 
+    // Perbarui berkas jika ada yang diunggah
     if ($_FILES['berkas']['error'] === 0 && !empty($_FILES['berkas']['name'])) {
-        // Pengguna memilih untuk mengunggah berkas baru
         $file_name = $_FILES['berkas']['name'];
         $file_tmp = $_FILES['berkas']['tmp_name'];
         $file_destination = 'admin/Laporan PKL/' . $file_name;
 
-        // Pindahkan berkas yang diunggah ke lokasi yang ditentukan
         move_uploaded_file($file_tmp, $file_destination);
 
-        // Memeriksa dan menghapus berkas lama
+        // Hapus berkas lama jika ada
+        $old_file_query = mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'");
+        $old_file = mysqli_fetch_array($old_file_query);
         if ($old_file && is_file($old_file['berkas'])) {
             unlink($old_file['berkas']);
         }
     } else {
-        // Pengguna tidak memilih untuk mengunggah berkas baru
-        // Tetap gunakan berkas yang sudah ada
-        $file_destination = $old_file['berkas']; // Gunakan berkas lama
+        // Jika tidak ada berkas yang diunggah, gunakan berkas lama
+        $old_file_query = mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'");
+        $old_file = mysqli_fetch_array($old_file_query);
+        $file_destination = $old_file['berkas'];
     }
 
-    // Menggunakan prepared statements untuk mencegah SQL injection
+    // Perbarui data laporan PKL
     $query = "UPDATE laporan_pkl 
-              SET id_siswa=?, 
-                  tanggal_kumpul=?, 
-                  berkas=?, 
-                  status=? 
-              WHERE id_laporan=?";
+    SET id_siswa=?, 
+        tanggal_kumpul=?, 
+        berkas=?,
+        catatan=?, 
+        status=? 
+    WHERE id_laporan=?";
     $stmt = mysqli_prepare($koneksi, $query);
-    mysqli_stmt_bind_param($stmt, "isssi", $id_siswa, $tanggal_kumpul, $file_destination, $status, $id_laporan);
-    $result = mysqli_stmt_execute($stmt);
-
-    // Memeriksa keberhasilan eksekusi query
-    if ($result) {
+    mysqli_stmt_bind_param($stmt, "issssi", $id_siswa, $tanggal_kumpul, $file_destination, $catatan, $status, $id_laporan);
+    $result_update = mysqli_stmt_execute($stmt);
+    
+    if ($result_update) {
         $rows_affected = mysqli_stmt_affected_rows($stmt);
         if ($rows_affected > 0) {
-            $success_message = "Berhasil Memperbarui Data Laporan!";
-            header("location:datalaporan.php");
+            $_SESSION['success_message'] = "Data Laporan Berhasil Diubah !";
+           
         } else {
-            $error_message = "Tidak ada perubahan pada Data Laporan!";
+            $_SESSION['error_message'] = "Tidak Ada Perubahan Pada Data Laporan !";
         }
     } else {
-        $error_message = "Tidak dapat Memperbarui Data Laporan! Error: " . mysqli_error($koneksi);
+        $_SESSION['error_message'] = "Error: " . mysqli_error($koneksi);
+    }
+
+    if ($status == 'Ditolak') {
+        require_once "../library/PHPMailer.php";
+        require_once "../library/Exception.php";
+        require_once "../library/OAuth.php";
+        require_once "../library/POP3.php";
+        require_once "../library/SMTP.php";
+
+        $mail = new PHPMailer();
+
+        $mail->SMTPDebug = 0;
+        $mail->isSMTP();
+        $mail->Host = "ssl://smtp.gmail.com";
+        $mail->SMTPAuth = true;
+        $mail->Username = "sirepositorysmkalmujahirin@gmail.com";
+        $mail->Password = "cqutrhboyqtviwck";
+        $mail->SMTPSecure = "ssl";
+        $mail->Port = 465;
+
+        $mail->setFrom("sirepositorysmkalmujahirin@gmail.com", "Sirepository-Sistem Informasi Repository");
+        $mail->addAddress($emailPenerima);
+
+        $mail->isHTML(true);
+        $mail->Subject = "Laporan PKL Ditolak";
+        $mail->Body = "Laporan PKL Ditolak. Harap periksa kembali laporan Anda dan lakukan revisi sesuai petunjuk yang diberikan.
+        <br> Detail catatan revisi dapat anda lihat pada riwayat laporan !";
+
+        if (!$mail->send()) {
+            echo "Terjadi kesalahan dalam mengirim email: " . $mail->ErrorInfo;
+        } else {
+            echo "Email notifikasi laporan ditolak berhasil dikirim.";
+        }
     }
 }
 
 if (isset($_GET['id_laporan'])) {
     $id_laporan = $_GET['id_laporan'];
-
     mysqli_query($koneksi, "DELETE FROM laporan_pkl WHERE id_laporan='$id_laporan'");
     header("location:datalaporan.php");
 }
 ?>
 
+
 <style>
-    body, table{
+    body,
+    table {
         font-family: "Poppins", sans-serif;
     }
-    .form,label,input{
+
+    .form,
+    label,
+    input {
         font-family: "Poppins", sans-serif;
     }
 </style>
@@ -103,8 +152,9 @@ if (isset($_GET['id_laporan'])) {
                         <div class="button-container">
                             <div class="spacer"></div>
                             <div class="buttons-right">
-                            <button id="printButton">
-                                    <a href="../admin/cetak/datalaporan.php" style="text-decoration: none; color: inherit;" target="_blank">
+                                <button id="printButton">
+                                    <a href="../admin/cetak/datalaporan.php"
+                                        style="text-decoration: none; color: inherit;" target="_blank">
                                         <i class="fas fa-print"></i> Cetak
                                     </a>
                                 </button>
@@ -119,14 +169,17 @@ if (isset($_GET['id_laporan'])) {
                         </div>
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-striped table-hover">
-                                <?php
-                                if (!empty($error_message)) {
-                                    echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
-                                }
-                                if (!empty($success_message)) {
-                                    echo '<div class="alert alert-success" role="alert">' . $success_message . '</div>';
-                                }
-                                ?>
+                            <?php
+                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+                                unset($_SESSION['error_message']);
+                            }
+
+                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
+                                unset($_SESSION['success_message']);
+                            }
+                            ?>
                                 <thead>
                                     <tr>
                                         <th>No.</th>
@@ -134,6 +187,7 @@ if (isset($_GET['id_laporan'])) {
                                         <th>Tanggal Pengupulan</th>
                                         <th>file</th>
                                         <th>status</th>
+                                        <th>catatan</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
@@ -149,6 +203,7 @@ if (isset($_GET['id_laporan'])) {
                                         echo "<td>" . date('d-m-Y', strtotime($row['tanggal_kumpul'])) . "</td>";
                                         echo "<td><a href='" . 'Laporan PKL' . '/' . $row['berkas'] . "' target='_blank'>" . $row['berkas'] . "</a></td>";
                                         echo "<td>" . $row['status'] . "</td>";
+                                        echo "<td>" . $row['catatan'] . "</td>";
                                         echo "<td>";
                                         echo "<div class='d-flex'>";
                                         echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_laporan'] . "' data-bs-whatever='@mdo'>";
@@ -212,10 +267,15 @@ if (isset($_GET['id_laporan'])) {
                                                                 </select>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label for="id_laporan">ID</label>
+                                                                <label for="catatan">Catatan Revisi</label>
+                                                                <input type="text" class="form-control" id="catatan"
+                                                                    name="catatan" value="<?= $row['catatan']; ?>">
+                                                            </div>
+
+                                                            <div class="form-group">
                                                                 <input type="text" class="form-control" id="id_laporan"
                                                                     value="<?= $row['id_laporan']; ?>" name="id_laporan"
-                                                                    readonly>
+                                                                    hidden>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="Nama_siswa">Nama Lengkap :</label>

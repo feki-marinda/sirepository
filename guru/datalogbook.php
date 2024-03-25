@@ -83,9 +83,6 @@ if (isset($_GET['id_logbook'])) {
                     <div class="card mb-4">
                         <div class="button-container">
                             <div class="spacer"></div>
-                            <div class="buttons-right"><button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak</button>
-                            </div>
                         </div>
                     </div>
 
