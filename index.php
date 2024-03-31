@@ -5,8 +5,9 @@ session_start();
 if (isset($_POST["login"])) {
     $username = mysqli_real_escape_string($koneksi, $_POST["username"]);
     $password = mysqli_real_escape_string($koneksi, $_POST["password"]);
+    $status = $_POST["status"];
 
-    $query = "SELECT * FROM user WHERE username = '$username'";
+    $query = "SELECT * FROM user WHERE username = '$username' AND status = '$status'";
     $result = mysqli_query($koneksi, $query) or die(mysqli_error($koneksi));
 
     if (mysqli_num_rows($result) == 1) {
@@ -15,16 +16,26 @@ if (isset($_POST["login"])) {
         if ($password === $row["password"]) {
             $_SESSION['username'] = $username;
             $_SESSION['id_user'] = $row['id_user'];  
-            header("Location: home.php");
+            $_SESSION['status'] = $status; // Simpan peran pengguna di sesi
+
+            // Arahkan pengguna ke halaman sesuai dengan peran mereka
+            if ($status == 'admin') {
+                header("Location: admin/index.php");
+            } elseif ($status == 'siswa') {
+                header("Location: home.php");
+            } elseif ($status == 'guru') {
+                header("Location: guru/index.php");
+            }
             exit;
         } else {
-            echo "Password tidak cocok.";
+            $error = "Password tidak cocok.";
         }
     } else {
-        echo "Username tidak ditemukan.";
+        $error = "Username atau peran tidak ditemukan.";
     }
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -59,9 +70,9 @@ include 'head.html';
                 <form style="position: relative; margin: 50px;" action="" method="post">
                     <?php
                     if (isset($error)) {
-                        echo '<div class="alert alert-danger" role="alert">' . "pesan eror" . '</div>';
+                        echo '<div class="alert alert-danger" status="alert">' . $error . '</div>';
                     }
-                    ?>
+                    ?>                    
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
                         <input type="text" class="form-control" id="username" name="username" required
@@ -72,13 +83,22 @@ include 'head.html';
                         <input type="password" class="form-control" id="password" name="password" required
                             placeholder="Masukkan Password Anda">
                     </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Login Sebagai</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="" disabled selected>Pilih Login Sebagai</option>
+                            <option value="admin">Admin</option>
+                            <option value="guru">Guru</option>
+                            <option value="siswa">Siswa</option>
+                        </select>
+                    </div>
                     <div class="d-grid gap-2">
                         <button class="btn btn-primary" type="submit" name="login">Login</button>
                         <div class="text-center">
                             <p>Belum punya akun? <a href="register.php" class="btn btn-link">Buat akun</a></p>
                         </div>
-
                     </div>
+                    
                 </form>
 
             </div>

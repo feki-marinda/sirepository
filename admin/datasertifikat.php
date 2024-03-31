@@ -1,8 +1,14 @@
 <?php
-session_start();
 require '../vendor/autoload.php';
 include 'conn.php';
 require '../uploadsave.php';
+session_start();
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+
+if (empty($id_user)) {
+    header("Location: ../index.php");
+    exit;
+}
 
 use Google\Client;
 use Google\Service\Drive;

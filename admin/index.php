@@ -1,3 +1,14 @@
+<?php
+session_start();
+include('conn.php');
+
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+
+if (empty($id_user)) {
+    header("Location: ../index.php");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,54 +42,72 @@
                     <li class="breadcrumb-item active">Dashboard</li>
                 </ol>
                 <div class="row">
-                    <div class="col-xl-3 col-md-6">
-                        <div class="card bg-primary text-white mb-4">
-                            <div class="card-body">Data Siswa</div>
-                            <div class="card-footer d-flex align-items-center justify-content-between">
-                                <a class="small text-white stretched-link" href="#">View Details</a>
-                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6">
-                        <div class="card bg-warning text-white mb-4">
-                            <div class="card-body">Data Repository</div>
-                            <div class="card-footer d-flex align-items-center justify-content-between">
-                                <a class="small text-white stretched-link" href="#">View Details</a>
-                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6">
-                        <div class="card bg-success text-white mb-4">
-                            <div class="card-body">Data Guru Pamong</div>
-                            <div class="card-footer d-flex align-items-center justify-content-between">
-                                <a class="small text-white stretched-link" href="#">View Details</a>
-                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-md-6">
-                        <div class="card bg-danger text-white mb-4">
-                            <div class="card-body">Data Mitra</div>
-                            <div class="card-footer d-flex align-items-center justify-content-between">
-                                <a class="small text-white stretched-link" href="#">View Details</a>
-                                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row text-center">
-                    <h2 class=""><strong>Selamat Datang Admin <br> Sistem Informasi Repository Laporan PKL Siswa</strong></h2>
-                    <h2><strong>SMK Al - Muhajirin</strong></h2>
-                </div>
-                <div class="row justify-content-center">
-    <div class="col-md-6 text-center">
-        <img src="assets/img/smk.png" alt="" style="width: 50%; height: 100%; display: block; margin: 0 auto;">
-    </div>
-</div>
 
-            </div>
+
+                    <?php
+                    include 'conn.php';
+
+                    // Eksekusi query SQL
+                    $sql = "SELECT
+COUNT(*) AS jumlah_siswa,
+pkl.tahun_pelajaran
+FROM
+laporan_pkl
+LEFT JOIN siswa ON laporan_pkl.id_siswa = siswa.id_siswa
+LEFT JOIN pkl ON pkl.id_siswa = siswa.id_siswa
+WHERE
+pkl.tahun_pelajaran BETWEEN YEAR(CURDATE()) - 2 AND YEAR(CURDATE())
+GROUP BY
+pkl.tahun_pelajaran
+LIMIT 3"; // Batasi jumlah baris menjadi 3
+                    
+                    // Array warna yang berbeda untuk card
+                    $colors = ['bg-primary', 'bg-secondary', 'bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-dark'];
+
+                    $result = mysqli_query($koneksi, $sql);
+                    if (!$result) {
+                        die("Error: " . mysqli_error($koneksi));
+                    }
+
+                    // Variabel untuk menyimpan indeks warna
+                    $color_index = 0;
+
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $card_color = $colors[$color_index % count($colors)];
+
+                        echo '<div class="col-xl-3 col-md-6">';
+                        echo '<div class="card ' . $card_color . ' text-white mb-4">';
+                        echo '<div class="card-body">' . $row['tahun_pelajaran'] . '</div>';
+                        echo '<div class="card-footer d-flex align-items-center justify-content-between">';
+                        echo '<a class="small text-white stretched-link" href="details.php?tahun_pelajaran=' . $row['tahun_pelajaran'] . '">View Details</a>';
+                        echo '<div class="small text-white"><i class="fas fa-angle-right"></i></div>';
+                        echo '</div>';
+                        echo '</div>';
+                        echo '</div>';
+
+                        // Menambah indeks warna untuk pemilihan warna yang berbeda
+                        $color_index++;
+                    }
+
+                    // Menutup koneksi
+                    mysqli_close($koneksi);
+                    ?>
+
+
+
+                    <div class="row text-center">
+                        <h2 class=""><strong>Selamat Datang Admin <br> Sistem Informasi Repository Laporan PKL
+                                Siswa</strong></h2>
+                        <h2><strong>SMK Al - Muhajirin</strong></h2>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 text-center">
+                            <img src="assets/img/smk.png" alt=""
+                                style="width: 50%; height: 100%; display: block; margin: 0 auto;">
+                        </div>
+                    </div>
+
+                </div>
         </main>
         <footer class="py-4 bg-light mt-auto">
             <div class="container-fluid px-4">

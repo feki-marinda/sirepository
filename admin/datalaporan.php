@@ -4,6 +4,13 @@ include 'conn.php';
 require '../uploadscript.php';
 session_start();
 
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+
+if (empty($id_user)) {
+    header("Location: ../index.php");
+    exit;
+}
+
 use Google\Client;
 use Google\Service\Drive;
 

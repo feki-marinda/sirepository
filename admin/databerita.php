@@ -1,8 +1,13 @@
 <?php
 session_start();
-include 'conn.php';
+include('conn.php');
 
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
 
+if (empty($id_user)) {
+    header("Location: ../index.php");
+    exit;
+}
 
 $query = "SELECT * FROM berita";
 $result = $koneksi->query($query);
@@ -57,9 +62,7 @@ if (isset($_POST['EditBerita'])) {
     $tanggal = $_POST['tanggal'];
     $foto_baru = $_FILES['gambarnew']['name'];
 
-    // Cek apakah ada file gambar baru yang diunggah
     if (!empty($foto_baru)) {
-        // Ekstensi yang diperbolehkan
         $ekstensi_diperbolehkan = array('png', 'jpg', 'jpeg', 'webp', 'gif');
         $x = explode('.', $foto_baru);
         $ekstensi = strtolower(end($x));
@@ -67,36 +70,28 @@ if (isset($_POST['EditBerita'])) {
         $angka_acak = rand(1, 999);
         $nama_gambar_baru = $angka_acak . '-' . $foto_baru;
 
-        // Cek ekstensi gambar
         if (in_array($ekstensi, $ekstensi_diperbolehkan)) {
-            // Ambil data berita sebelum diubah
             $berita_sebelumnya = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT * FROM berita WHERE id_berita='$id_berita'"));
             $gambar_lama = $berita_sebelumnya['foto'];
 
-            // Hapus gambar lama jika ada
             if (is_file("gambar/siswa/" . $gambar_lama)) {
                 unlink("gambar/siswa/" . $gambar_lama);
             }
 
-            // Pindahkan file gambar baru
             move_uploaded_file($file_tmp, 'gambar/siswa/' . $nama_gambar_baru);
 
-            // Perbarui data berita dengan gambar baru
             $query = "UPDATE berita SET judul=?, isi_berita=?, tanggal=?, foto=? WHERE id_berita=?";
             $stmt = mysqli_prepare($koneksi, $query);
             mysqli_stmt_bind_param($stmt, 'ssssi', $judul, $isi_berita, $tanggal, $nama_gambar_baru, $id_berita);
         } else {
-            // Ekstensi tidak valid
             $_SESSION['error_message'] = "Ekstensi file gambar tidak valid. Gunakan png, jpg, jpeg, webp, atau gif.";
         }
     } else {
-        // Tidak ada gambar baru, perbarui data berita tanpa gambar
         $query = "UPDATE berita SET judul=?, isi_berita=?, tanggal=? WHERE id_berita=?";
         $stmt = mysqli_prepare($koneksi, $query);
         mysqli_stmt_bind_param($stmt, 'sssi', $judul, $isi_berita, $tanggal, $id_berita);
     }
 
-    // Eksekusi query jika query telah disiapkan
     if (isset($stmt)) {
         $result = mysqli_stmt_execute($stmt);
 
@@ -111,11 +106,9 @@ if (isset($_POST['EditBerita'])) {
             $_SESSION['error_message'] = "Error: " . mysqli_stmt_error($stmt);
         }
 
-        // Tutup statement
         mysqli_stmt_close($stmt);
     }
 
-    // Redirect ke halaman databerita.php
     header("location:databerita.php");
     exit();
 }
@@ -137,6 +130,7 @@ if (isset($_GET['id_berita'])) {
 <html lang="en">
 
 <?php include 'head.html' ?>
+
 <body class="sb-nav-fixed">
     <?php include 'header.php' ?>
     <div id="layoutSidenav" style="width: 100%">
@@ -157,7 +151,7 @@ if (isset($_GET['id_berita'])) {
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Berita</button>
-                                
+
                             </div>
                         </div>
                     </div>
@@ -210,7 +204,12 @@ if (isset($_GET['id_berita'])) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['judul'] . "</td>";
-                                        echo "<td>" . $row['isi_berita'] . "</td>";
+                                        echo "<td>";
+                                        echo "<div style='text-align: justify;'>";
+                                        echo "<span class='expandable' onclick='expandContent(this)'>" . substr($row['isi_berita'], 0, 100) . "<a href='#' style='color: blue;'> Selengkapnya</a></span>";
+                                        echo "<div class='expanded-content' style='display: none;'>" . $row['isi_berita'] . "</div>";
+                                        echo "</div>";
+                                        echo "</td>";
                                         echo "<td>" . date('d-m-Y', strtotime($row['tanggal'])) . "</td>";
                                         echo "<td> <img src='gambar/siswa/" . $row['foto'] . "' width='120' height='120'></td>";
                                         echo "<td>";
@@ -227,7 +226,6 @@ if (isset($_GET['id_berita'])) {
 
                                         ?>
 
-                                        <!-- Modal hapus data -->
                                         <div class="modal fade" id='hapus<?= $row['id_berita'] ?>' tabindex="-1"
                                             role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-lg">
@@ -377,10 +375,21 @@ if (isset($_GET['id_berita'])) {
             </footer>
         </div>
     </div>
-    
-    <?php include 'footer.php'; ?>
-    
 
+    <?php include 'footer.php'; ?>
+
+    <script>
+        function expandContent(element) {
+            var expandedContent = element.nextElementSibling;
+            if (expandedContent.style.display === "none" || expandedContent.style.display === "") {
+                expandedContent.style.display = "block";
+                element.innerHTML = element.nextElementSibling.innerHTML;
+            } else {
+                expandedContent.style.display = "none";
+                element.innerHTML = element.innerHTML.slice(0, 100) + "...";
+            }
+        }
+    </script>
 </body>
 
 </html>

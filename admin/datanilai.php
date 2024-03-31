@@ -1,6 +1,13 @@
 <?php
 session_start();
-require_once 'conn.php';
+include('conn.php');
+
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+
+if (empty($id_user)) {
+    header("Location: ../index.php");
+    exit;
+}
 
 $success_message = ''; 
 $query = "SELECT siswa.id_siswa, nilai_pkl.id_nilai, siswa.Nama_siswa, nilai_pkl.nilai, nilai_pkl.grade, nilai_pkl.file FROM nilai_PKL INNER JOIN siswa ON nilai_pkl.id_siswa = siswa.id_siswa";

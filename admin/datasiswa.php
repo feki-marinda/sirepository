@@ -1,6 +1,13 @@
 <?php
 session_start();
-include 'conn.php';
+include('conn.php');
+
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+
+if (empty($id_user)) {
+    header("Location: ../index.php");
+    exit;
+}
 
 if (!$koneksi) {
     die("Koneksi database gagal: " . mysqli_connect_error());

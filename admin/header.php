@@ -46,7 +46,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary me-auto" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger">Logout</button>
+                <button type="button" class="btn btn-danger" onclick="logout()">Logout</button>
+
+<script>
+    function logout() {
+        window.location.href = '../logout.php';
+    }
+</script>
+
             </div>
         </div>
     </div>
