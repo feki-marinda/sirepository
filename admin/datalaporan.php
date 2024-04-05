@@ -4,9 +4,9 @@ include 'conn.php';
 require '../uploadscript.php';
 session_start();
 
-$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
 
-if (empty($id_user)) {
+if (empty($status)) {
     header("Location: ../index.php");
     exit;
 }
@@ -37,7 +37,7 @@ if (isset($_POST['TambahLaporan'])) {
     if (!in_array($ext_file, $ekstensi_dokumen)) {
         echo "Error : Ekstensi file tidak sesuai !";
     } else {
-        if ($ukuran_file < 208815000) {
+        if ($ukuran_file < 100 * 1024 * 1024) {
             $file_dokumen = $rand . '_' . $file_name;
             $upload_dir = 'Laporan PKL/';
 
@@ -248,10 +248,9 @@ if (isset($_GET['id_laporan'])) {
                                                         <form method="post" action="datalaporan.php"
                                                             enctype="multipart/form-data">
                                                             <div class="form-group">
-                                                                <label for="id_laporan">ID</label>
                                                                 <input type="text" class="form-control" id="id_laporan"
                                                                     value="<?= $row['id_laporan']; ?>" name="id_laporan"
-                                                                    readonly>
+                                                                    hidden>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="Nama_siswa">Nama Lengkap :</label>
@@ -314,7 +313,7 @@ if (isset($_GET['id_laporan'])) {
                         </div>
                         <div class="modal-body ">
                             <form action="#" method="post" id="formTambahData" enctype="multipart/form-data">
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="id_siswa" class="col-form-label">Pilih Siswa:</label>
                                     <select class="form-select" id="id_siswa" name="id_siswa" required>
                                         <option value="" disabled selected>Pilih Siswa</option>
@@ -330,12 +329,12 @@ if (isset($_GET['id_laporan'])) {
                                         ?>
                                     </select>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="tanggal_kumpul" class="col-form-label">Tanggal Pengumpulan:</label>
                                     <input type="date" class="form-control" id="tanggal_kumpul" name="tanggal_kumpul"
                                         required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="berkas" class="col-form-label">berkas Laporan :</label>
                                     <input type="file" class="form-control" id="berkas" name="berkas" required>
                                 </div>

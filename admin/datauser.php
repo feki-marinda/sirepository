@@ -2,9 +2,9 @@
 session_start();
 include('conn.php');
 
-$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
 
-if (empty($id_user)) {
+if (empty($status)) {
     header("Location: ../index.php");
     exit;
 }
@@ -107,10 +107,7 @@ $koneksi->close();
                             <div class="buttons-right">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
-                                    Tambah Data User</button>
-                                <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
-                                </button>
+                                    Tambah Data User</button>                                
                             </div>
                         </div>
                     </div>
@@ -199,9 +196,8 @@ $koneksi->close();
                                                     <div class="modal-body">
                                                         <form method="POST" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
-                                                                <label for="id_user">ID</label>
                                                                 <input type="text" class="form-control" id="id_user"
-                                                                    value="<?= $row['id_user']; ?>" name="id_user" readonly>
+                                                                    value="<?= $row['id_user']; ?>" name="id_user" hidden>
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="username">username</label>

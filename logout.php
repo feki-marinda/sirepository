@@ -1,9 +1,12 @@
 <?php
 session_start();
-$_SESSION = [];
-session_unset();
-session_destroy();
 
+// Hapus session sesuai dengan jenis pengguna
+unset($_SESSION['admin']);
+unset($_SESSION['siswa']);
+unset($_SESSION['guru']);
+
+// Redirect ke halaman login
 header("Location: index.php");
 exit;
 ?>

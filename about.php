@@ -2,9 +2,9 @@
 session_start();
 include('conn.php');
 
-$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+$password = isset($_SESSION['password']) ? $_SESSION['password'] : '';
 
-if (empty($id_user)) {
+if (empty($password)) {
   header("Location: index.php");
   exit;
 }

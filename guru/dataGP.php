@@ -1,6 +1,13 @@
 <?php
-include 'conn.php';
+session_start();
+include('conn.php');
 
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+
+if (empty($username)) {
+    header("Location: ../index.php");
+    exit;
+}
 $query = "SELECT * FROM guru_pamong";
 $result = mysqli_query($koneksi, $query);
 

@@ -2,9 +2,9 @@
 session_start();
 include('conn.php');
 
-$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
 
-if (empty($id_user)) {
+if (empty($status)) {
     header("Location: ../index.php");
     exit;
 }
@@ -281,7 +281,7 @@ $koneksi->close();
                                         <!-- Modal edit data -->
                                         <div class='modal fade' id='edit<?= $row['id_logbook'] ?>' tabindex='-1'
                                             aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
@@ -304,8 +304,7 @@ $koneksi->close();
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <input type="text" class="form-control" id="id_pkl"
-                                                                        value="<?= $row['id_pkl']; ?>" name="id_pkl"
-                                                                        hidden>
+                                                                        value="<?= $row['id_pkl']; ?>" name="id_pkl" hidden>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="Nama_siswa">Nama_siswa</label>
@@ -321,15 +320,19 @@ $koneksi->close();
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="aktivitas">Aktivitas</label>
-                                                                    <input type="text" class="form-control" id="aktivitas"
-                                                                        value="<?= $row['aktivitas']; ?>" name="aktivitas"
-                                                                        required>
+                                                                    <textarea class="form-control" id="aktivitas"
+                                                                        name="aktivitas"
+                                                                        required><?= $row['aktivitas']; ?></textarea>
                                                                 </div>
                                                                 <div class="form-group mt-3">
                                                                     <label for="dokumentasi">Dokumentasi</label>
-                                                                    <input type="file" name="gambarnew"
-                                                                        class="form-control-file">
+                                                                    <div class="custom-file">
+                                                                        <input type="file" class="custom-file-input"
+                                                                            id="dokumentasi" name="gambarnew"
+                                                                            accept="image/*">
+                                                                                                                                            </div>
                                                                 </div>
+
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary"

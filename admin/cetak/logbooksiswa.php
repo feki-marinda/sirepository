@@ -55,7 +55,7 @@ $html = '
     <tr>
         <th>No.</th>
         <th>Nama</th>
-        <th>Tanggal Kegiatan</th>
+        <th>Tanggal <br>Kegiatan</th>
         <th>Aktivitas</th>
         <th>Dokumentasi</th>
     </tr>

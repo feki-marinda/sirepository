@@ -50,7 +50,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
 <script>
     function logout() {
-        window.location.href = '../logout.php';
+        window.location.href = 'logout.php';
     }
 </script>
 

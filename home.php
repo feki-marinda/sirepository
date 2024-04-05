@@ -8,6 +8,7 @@ if (empty($id_user)) {
     header("Location: index.php");
     exit;
 }
+
 ?>
 
 

@@ -1,5 +1,13 @@
 <?php
-include 'conn.php';
+session_start();
+include('conn.php');
+
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+
+if (empty($username)) {
+    header("Location: ../index.php");
+    exit;
+}
 
 function escapeString($koneksi, $string)
 {

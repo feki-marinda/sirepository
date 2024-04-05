@@ -5,7 +5,7 @@ session_start();
 if (isset($_POST["login"])) {
     $username = mysqli_real_escape_string($koneksi, $_POST["username"]);
     $password = mysqli_real_escape_string($koneksi, $_POST["password"]);
-    $status = $_POST["status"];
+    $status = mysqli_real_escape_string($koneksi, $_POST["status"]);
 
     $query = "SELECT * FROM user WHERE username = '$username' AND status = '$status'";
     $result = mysqli_query($koneksi, $query) or die(mysqli_error($koneksi));

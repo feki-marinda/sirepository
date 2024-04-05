@@ -2,9 +2,9 @@
 session_start();
 include('conn.php');
 
-$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
 
-if (empty($id_user)) {
+if (empty($status)) {
     header("Location: ../index.php");
     exit;
 }
@@ -250,13 +250,12 @@ if (isset($_GET['id_guru'])) {
                                                     <div class="modal-body">
                                                         <form method="post" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
-                                                                <div class="form-group">
-                                                                    <label for="id_guru">ID</label>
+                                                                <div class="form-group mb-2">
                                                                     <input type="text" class="form-control" id="id_guru"
                                                                         value="<?= $row['id_guru']; ?>" name="id_guru"
-                                                                        readonly>
+                                                                        hidden>
                                                                 </div>
-                                                                <div class="form-group">
+                                                                <div class="form-group ">
                                                                     <label for="nama">Nama Lengkap</label>
                                                                     <input type="text" class="form-control" id="nama"
                                                                         value="<?= $row['nama']; ?>" name="nama" required>
@@ -333,27 +332,27 @@ if (isset($_GET['id_guru'])) {
                         </div>
                         <div class="modal-body ">
                             <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="nama" class="col-form-label">Nama Lengkap:</label>
                                     <input type="text" class="form-control" id="nama" name="nama" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="NIP" class="col-form-label">NIP:</label>
                                     <input type="text" class="form-control" id="NIP" name="NIP" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="Email" class="col-form-label">Email:</label>
                                     <input type="email" class="form-control" id="Email" name="Email" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="Alamat" class="col-form-label">Alamat:</label>
                                     <input type="text" class="form-control" id="Alamat" name="Alamat" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="Foto" class="col-form-label">Foto:</label>
                                     <input type="file" class="form-control" id="Foto" name="Foto" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="no_telp" class="col-form-label">No telp:</label>
                                     <input type="text" class="form-control" id="no_telp" name="no_telp" required>
                                 </div>

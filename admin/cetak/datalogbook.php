@@ -44,11 +44,12 @@ $html = '
 <h3 style="text-align:center">SMK Al-Muhajirin</h3>
 <table border="1" cellpadding="5" cellspacing="0">
 <thead>
-    <tr>
+     <tr>
         <th>No.</th>
         <th>Nama</th>
-        <th>Tanggal Kegiatan</th>
+        <th>Tanggal</th>
         <th>Aktivitas</th>
+        <th>Dokumentasi</th>
     </tr>
     </thead>';
     
@@ -60,6 +61,7 @@ $html = '
             <td>' . $row['Nama_siswa'] . '</td>
             <td>' . $formattedDate . '</td>
             <td>' . $row['aktivitas'] . '</td>
+            <td><img src="../../Logbook/' . $row['dokumentasi'] . '" style="max-width: 20%; height: auto;" class="img-responsive"></td>
         </tr>';
     }
     

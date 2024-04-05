@@ -3,9 +3,9 @@ require '../vendor/autoload.php';
 include 'conn.php';
 require '../uploadsave.php';
 session_start();
-$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
 
-if (empty($id_user)) {
+if (empty($status)) {
     header("Location: ../index.php");
     exit;
 }
@@ -278,7 +278,7 @@ if (isset($_GET['id_sertifikat'])) {
                         </div>
                         <div class="modal-body ">
                             <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="Nama_siswa" class="col-form-label">Pilih Siswa:</label>
                                     <select class="form-select" id="Nama_siswa" name="Nama_siswa" required>
                                         <option value="" disabled selected>Pilih Siswa</option>
@@ -295,7 +295,7 @@ if (isset($_GET['id_sertifikat'])) {
                                     </select>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="file_sertifikat" class="col-form-label">File Sertifikat:</label>
                                     <input type="file" class="form-control" id="file_sertifikat" name="file_sertifikat"
                                         required>

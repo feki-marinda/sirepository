@@ -2,9 +2,9 @@
 session_start();
 include('conn.php');
 
-$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
 
-if (empty($id_user)) {
+if (empty($status)) {
     header("Location: ../index.php");
     exit;
 }
@@ -235,10 +235,9 @@ if (isset($_GET['id_siswa'])) {
                                                         <form method="post" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
                                                                 <div class="form-group">
-                                                                    <label for="id_siswa">ID</label>
                                                                     <input type="text" class="form-control" id="id_siswa"
                                                                         value="<?= $row['id_siswa']; ?>" name="id_siswa"
-                                                                        readonly>
+                                                                        hidden>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="Nama_siswa">Nama Lengkap</label>

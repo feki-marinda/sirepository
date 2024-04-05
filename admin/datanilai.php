@@ -2,9 +2,9 @@
 session_start();
 include('conn.php');
 
-$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
 
-if (empty($id_user)) {
+if (empty($status)) {
     header("Location: ../index.php");
     exit;
 }
@@ -261,7 +261,7 @@ if (isset($_GET['id_nilai'])) {
 
                                         <div class='modal fade' id='edit<?= $row['id_nilai'] ?>' tabindex='-1'
                                             aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Edit Data Nilai
@@ -273,10 +273,9 @@ if (isset($_GET['id_nilai'])) {
                                                         <form method="post" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
                                                                 <div class="form-group">
-                                                                    <label for="id_nilai">ID</label>
                                                                     <input type="text" class="form-control" id="id_nilai"
                                                                         value="<?= $row['id_nilai']; ?>" name="id_nilai"
-                                                                        readonly>
+                                                                        hidden>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="Nama_siswa">Nama siswa</label>
@@ -336,7 +335,7 @@ if (isset($_GET['id_nilai'])) {
                         <div class="modal-body ">
                             <form method="POST" action="#" enctype="multipart/form-data">
                                 <input type="hidden" name="id_nilai" value="<?= $row['id_nilai']; ?>">
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="id_siswa" class="col-form-label">Nama Siswa :</label>
                                     <select name="id_siswa" id="id_siswa" class="form-control" required>
                                         <?php
@@ -347,11 +346,11 @@ if (isset($_GET['id_nilai'])) {
                                         ?>
                                     </select>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="nilai" class="col-form-label">Rata-rata Nilai :</label>
                                     <input type="int" class="form-control" id="nilai" name="nilai" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="grade" class="col-form-label">Grade :</label>
                                     <input type="text" class="form-control" id="grade" name="grade" required>
                                 </div>

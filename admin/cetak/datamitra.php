@@ -39,9 +39,9 @@ $html = '
     <tr>
         <th>No.</th>
         <th>Nama Perusahaan</th>
-        <th>Foto</th>
         <th>Alamat</th>
         <th>Kontak</th>
+        <th>Foto</th>
     </tr>
     </thead>';
 
@@ -50,9 +50,9 @@ while ($row = mysqli_fetch_assoc($result)) {
     $html .= '<tr>
         <td>' . $no++ . '</td>
         <td>' . $row['nama'] . '</td>
-        <td><img src="../../gambar/' . $row['foto'] . '" width="140" height="150"></td>
         <td>' . $row['alamat'] . '</td>
         <td>' . $row['kontak'] . '</td>
+        <td><img src="../../gambar/' . $row['foto'] . '" width="140" height="150"></td>
     </tr>';
 }
 

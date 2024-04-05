@@ -2,9 +2,9 @@
 session_start();
 include('conn.php');
 
-$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+$status = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
 
-if (empty($id_user)) {
+if (empty($status)) {
     header("Location: ../index.php");
     exit;
 }
@@ -241,7 +241,6 @@ if (isset($_GET['id_mitra'])) {
                                                     <div class="modal-body">
                                                         <form method="post" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
-                                                                <label for="id_mitra">ID</label>
                                                                 <input type="text" class="form-control" id="id_mitra"
                                                                     value="<?= $row['id_mitra']; ?>" name="id_mitra" hidden>
                                                             </div>
@@ -308,19 +307,19 @@ if (isset($_GET['id_mitra'])) {
                         </div>
                         <div class="modal-body ">
                             <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="nama" class="col-form-label">Nama Perusahaan :</label>
                                     <input type="text" class="form-control" id="nama" name="nama" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="alamat" class="col-form-label">Alamat :</label>
                                     <input type="text" class="form-control" id="alamat" name="alamat" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="kontak" class="col-form-label">Telp :</label>
                                     <input type="text" class="form-control" id="kontak" name="kontak" required>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="foto" class="col-form-label">Foto:</label>
                                     <input type="file" class="form-control" id="foto" name="foto" accept="image/*"
                                         required>

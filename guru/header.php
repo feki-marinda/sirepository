@@ -45,9 +45,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <h3>Apakah Anda Yakin Ingin Keluar ?</h3>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary me-auto" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger">Logout</button>
-            </div>
+    <button type="button" class="btn btn-secondary me-auto" data-bs-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-danger" id="logoutBtn">Logout</button>
+</div>
+
+<script>
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        window.location.href = '../logout.php'; // Mengarahkan ke halaman logout.php
+    });
+</script>
+
         </div>
     </div>
 </div>
