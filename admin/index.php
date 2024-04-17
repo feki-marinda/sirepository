@@ -47,21 +47,19 @@ if (empty($status)) {
                     <?php
                     include 'conn.php';
 
-                    // Eksekusi query SQL
                     $sql = "SELECT
-COUNT(*) AS jumlah_siswa,
-pkl.tahun_pelajaran
-FROM
-laporan_pkl
-LEFT JOIN siswa ON laporan_pkl.id_siswa = siswa.id_siswa
-LEFT JOIN pkl ON pkl.id_siswa = siswa.id_siswa
-WHERE
-pkl.tahun_pelajaran BETWEEN YEAR(CURDATE()) - 2 AND YEAR(CURDATE())
-GROUP BY
-pkl.tahun_pelajaran
-LIMIT 3"; // Batasi jumlah baris menjadi 3
+                    COUNT(*) AS jumlah_siswa,
+                    pkl.tahun_pelajaran
+                FROM
+                    laporan_pkl
+                LEFT JOIN siswa ON laporan_pkl.id_siswa = siswa.id_siswa
+                LEFT JOIN pkl ON pkl.id_siswa = siswa.id_siswa
+                WHERE
+                    pkl.tahun_pelajaran BETWEEN YEAR(CURDATE()) - 2 AND YEAR(CURDATE())
+                GROUP BY
+                    pkl.tahun_pelajaran
+                LIMIT 3"; 
                     
-                    // Array warna yang berbeda untuk card
                     $colors = ['bg-primary', 'bg-secondary', 'bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-dark'];
 
                     $result = mysqli_query($koneksi, $sql);
@@ -69,7 +67,6 @@ LIMIT 3"; // Batasi jumlah baris menjadi 3
                         die("Error: " . mysqli_error($koneksi));
                     }
 
-                    // Variabel untuk menyimpan indeks warna
                     $color_index = 0;
 
                     while ($row = mysqli_fetch_assoc($result)) {
@@ -85,11 +82,9 @@ LIMIT 3"; // Batasi jumlah baris menjadi 3
                         echo '</div>';
                         echo '</div>';
 
-                        // Menambah indeks warna untuk pemilihan warna yang berbeda
                         $color_index++;
                     }
 
-                    // Menutup koneksi
                     mysqli_close($koneksi);
                     ?>
 

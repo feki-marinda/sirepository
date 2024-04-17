@@ -52,7 +52,7 @@ if (empty($id_user)) {
         <div class="container mt-4">
   <div class="row">
     <div class="col-md-3">
-      <img src="gambar/foto-1.jpg" alt="Profile Picture" class="img-fluid">
+      <img src="guru/assets/img/admin.jpeg" alt="Profile Picture" class="img-fluid">
     </div>
     <div class="col-md-9">
       <table class="table">

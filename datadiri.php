@@ -80,7 +80,7 @@ $result = mysqli_query($koneksi, $query);
                     </ul>
                 </div>
 
-                <div class="col-md-9">
+                <div class="col-md-10">
                     <div class="tab-content" id="myTabContent">
                         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                             <?php include 'datasiswa.php'; ?>

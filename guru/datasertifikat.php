@@ -1,13 +1,11 @@
 <?php
-include('conn.php');
 require '../vendor/autoload.php';
+include 'conn.php';
 require '../uploadsave.php';
-
 session_start();
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
 
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
-
-if (empty($username)) {
+if (empty($status)) {
     header("Location: ../index.php");
     exit;
 }
@@ -172,7 +170,7 @@ if (isset($_GET['id_sertifikat'])) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
-                                        echo "<td><img src='Sertifikat/" . $row['file_sertifikat'] . "' width='150' height='130'></td>";
+                                        echo "<td><a href='..\admin/Sertifikat/" . $row['file_sertifikat'] . "' target='_blank'>" . $row['file_sertifikat'] . "</a></td>";
                                         echo "<td>";
                                         echo "<div class='d-flex'>";
                                         echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_sertifikat'] . "' data-bs-whatever='@mdo'>";
@@ -280,7 +278,7 @@ if (isset($_GET['id_sertifikat'])) {
                         </div>
                         <div class="modal-body ">
                             <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="Nama_siswa" class="col-form-label">Pilih Siswa:</label>
                                     <select class="form-select" id="Nama_siswa" name="Nama_siswa" required>
                                         <option value="" disabled selected>Pilih Siswa</option>
@@ -297,7 +295,7 @@ if (isset($_GET['id_sertifikat'])) {
                                     </select>
                                 </div>
 
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label for="file_sertifikat" class="col-form-label">File Sertifikat:</label>
                                     <input type="file" class="form-control" id="file_sertifikat" name="file_sertifikat"
                                         required>
@@ -318,6 +316,12 @@ if (isset($_GET['id_sertifikat'])) {
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
                     </div>
                 </div>
             </footer>

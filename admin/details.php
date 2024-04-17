@@ -35,7 +35,7 @@ if (isset($_GET['tahun_pelajaran'])) {
                     </ol>
 
                     <div class="card mb-4 text-center">
-                        <h3><strong>Data Laporan PKL Sisa SMK Al-Muhajirin <br> Tahun
+                        <h3><strong>Data Laporan PKL Siwsa SMK Al-Muhajirin <br> Tahun
                                 <?php echo $tahun_pelajaran; ?>
                             </strong></h3>
                     </div>

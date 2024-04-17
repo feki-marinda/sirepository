@@ -33,7 +33,7 @@ if (empty($id_user)) {
     aria-labelledby="v-pills-home-tab">
 
     <div class="card-body">
-      <h5 class="card-title">Informasi Data Siswa</h5>
+      <h3 class="card-title text-center">Informasi Data Siswa</h3>
       <table class="table table-sm">
     <?php
     while ($row = mysqli_fetch_assoc($result)) {

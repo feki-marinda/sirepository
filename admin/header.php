@@ -9,13 +9,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
         }
 </style>
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-    <!-- Navbar Brand-->
     <a class="navbar-brand ps-3" href="index.php"><img src="assets/img/r.png" alt="" style="width: 200px; height: 40px;"></a>
 
-    <!-- Sidebar Toggle-->
     <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
             class="fas fa-bars"></i></button>
-    <!-- Navbar Search-->
     <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
         <div class="input-group">
             <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..."
@@ -105,6 +102,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <a class="nav-link <?php echo ($current_page === 'datamitra.php') ? 'active' : ''; ?>" href="datamitra.php">
                     <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
                     Data Mitra
+                </a>
+                <a class="nav-link <?php echo ($current_page === 'indikator.php') ? 'active' : ''; ?>" href="indikator.php">
+                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                    Data Indikator
                 </a>
                 <a class="nav-link <?php echo ($current_page === 'datanilai.php') ? 'active' : ''; ?>" href="datanilai.php">
                     <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>

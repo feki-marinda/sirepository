@@ -68,7 +68,7 @@ include 'conn.php';
                 </h1>
             </div>
             <br>
-            <div class="ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow" >
+            <div class="ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow">
                 <div class="ms-2 pt-2 me-2 mb-3">
                     <h2 class="text-center">Logbook Harian</h2>
                     <div class="d-flex justify-content-end">
@@ -142,15 +142,15 @@ include 'conn.php';
                     </table>
 
 
-                    
+
                 </div>
             </div>
         </div>
         <script>
-                        $(document).ready(function () {
-                            $('#example').DataTable();
-                        });
-                    </script>
+            $(document).ready(function () {
+                $('#example').DataTable();
+            });
+        </script>
         <script src="assets/js/main.js"></script>
 
     </main>

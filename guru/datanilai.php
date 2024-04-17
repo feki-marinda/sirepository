@@ -2,94 +2,82 @@
 session_start();
 include('conn.php');
 
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
 
-if (empty($username)) {
+if (empty($status)) {
     header("Location: ../index.php");
     exit;
 }
 
-$query = "SELECT * FROM nilai_PKL INNER JOIN siswa on nilai_pkl.id_siswa=siswa.id_siswa";
+$success_message = '';
+$query = "SELECT nilai_pkl.id_nilai, nilai_pkl.nilai, siswa.id_siswa, siswa.Nama_siswa, indikator.id_indikator, indikator.indikator 
+FROM nilai_PKL 
+INNER JOIN siswa ON nilai_pkl.id_siswa = siswa.id_siswa 
+INNER JOIN indikator ON indikator.id_indikator = nilai_pkl.id_indikator 
+GROUP BY siswa.id_siswa;
+";
 $result = $koneksi->query($query);
-
 if (!$result) {
     die("Error: " . $koneksi->error);
 }
+
 if (isset($_POST['TambahNilai'])) {
     $id_siswa = $_POST['id_siswa'];
-    $nilai = $_POST['nilai'];
-    $grade = $_POST['grade'];
-    $file = $_POST['file'];
 
-    $query = "INSERT INTO nilai_pkl (id_siswa, grade, nilai, file) 
-              VALUES ('$id_siswa', '$grade', '$nilai', '$file')";
+    // Looping untuk menangkap nilai dari setiap indikator
+    for ($i = 0; $i < 10; $i++) {
+        $id_indikator = $_POST['id_indikator' . $i];
+        $nilai = $_POST['nilai' . $i];
 
-    if ($koneksi->query($query) === TRUE) {
-        header('Location: datanilai.php');
-        exit;
-    } else {
-        echo 'Error: ' . $koneksi->error;
+        // Query untuk menyimpan nilai siswa ke dalam tabel nilai_pkl
+        $query_insert = "INSERT INTO nilai_pkl (id_siswa, id_indikator, nilai) VALUES ('$id_siswa', '$id_indikator', '$nilai')";
+        $result_insert = mysqli_query($koneksi, $query_insert);
+
+        if (!$result_insert) {
+            die('Error: ' . mysqli_error($koneksi));
+        }
     }
+
+    // Jika berhasil menambahkan nilai, arahkan pengguna ke halaman yang sesuai
+    header("Location: datatanilai.php");
+    exit();
 }
+
 if (isset($_POST['EditNilai'])) {
+    // Ambil data dari formulir edit
     $id_nilai = $_POST['id_nilai'];
-    $nilai = $_POST['nilai'];
     $id_siswa = $_POST['id_siswa'];
-    $grade = $_POST['grade'];
-    $file = $_POST['file'];
 
-    $update_query = "UPDATE nilai_pkl SET nilai=?, id_siswa=?, grade=?, file=? WHERE id_nilai=?";
+    for ($i = 0; $i < 10; $i++) {
+        $id_indikator = $_POST['id_indikator' . $i];
+        $nilai = $_POST['nilai' . $i];
 
-    // Prepared statement
-    $stmt = mysqli_prepare($koneksi, $update_query);
-
-    if (!$stmt) {
-        // Gagal membuat prepared statement
-        echo 'Error creating prepared statement: ' . mysqli_error($koneksi);
-        exit;
+        mysqli_query($koneksi, "UPDATE nilai_pkl SET id_siswa = '$id_siswa', id_indikator = '$id_indikator', nilai = '$nilai' WHERE id_nilai = '$id_nilai'");
     }
 
-    // Bind parameters
-    $success_bind = mysqli_stmt_bind_param($stmt, "ssssi", $nilai, $id_siswa, $grade, $file, $id_nilai);
+    $_SESSION['success_message'] = "Data nilai telah berhasil diperbarui.";
+    header("Location: datanilai.php");
+    exit();
+}
 
-    if (!$success_bind) {
-        // Gagal binding parameters
-        echo 'Error binding parameters: ' . mysqli_stmt_error($stmt);
-        exit;
-    }
+if (isset($_GET['id_siswa'])) {
+    $id_siswa = $_GET['id_siswa'];
+    $delete_query = "DELETE FROM nilai_pkl WHERE id_siswa='$id_siswa'";
 
-    // Eksekusi statement
-    $success_execute = mysqli_stmt_execute($stmt);
-
-    if ($success_execute) {
-        // Redirect setelah edit
-        header('Location: datanilai.php');
-        exit;
+    if (mysqli_query($koneksi, $delete_query)) {
+        $_SESSION['success_message'] = "Berhasil Menghapus Data Nilai!";
+        header("Location: datanilai.php");
+        exit();
     } else {
-        echo 'Error updating data: ' . mysqli_stmt_error($stmt);
+        $_SESSION['error_message'] = "Error: Tidak Dapat Menghapus Data Nilai !";
+        header("Location: datanilai.php");
+        exit();
     }
-
-    // Tutup prepared statement
-    mysqli_stmt_close($stmt);
 }
 
-
-if (isset($_GET['id_nilai'])) {
-    $id_nilai = $_GET['id_nilai'];
-
-    mysqli_query($koneksi, "DELETE FROM nilai_pkl WHERE id_nilai='$id_nilai'");
-}
 
 ?>
 
-<style>
-    body, table{
-        font-family: "Poppins", sans-serif;
-    }
-    .form,label,input{
-        font-family: "Poppins", sans-serif;
-    }
-</style>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -117,7 +105,10 @@ if (isset($_GET['id_nilai'])) {
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Nilai PKL</button>
                                 <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
+                                    <a href="cetak/datanilai.php" style="text-decoration: none; color: inherit;"
+                                        target="_blank">
+                                        <i class="fas fa-print"></i> Cetak
+                                    </a>
                                 </button>
                             </div>
                         </div>
@@ -129,14 +120,23 @@ if (isset($_GET['id_nilai'])) {
                             Data Nilai PKL
                         </div>
                         <div class="card-body">
+                            <?php
+                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
+                                unset($_SESSION['error_message']);
+                            }
+
+                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
+                                unset($_SESSION['success_message']);
+                            }
+                            ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
                                 <thead>
                                     <tr>
                                         <th>No.</th>
                                         <th>Nama Siswa</th>
-                                        <th>Nilai</th>
-                                        <th>Grade</th>
-                                        <th>File</th>
+                                        <th>Detail</th>
                                         <th>Keterangan</th>
                                     </tr>
                                 </thead>
@@ -144,37 +144,22 @@ if (isset($_GET['id_nilai'])) {
                                 <tbody>
                                     <?php
                                     $no = 1;
-                                    $query = "SELECT * FROM nilai_PKL INNER JOIN siswa on nilai_pkl.id_siswa=siswa.id_siswa";
-                                    $result = $koneksi->query($query);
+
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
-                                        echo "<td>" . $row['nilai'] . "</td>";
-                                        echo "<td>" . $row['grade'] . "</td>";
-                                        echo "<td>" . $row['file'] . "</td>";
+                                        echo "<td><a href='..\admin/detailnilai.php?id_siswa=" . $row['id_siswa'] . "'>Detail Nilai</a></td>";
                                         echo "<td>";
-                                        // Tombol Detail
-                                        echo "<div class='btn-group me-2'>";
-                                        echo "<button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_nilai'] . "'><i class='fa-solid fa-eye'></i> Detail</button>";
-                                        echo "</div>";
-
-                                        // Tombol Edit
-                                        echo "<div class='btn-group me-2'>";
-                                        echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_nilai'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
-                                        echo "</div>";
-
-                                        // Tombol Hapus
-                                        echo "<div class='btn-group mt-2'>";
-                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_nilai'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
-                                        echo "</div>";
-
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_nilai'] . "'>";
+                                        echo "<i class='fas fa-trash'></i> Hapus";
+                                        echo "</button>";
                                         echo "</td>";
                                         echo "</tr>";
                                         ?>
                                         <div class="modal fade" id='hapus<?= $row['id_nilai'] ?>' tabindex="-1"
                                             role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="exampleModalLabel">Hapus Data Nilai
@@ -187,71 +172,15 @@ if (isset($_GET['id_nilai'])) {
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal">Tidak</button>
-                                                        <a href="datanilai.php?id_nilai=<?= $row['id_nilai'] ?>"
+                                                            data-bs-dismiss="modal">Tidak</button>                                                            
+                                                        <a href="datanilai.php?id_siswa=<?= $row['id_siswa'] ?>"
                                                             class="btn btn-danger">Delete</a>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class='modal fade' id='edit<?= $row['id_nilai'] ?>' tabindex='-1'
-                                            aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data nilai</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <?php
-                                                        var_dump($row['id_siswa']);
-                                                        var_dump($row['Nama_siswa']);
-                                                        ?>
-                                                        <div class="modal-body">
-                                                            <form method="POST" action="#" enctype="multipart/form-data">
-                                                                <div class="form-group">
-                                                                    <label for="id_siswa">ID</label>
-                                                                    <input type="text" class="form-control" id="id_siswa"
-                                                                        value="<?= $row['id_siswa']; ?>" name="id_siswa"
-                                                                        readonly>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="Nama_siswa">Nama Siswa</label>
-                                                                    <input type="text" class="form-control" id="Nama_siswa"
-                                                                        value="<?= $row['Nama_siswa']; ?>" name="Nama_siswa"
-                                                                        required>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="nilai">Rata-rata Nilai</label>
-                                                                    <input type="int" class="form-control" id="nilai"
-                                                                        value="<?= $row['nilai']; ?>" name="nilai" required>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="grade">Grade</label>
-                                                                    <input type="text" class="form-control" id="grade"
-                                                                        value="<?= $row['grade']; ?>" name="grade" required>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <label for="file">File</label>
-                                                                    <input type="text" class="form-control" id="file"
-                                                                        value="<?= $row['file']; ?>" name="file" required>
-                                                                </div>
-                                                                <div class="modal-footer">
-                                                                    <button type="button" class="btn btn-secondary"
-                                                                        data-bs-dismiss="modal">Close</button>
-                                                                    <button type="submit" class="btn btn-primary"
-                                                                        name="EditNilai" value="Submit">Submit</button>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-
-                                            <?php
+                                        <?php
                                     }
                                     ?>
                                 </tbody>
@@ -263,17 +192,18 @@ if (isset($_GET['id_nilai'])) {
 
 
             <div class="modal fade" id="tambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Tambah Data nilai</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Tambah Data Nilai</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body ">
-                            <form action="#" method="post" id="formTambahData">
-                                <div class="mb-3">
-                                    <label for="nama_siswa" class="col-form-label">Nama Siswa :</label>
-                                    <select name="id_siswa" id="id_siswa" required>
+                            <form method="POST" action="#" enctype="multipart/form-data">
+                                <input type="hidden" name="id_nilai" value="<?= $row['id_nilai']; ?>">
+                                <div class="form-group">
+                                    <label for="id_siswa" class="col-form-label">Nama Siswa :</label>
+                                    <select name="id_siswa" id="id_siswa" class="form-control" required>
                                         <?php
                                         $query_siswa = "SELECT * FROM siswa";
                                         $result_siswa = $koneksi->query($query_siswa);
@@ -282,18 +212,34 @@ if (isset($_GET['id_nilai'])) {
                                         ?>
                                     </select>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="nilai" class="col-form-label">Rata-rata Nilai :</label>
-                                    <input type="int" class="form-control" id="nilai" name="nilai" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="grade" class="col-form-label">Grade :</label>
-                                    <input type="text" class="form-control" id="grade" name="grade" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="file" class="col-form-label">file :</label>
-                                    <input type="text" class="form-control" id="file" name="file" required>
-                                </div>
+
+                                <?php for ($i = 0; $i < 10; $i++): ?>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="id_indikator<?= $i ?>" class="col-form-label">Indikator
+                                                    Penilaian</label>
+                                                <select name="id_indikator<?= $i ?>" id="id_indikator<?= $i ?>"
+                                                    class="form-control" required>
+                                                    <?php
+                                                    $query_siswa = "SELECT * FROM indikator";
+                                                    $result_siswa = $koneksi->query($query_siswa);
+                                                    while ($row_siswa = mysqli_fetch_assoc($result_siswa))
+                                                        echo "<option value='" . $row_siswa['id_indikator'] . "'>" . $row_siswa['indikator'] . "</option>";
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="nilai<?= $i ?>" class="col-form-label">Nilai</label>
+                                                <input type="text" class="form-control" id="nilai<?= $i ?>"
+                                                    name="nilai<?= $i ?>" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endfor; ?>
+
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
                                         data-bs-dismiss="modal">Close</button>
@@ -305,7 +251,6 @@ if (isset($_GET['id_nilai'])) {
                     </div>
                 </div>
             </div>
-
 
 
             <footer class="py-4 bg-light mt-auto">
@@ -332,6 +277,11 @@ if (isset($_GET['id_nilai'])) {
         crossorigin="anonymous"></script>
     <script src="js/datatables-simple-demo.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+
 
 </body>
 
