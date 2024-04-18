@@ -7,7 +7,6 @@ use Google\Service\Drive;
 function editGoogleDriveFile($googleDriveFileId, $berkas)
 {
     try {
-        // Buat koneksi ke Google Drive API
         $client = new Client();
         putenv('GOOGLE_APPLICATION_CREDENTIALS=./credentials.json');
         $client->useApplicationDefaultCredentials();
@@ -18,7 +17,6 @@ function editGoogleDriveFile($googleDriveFileId, $berkas)
             'name' => $berkas,
             'parents' => ['1t4miHgS9QTm8YA5wjOvmIpCPhauE-YPw']
         ));
-        // Baca isi file lokal
         $content = file_get_contents($googleDriveFileId);
         $file = $driveService->files->create($fileMetadata, array(
             'data' => $content,

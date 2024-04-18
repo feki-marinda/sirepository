@@ -1,7 +1,7 @@
 <?php
 include 'conn.php';
 
-function registrasi($data){
+function registrasi_siswa($data){
     global $koneksi;
 
     $username = mysqli_real_escape_string($koneksi, stripcslashes($data["username"]));
@@ -17,26 +17,17 @@ function registrasi($data){
     $email = mysqli_real_escape_string($koneksi, $data["email"]);
     $status = mysqli_real_escape_string($koneksi, $data["status"]);
 
+    // Query untuk insert data ke tabel 'user'
+    $query_user = "INSERT INTO user (username, password, status) VALUES ('$username', '$password','$status')";
 
-    $result = mysqli_query($koneksi, "SELECT * FROM user WHERE username = '$username'");
-    if(mysqli_fetch_assoc($result)){
-        echo "Username sudah terdaftar!";
-        return false;
-    }
-
-    if ($password !== $confirm_password){
-        echo "Konfirmasi password salah!";
-        return false;
-    }
-
-    $result_user = mysqli_query($koneksi, "INSERT INTO user (username, password, status) VALUES ('$username', '$password','$status')");
-
-    if ($result_user) {
+    if (mysqli_query($koneksi, $query_user)) {
         $user_id = mysqli_insert_id($koneksi);
 
-        $result_siswa = mysqli_query($koneksi, "INSERT INTO siswa (id_user, Nama_siswa, NIS, tanggal_lahir, jenis_kelamin, alamat, kelas, no_hp, email) VALUES ('$user_id', '$nama', '$NIS', '$tanggal_lahir', '$jenis_kelamin', '$alamat', '$kelas','$no_hp','$email')");
+        // Query untuk insert data ke tabel 'siswa'
+        $query_siswa = "INSERT INTO siswa (id_user, Nama_siswa, NIS, tanggal_lahir, jenis_kelamin, alamat, kelas, no_hp, email) 
+        VALUES ('$user_id', '$nama', '$NIS', '$tanggal_lahir', '$jenis_kelamin', '$alamat', '$kelas','$no_hp','$email')";
 
-        if ($result_siswa) {
+        if (mysqli_query($koneksi, $query_siswa)) {
             return true;
         } else {
             echo "Pendaftaran gagal untuk siswa. Error: " . mysqli_error($koneksi);

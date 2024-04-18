@@ -4,7 +4,7 @@ require 'login.php';
 $error_message = $success_message = '';
 if (isset($_POST['register'])) {
 
-    if (registrasi($_POST) > 0) {
+    if (registrasi_siswa($_POST) > 0) {
         $success_message = "Registrasi Berhasil. Kembali Ke Halaman <a href='index.php'>Login</a>.";
     } else {
         $error_message = "Pendaftaran gagal !";
@@ -178,7 +178,6 @@ if (isset($_POST['register'])) {
 
     <script>
         function showForm(formType) {
-            // Sembunyikan semua formulir
             document.getElementById('nav-home').classList.add('show', 'active');
             document.getElementById('nav-profile').classList.remove('show', 'active');
 

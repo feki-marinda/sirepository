@@ -1,36 +1,13 @@
 <?php
-include 'conn.php';
+require 'guru.php';
+
 $error_message = $success_message = '';
+if (isset($_POST['registrasi'])) {
 
-// Cek jika form telah disubmit
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $id_guru = $_POST['id_guru'];
-    $id_user = $_POST['id_user'];
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $status = $_POST['status'];
-    $nama = $_POST['nama'];
-    $nip = $_POST['NIP'];
-    $email = $_POST['Email'];
-    $alamat = $_POST['Alamat'];
-    $no_telp = $_POST['no_telp'];
-
-    // Query untuk insert data ke tabel 'user'
-    $query_user = "INSERT INTO user (username, password, status) VALUES ('$username', '$password','$status')";
-
-    if (mysqli_query($koneksi, $query_user)) {
-        $user_id = mysqli_insert_id($koneksi);
-
-        // Query untuk insert data ke tabel 'guru_pamong'
-        $query_guru = "INSERT INTO guru_pamong (id_guru, id_user, nama, NIP, Email, Alamat, no_telp) VALUES ('$id_guru', '$user_id', '$nama', '$nip', '$email', '$alamat', '$no_telp')";
-
-        if (mysqli_query($koneksi, $query_guru)) {
-            $success_message = "Registrasi Berhasil. Kembali Ke Halaman <a href='index.php'>Login</a>.";
-        } else {
-            $error_message = "Pendaftaran gagal !";
-        }
+    if (registrasi_guru($_POST)) {
+        $success_message = "Registrasi Berhasil. Kembali Ke Halaman <a href='index.php'>Login</a>.";
     } else {
-        $error_message = "Error: " . mysqli_error($koneksi);
+        $error_message = "Pendaftaran gagal !";
     }
 }
 ?>
@@ -97,6 +74,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <!-- Tombol Submit -->
     <div class="d-grid gap-2">
-        <button class="btn btn-primary" type="submit" nama="Registrasi">Submit</button>
+        <button class="btn btn-primary" type="submit" name="registrasi">Submit</button>
     </div>
 </form>

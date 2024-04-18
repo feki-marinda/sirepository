@@ -17,9 +17,17 @@ if (!$result_siswa) {
 }
 
 $row_siswa = mysqli_fetch_assoc($result_siswa);
-$nama_siswa = $row_siswa['Nama_siswa'];
-$tempat_pkl = $row_siswa['nama_perusahaan'];
-$nis = $row_siswa['NIS'];
+
+if ($row_siswa) {
+    $nama_siswa = $row_siswa['Nama_siswa'];
+    $tempat_pkl = $row_siswa['nama_perusahaan'];
+    $nis = $row_siswa['NIS'];
+} else {
+    $nama_siswa = '';
+    $tempat_pkl = '';
+    $nis = '';
+}
+
 
 $nama = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 $query = "SELECT indikator.indikator, nilai_pkl.nilai

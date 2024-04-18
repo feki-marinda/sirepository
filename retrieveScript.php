@@ -1,5 +1,4 @@
 <?php
-// retrieveScript.php
 
 function getLoggedInUserName() {
     session_start();

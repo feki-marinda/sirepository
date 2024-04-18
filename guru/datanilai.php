@@ -104,12 +104,7 @@ if (isset($_GET['id_siswa'])) {
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Nilai PKL</button>
-                                <button id="printButton">
-                                    <a href="cetak/datanilai.php" style="text-decoration: none; color: inherit;"
-                                        target="_blank">
-                                        <i class="fas fa-print"></i> Cetak
-                                    </a>
-                                </button>
+                                
                             </div>
                         </div>
                     </div>

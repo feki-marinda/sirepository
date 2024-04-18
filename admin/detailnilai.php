@@ -56,8 +56,13 @@ if (isset($_POST['EditNilai'])) {
 <html lang="en">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<?php include 'head.html' ?>
 <style>
+    @media print {
+        .aksi {
+            display: none;
+        }
+    }
+
     table {
         border-collapse: collapse;
         width: 100%;
@@ -66,7 +71,7 @@ if (isset($_POST['EditNilai'])) {
     th,
     td {
         border: 1px solid black;
-        padding: 8px;
+        padding: 3px;
     }
 
     .text-center h5,
@@ -95,10 +100,10 @@ if (isset($_POST['EditNilai'])) {
 
         </div>
         <div class="text-center">
-            <h5>Form Penilaian </h5>
-            <h5>Praktek Kerja Lapangan</h5>
+            <h4>Form Penilaian </h4>
+            <h4>Praktek Kerja Lapangan</h4>
         </div>
-
+        <br>
         <div class="row">
             <div class="col-4"><strong>Nama</strong></div>
             <div class="col-8"><strong>:
@@ -121,27 +126,27 @@ if (isset($_POST['EditNilai'])) {
 
 
         <table>
-            <tr style="background-color: #ADD8E6;">
+            <tr style="background-color: #ADD8E6;" class="text-center">
                 <td>No</td>
                 <td>Indikator</td>
                 <td>Nilai</td>
-                <td>Keterangan</td>
+                <td class="aksi">Keterangan</td>
             </tr>
             <?php
             $no = 1;
             while ($row = mysqli_fetch_assoc($result)) { ?>
                 <tr>
-                    <td>
+                    <td class="text-center">
                         <?php echo $no++; ?>
                     </td>
                     <td>
                         <?php echo $row['indikator'] ?>
                     </td>
-                    <td>
+                    <td class="text-center">
                         <?php echo $row['nilai'] ?>
                     </td>
-                    <td>
-                        <?php echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_nilai'] . "' data-bs-whatever='@mdo'>";
+                    <td class="aksi">
+                        <?php echo "<button type='button' class='btn btn-primary ms-3' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_nilai'] . "' data-bs-whatever='@mdo'>";
                         echo "<i class='fas fa-pencil-alt'></i> Edit";
                         echo "</button>"; ?>
                     </td>
@@ -194,24 +199,33 @@ if (isset($_POST['EditNilai'])) {
 
             <?php } ?>
         </table>
+        <br>
         <div>
             <div class="row">
-                <div class="col-7"></div>
+                <div class="col-7">                    
+                </div>
                 <div class="col-5">
                     <strong>
                         <?php
                         $tanggal_sekarang = date("d M Y");
                         echo "<p>Bangkalan, $tanggal_sekarang</p>";
                         ?>
-                        <p>Pembimbing Du/Di</p>
+                        <p>Guru Pamong</p>
                         <br><br><br>
                         <hr>
                     </strong>
+
+                    <div class="d-grid gap-2 mx-auto mt-5 ms-2">
+                        <button class="btn btn-primary" type="button" onclick="printPage()">Cetak</button>
+                    </div>
+
                 </div>
             </div>
         </div>
 
-        <button type="button" onclick="printPage()">Print</button>
+        <br><br>
+
+
         <script>
             function printPage() {
                 window.print();

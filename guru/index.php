@@ -14,12 +14,10 @@ $query = "SELECT * FROM guru_pamong INNER JOIN user
 ON user.id_user=guru_pamong.id_user WHERE username='$username'";
 $result_data = mysqli_query($koneksi, $query);
 
-// Periksa apakah query menghasilkan hasil yang valid
 if (!$result_data) {
     die("Error: " . mysqli_error($koneksi));
 }
 
-// Ambil data guru pamong dari hasil query
 
 ?>
 
@@ -101,6 +99,18 @@ if (!$result_data) {
 
                 </div>
 
+                <div class="row text-center">
+                        <h2 class=""><strong>Selamat Datang Di <br> Sistem Informasi Repository Laporan PKL
+                                Siswa</strong></h2>
+                        <h2><strong>SMK Al - Muhajirin</strong></h2>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 text-center">
+                            <img src="assets/img/smk.png" alt=""
+                                style="width: 50%; height: 100%; display: block; margin: 0 auto;">
+                        </div>
+                    </div>
+
                 <div class="text-center">
                     <h1>Data Guru Pamong</h1>
                 </div>
@@ -115,7 +125,7 @@ if (!$result_data) {
                         $Email = $row['Email'];
                         $no_telp = $row['no_telp']; ?>
 
-                        <table class="table">
+                        <table class="table table-striped">
                             <tr>
                                 <td>Nama</td>
                                 <td>
