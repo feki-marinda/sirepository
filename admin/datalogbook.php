@@ -39,25 +39,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["TambahLogbook"])) {
                 $xx = $rand . '_' . $filename;
                 move_uploaded_file($_FILES['dokumentasi']['tmp_name'], '../Logbook/' . $xx);
 
-                // Perbaikan pada query
                 $insert_query = "INSERT INTO logbook (id_siswa, id_pkl, tanggal, aktivitas, dokumentasi) 
                 VALUES ('$id_siswa', '$id_pkl', '$tanggal', '$aktivitas', '$xx')";
                 $insert_result = mysqli_query($koneksi, $insert_query);
 
                 if ($insert_result) {
-                    // Pesan sukses jika query berhasil dieksekusi
-                    $_SESSION['success_message'] = "Data logbook berhasil ditambahkan!";
+                    $_SESSION['success_message'] = "Data Logbook Berhasil Ditambahkan!";
                 } else {
-                    // Pesan kesalahan jika query gagal dieksekusi
                     $_SESSION['error_message'] = "Error: " . mysqli_error($koneksi);
                 }
             } else {
-                // Pesan kesalahan jika ukuran file terlalu besar
                 $_SESSION['error_message'] = "Error: Ukuran file terlalu besar!";
             }
         }
     } else {
-        // Pesan kesalahan jika file belum dipilih
         $_SESSION['error_message'] = "Error: File belum dipilih!";
     }
 
@@ -105,7 +100,7 @@ if (isset($_POST['EditLogbook'])) {
     if ($result) {
         $rows_affected = mysqli_affected_rows($koneksi);
         if ($rows_affected > 0) {
-            $_SESSION['success_message'] = "Data berhasil diubah!";
+            $_SESSION['success_message'] = "Data Berhasil Diubah!";
         } else {
             $_SESSION['error_message'] = "Tidak ada perubahan pada data!";
         }
@@ -156,43 +151,12 @@ $koneksi->close();
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Logbook</button>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                                    data-bs-target="#staticBackdrop">
-                                    <i class="fas fa-print"></i> Cetak
-                                </button>
+                                
 
                             </div>
                         </div>
                     </div>
-
-                    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
-                        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="staticBackdropLabel">Cetak Logbook Siswa</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form action="cetak/datalogbook.php" method="post" target="_blank">
-                                        <div class="mb-3">
-                                            <label for="Nama_siswa" class="form-label">Masukkan Nama:</label>
-                                            <input type="text" class="form-control" id="Nama_siswa" name="Nama_siswa"
-                                                required>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Tutup</button>
-                                            <button type="submit" class="btn btn-primary">Cetak</button>
-                                        </div>
-                                    </form>
-
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                   
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>

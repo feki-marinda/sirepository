@@ -2,8 +2,8 @@
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-
 include '../conn.php';
+
 $nama = mysqli_real_escape_string($koneksi, $_POST['Nama_siswa']); 
 
 $query = "SELECT logbook.*, pkl.*, siswa.*
@@ -17,7 +17,10 @@ if (!$result) {
     die("Error in query: " . mysqli_error($koneksi));
 }
 
-
+// Ambil data siswa
+$query_siswa = "SELECT * FROM siswa WHERE Nama_siswa = '$nama'";
+$result_siswa = mysqli_query($koneksi, $query_siswa);
+$row_siswa = mysqli_fetch_assoc($result_siswa);
 
 $mpdf = new \Mpdf\Mpdf();
 $html = '
@@ -42,6 +45,26 @@ $html = '
 <body>
 <h2 style="text-align:center">Data Logbook Siswa Praktik Kerja Lapangan</h2>
 <h3 style="text-align:center">SMK Al-Muhajirin</h3>
+
+<table>
+    <tr>
+        <td>Nama</td>
+        <td> : ' . $row_siswa['Nama_siswa'] .'</td>
+    </tr>
+    <tr>
+        <td>NIS</td>
+        <td> : '. $row_siswa['NIM'].'</td>
+    </tr>
+    <tr>
+        <td>Kelas</td>
+        <td>: '.$row_siswa['kelas'].'</td>
+    </tr>
+    <tr>
+        <td>Tempat PKL</td>
+        <td>: '.$row_siswa['tempat_magang'].'</td>
+    </tr>
+</table>
+
 <table border="1" cellpadding="5" cellspacing="0">
 <thead>
      <tr>
@@ -74,4 +97,3 @@ $html .= '</tbody>
 
 $mpdf->WriteHTML($html);
 $mpdf->Output($nama.'-logbook.pdf', 'I');
-

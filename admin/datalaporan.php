@@ -14,7 +14,7 @@ if (empty($status)) {
 use Google\Client;
 use Google\Service\Drive;
 
-$error_message = $success_message = '';
+$error_laporan = $success_laporan = '';
 $query = "SELECT*FROM laporan_pkl JOIN siswa ON siswa.id_siswa=laporan_pkl.id_siswa";
 $result = mysqli_query($koneksi, $query);
 
@@ -27,8 +27,8 @@ $ekstensi_dokumen = array('pdf', 'doc', 'docx');
 if (isset($_POST['TambahLaporan'])) {
     $id_laporan = $_POST['id_laporan'];
     $id_siswa = $_POST['id_siswa'];
+    $judul_laporan = $_POST['judul_laporan'];
     $tanggal_kumpul = $_POST['tanggal_kumpul'];
-    $rand = rand();
     $file_name = $_FILES['berkas']['name'];
     $file_tmp = $_FILES['berkas']['tmp_name'];
     $ukuran_file = $_FILES['berkas']['size'];
@@ -38,21 +38,21 @@ if (isset($_POST['TambahLaporan'])) {
         echo "Error : Ekstensi file tidak sesuai !";
     } else {
         if ($ukuran_file < 100 * 1024 * 1024) {
-            $file_dokumen = $rand . '_' . $file_name;
+            $file_dokumen = $file_name;
             $upload_dir = 'Laporan PKL/';
 
             $googleDriveFileId = uploadToGoogleDrive('admin/Laporan PKL/' . $file_name, $file_name);
 
             if (move_uploaded_file($_FILES['berkas']['tmp_name'], $upload_dir . $file_dokumen)) {
-                $query = "INSERT INTO laporan_pkl (id_siswa, tanggal_kumpul,berkas, google_drive_file_id) 
-                          VALUES ('$id_siswa', '$tanggal_kumpul', '$file_dokumen','$googleDriveFileId')";
+                $query = "INSERT INTO laporan_pkl (id_siswa, judul_laporan, tanggal_kumpul,berkas, google_drive_file_id) 
+                          VALUES ('$id_siswa', '$judul_laporan','$tanggal_kumpul', '$file_dokumen','$googleDriveFileId')";
 
                 if ($koneksi->query($query) === TRUE) {
-                    $_SESSION['success_message'] = "Laporan berhasil ditambahkan!";
+                    $_SESSION['success_laporan'] = "Laporan berhasil ditambahkan!";
                     header("Location: datalaporan.php");
                     exit();
                 } else {
-                    $_SESSION['error_message'] = "Error: " . $koneksi->error;
+                    $_SESSION['error_laporan'] = "Error: " . $koneksi->error;
                     header("Location: datalaporan.php");
                     exit();
                 }
@@ -70,6 +70,7 @@ if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $id_laporan = $_POST['id_laporan'];
     $id_siswa = $_POST['Nama_siswa'];
     $tanggal_kumpul = $_POST['tanggal_kumpul'];
+    $judul_laporan = $_POST['judul_laporan'];
 
     $file_name = $_FILES['berkas']['name'];
     $file_tmp = $_FILES['berkas']['tmp_name'];
@@ -77,43 +78,63 @@ if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $file_error = $_FILES['berkas']['error'];
 
     if ($file_error === 0) {
-        // Menangani unggahan berkas
-        $file_destination = 'admin/Laporan PKL/' . $file_name;
-        move_uploaded_file($file_tmp, $file_destination);
+        // Menyiapkan direktori tujuan dan nama file baru
+        $upload_dir = __DIR__ . '/Laporan PKL/';
+        $file_destination = $upload_dir . $file_name;
 
-        // Mengambil data berkas lama
-        $old_file_query = mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'");
-        $old_file = mysqli_fetch_array($old_file_query);
+        // Memeriksa ukuran file
+        if ($file_size < 100 * 1024 * 1024) {
+            // Pindahkan file yang diunggah ke direktori tujuan
+            if (move_uploaded_file($file_tmp, $file_destination)) {
+                // Menghapus file lama jika ada
+                $old_file_query = mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'");
+                $old_file = mysqli_fetch_array($old_file_query);
+                if ($old_file && is_file($old_file['berkas'])) {
+                    unlink($old_file['berkas']);
+                }
 
-        // Memeriksa dan menghapus berkas lama
-        if ($old_file && is_file($old_file['berkas'])) {
-            unlink($old_file['berkas']);
-        }
+                // Menggunakan prepared statements untuk mencegah SQL injection
+                $query = "UPDATE laporan_pkl 
+                          SET id_siswa=?, 
+                              tanggal_kumpul=?,
+                              judul_laporan=?, 
+                              berkas=? 
+                          WHERE id_laporan=?";
+                $stmt = mysqli_prepare($koneksi, $query);
+                mysqli_stmt_bind_param($stmt, "issss", $id_siswa, $tanggal_kumpul, $judul_laporan, $file_name, $id_laporan);
+                $result = mysqli_stmt_execute($stmt);
 
-        // Menggunakan prepared statements untuk mencegah SQL injection
-        $query = "UPDATE laporan_pkl 
-                  SET id_siswa=?, 
-                      tanggal_kumpul=?, 
-                      berkas=? 
-                  WHERE id_laporan=?";
-        $stmt = mysqli_prepare($koneksi, $query);
-        mysqli_stmt_bind_param($stmt, "isss", $id_siswa, $tanggal_kumpul, $file_name, $id_laporan);
-        $result = mysqli_stmt_execute($stmt);
-
-        // Memeriksa keberhasilan eksekusi query
-        if ($result) {
-            $rows_affected = mysqli_stmt_affected_rows($stmt);
-            if ($rows_affected > 0) {
-                $success_message = "Berhasil Memperbarui Data Laporan!";
-                header("location:datalaporan.php");
+                // Memeriksa keberhasilan eksekusi query
+                if ($result) {
+                    $rows_affected = mysqli_stmt_affected_rows($stmt);
+                    if ($rows_affected > 0) {
+                        $_SESSION['success_laporan'] = "Berhasil Memperbarui Data Laporan!";
+                        header("Location: datalaporan.php");
+                        exit();
+                    } else {
+                        $_SESSION['error_laporan'] = "Tidak ada perubahan pada Data Laporan!";
+                        header("Location: datalaporan.php");
+                        exit();
+                    }
+                } else {
+                    $_SESSION['error_laporan'] = "Tidak dapat Memperbarui Data Laporan! Error: " . mysqli_error($koneksi);
+                    header("Location: datalaporan.php");
+                    exit();
+                }
             } else {
-                $error_message = "Tidak ada perubahan pada Data Laporan!";
+                $_SESSION['error_laporan'] = "Error saat mengunggah file.";
+                header("Location: datalaporan.php");
+                exit();
             }
         } else {
-            $error_message = "Tidak dapat Memperbarui Data Laporan! Error: " . mysqli_error($koneksi);
+            $_SESSION['error_laporan'] = "Error: Ukuran dokumen melebihi batas maksimal";
+            header("Location: datalaporan.php");
+            exit();
         }
     } else {
-        $error_message = "Error uploading file. Error code: " . $file_error;
+        $_SESSION['error_laporan'] = "Error uploading file. Error code: " . $file_error;
+        header("Location: datalaporan.php");
+        exit();
     }
 }
 
@@ -121,9 +142,20 @@ if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
 if (isset($_GET['id_laporan'])) {
     $id_laporan = $_GET['id_laporan'];
 
-    mysqli_query($koneksi, "DELETE FROM laporan_pkl WHERE id_laporan='$id_laporan'");
+    // Coba hapus laporan
+    $hapus_query = mysqli_query($koneksi, "DELETE FROM laporan_pkl WHERE id_laporan='$id_laporan'");
+    if ($hapus_query) {
+        // Set pesan kesalahan jika ada masalah dalam penghapusan laporan
+        $_SESSION['success_laporan'] = "Laporan berhasil dihapus!";
+    } else {
+        $_SESSION['error_laporan'] = "Gagal menghapus laporan: " . mysqli_error($koneksi);
+    }
+
+    // Alihkan kembali ke halaman datalaporan.php
     header("location:datalaporan.php");
+    exit();
 }
+
 
 ?>
 <!DOCTYPE html>
@@ -154,9 +186,10 @@ if (isset($_GET['id_laporan'])) {
 
                             </div>
                             <div class="buttons-right">
-                                <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
-                                </button>
+                            <button id="printButton" onclick="window.open('cetak/datalaporan.php', '_blank')">
+    <i class="fas fa-print"></i> Cetak
+</button>
+
                             </div>
                         </div>
                     </div>
@@ -169,17 +202,18 @@ if (isset($_GET['id_laporan'])) {
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-striped table-hover">
                                 <?php
-                                if (!empty($error_message)) {
-                                    echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
+                                if (!empty($error_laporan)) {
+                                    echo '<div class="alert alert-danger" role="alert">' . $error_laporan . '</div>';
                                 }
-                                if (!empty($success_message)) {
-                                    echo '<div class="alert alert-success" role="alert">' . $success_message . '</div>';
+                                if (!empty($success_laporan)) {
+                                    echo '<div class="alert alert-success" role="alert">' . $success_laporan . '</div>';
                                 }
                                 ?>
                                 <thead>
                                     <tr>
                                         <th>No.</th>
                                         <th>Nama Lengkap</th>
+                                        <th>Judul Laporan</th>
                                         <th>Tanggal Pengupulan</th>
                                         <th>file</th>
                                         <th>Keterangan</th>
@@ -194,6 +228,7 @@ if (isset($_GET['id_laporan'])) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['Nama_siswa'] . "</td>";
+                                        echo "<td>" . $row['judul_laporan'] . "</td>";
                                         echo "<td>" . date('d-m-Y', strtotime($row['tanggal_kumpul'])) . "</td>";
                                         echo "<td><a href='" . 'Laporan PKL' . '/' . $row['berkas'] . "' target='_blank'>" . $row['berkas'] . "</a></td>";
                                         echo "<td>";
@@ -266,22 +301,25 @@ if (isset($_GET['id_laporan'])) {
                                                                 </select>
                                                             </div>
                                                             <div class="form-group">
+                                                                <label for="judul_laporan">Judul Laporan</label>
+                                                                <input type="text" class="form-control" id="judul_laporan"
+                                                                    value="<?= $row['judul_laporan']; ?>"
+                                                                    name="judul_laporan" required>
+                                                            </div>
+                                                            <div class="form-group">
                                                                 <label for="tanggal_kumpul">Tanggal Pengumpulan</label>
                                                                 <input type="date" class="form-control" id="tanggal_kumpul"
                                                                     value="<?= $row['tanggal_kumpul']; ?>"
                                                                     name="tanggal_kumpul" required>
                                                             </div>
                                                             <div class="form-group">
-                                                                <label for="berkas" class="col-form-label">Berkas
+                                                                <label for="berkas" class="col-form-label" require>Berkas
                                                                     (Word/PDF):</label>
                                                                 <?php
                                                                 echo "<p>Dokumen Saat Ini: {$row['berkas']}</p>";
                                                                 ?>
                                                                 <input type="file" class="form-control" id="berkas"
-                                                                    name="berkas" accept=".doc, .docx, .pdf">
-                                                                <small class="form-text text-muted">Pilih file Word
-                                                                    (doc/docx) atau PDF. Kosongkan jika tidak ingin
-                                                                    mengganti.</small>
+                                                                    name="berkas" accept=".doc, .docx, .pdf">                                                    
                                                             </div>
 
                                                             <div class="modal-footer">
@@ -330,12 +368,17 @@ if (isset($_GET['id_laporan'])) {
                                     </select>
                                 </div>
                                 <div class="form-group">
+                                    <label for="judul_laporan" class="col-form-label">Judul Laporan:</label>
+                                    <input type="text" class="form-control" id="judul_laporan" name="judul_laporan"
+                                        required>
+                                </div>
+                                <div class="form-group">
                                     <label for="tanggal_kumpul" class="col-form-label">Tanggal Pengumpulan:</label>
                                     <input type="date" class="form-control" id="tanggal_kumpul" name="tanggal_kumpul"
                                         required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="berkas" class="col-form-label">berkas Laporan :</label>
+                                    <label for="berkas" class="col-form-label">Berkas Laporan :</label>
                                     <input type="file" class="form-control" id="berkas" name="berkas" required>
                                 </div>
 

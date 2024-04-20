@@ -40,6 +40,7 @@ $html = '
 <tr>
 <th>No.</th>
 <th>Nama Lengkap</th>
+<th>Judul Laporan</th>
 <th>Tanggal Pengupulan</th>
 <th>status</th>
 </tr>
@@ -51,6 +52,7 @@ while ($row = mysqli_fetch_assoc($result)) {
     $html .= '<tr>
             <td>' . $no++ . '</td>
             <td>' . $row['Nama_siswa'] . '</td>
+            <td>' . $row['judul_laporan'] . '</td>
             <td>' . $formattedDate . '</td>
             <td>' . $row['status'] . '</td>
         </tr>';

@@ -1,12 +1,18 @@
 <?php
 include 'conn.php';
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+
+if (empty($id_user)) {
+    header("Location: index.php");
+    exit;
+}
 
 $query = "SELECT sertifikat.file_sertifikat 
           FROM sertifikat 
           INNER JOIN siswa ON siswa.id_siswa = sertifikat.id_siswa 
           INNER JOIN user ON user.id_user = siswa.id_user 
-          WHERE user.username = '$username'";
+          WHERE user.id_user = '$id_user'";
 $result = mysqli_query($koneksi, $query);
 
 ?>

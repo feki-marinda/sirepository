@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 18, 2024 at 05:20 AM
+-- Generation Time: Apr 18, 2024 at 09:02 AM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 7.4.29
 
@@ -64,6 +64,13 @@ CREATE TABLE `guru_pamong` (
   `Foto` text DEFAULT NULL,
   `no_telp` varchar(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `guru_pamong`
+--
+
+INSERT INTO `guru_pamong` (`id_guru`, `id_user`, `nama`, `NIP`, `Email`, `Alamat`, `Foto`, `no_telp`) VALUES
+(64, 170, 'Guru Pamong', 12309009, 'guru@gmail.com', 'Bangkalan', NULL, '0854325654322');
 
 -- --------------------------------------------------------
 
@@ -201,6 +208,13 @@ CREATE TABLE `siswa` (
   `email` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `siswa`
+--
+
+INSERT INTO `siswa` (`id_siswa`, `id_user`, `Nama_siswa`, `NIS`, `kelas`, `foto`, `jenis_kelamin`, `alamat`, `tanggal_lahir`, `no_hp`, `email`) VALUES
+(78, 169, 'User Siswa', 12345, '1A', NULL, 'Laki-laki', 'Bangkalan', '2024-04-11', 123456, 'fekimarinda2901@gmail.com');
+
 -- --------------------------------------------------------
 
 --
@@ -210,9 +224,18 @@ CREATE TABLE `siswa` (
 CREATE TABLE `user` (
   `id_user` int(11) NOT NULL,
   `username` varchar(20) NOT NULL,
-  `password` varchar(20) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
   `status` enum('admin','siswa','guru') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id_user`, `username`, `password`, `status`) VALUES
+(169, 'Siswa', '123', 'siswa'),
+(170, 'Guru', '123', 'guru'),
+(171, 'Admin', '123', 'admin');
 
 --
 -- Indexes for dumped tables
@@ -236,7 +259,7 @@ ALTER TABLE `dokumen`
 --
 ALTER TABLE `guru_pamong`
   ADD PRIMARY KEY (`id_guru`),
-  ADD KEY `id_user` (`id_user`) USING BTREE;
+  ADD UNIQUE KEY `id_user` (`id_user`) USING BTREE;
 
 --
 -- Indexes for table `indikator`
@@ -298,7 +321,8 @@ ALTER TABLE `siswa`
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
-  ADD PRIMARY KEY (`id_user`);
+  ADD PRIMARY KEY (`id_user`),
+  ADD KEY `status` (`status`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -320,7 +344,7 @@ ALTER TABLE `dokumen`
 -- AUTO_INCREMENT for table `guru_pamong`
 --
 ALTER TABLE `guru_pamong`
-  MODIFY `id_guru` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id_guru` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `indikator`
@@ -368,13 +392,13 @@ ALTER TABLE `sertifikat`
 -- AUTO_INCREMENT for table `siswa`
 --
 ALTER TABLE `siswa`
-  MODIFY `id_siswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=61;
+  MODIFY `id_siswa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=172;
 
 --
 -- Constraints for dumped tables
@@ -428,7 +452,7 @@ ALTER TABLE `sertifikat`
 -- Constraints for table `siswa`
 --
 ALTER TABLE `siswa`
-  ADD CONSTRAINT `siswa_ibfk_8` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`);
+  ADD CONSTRAINT `siswa_ibfk_1` FOREIGN KEY (`id_user`) REFERENCES `user` (`id_user`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

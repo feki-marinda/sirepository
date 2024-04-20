@@ -39,7 +39,7 @@ if (isset($_POST['TambahDokumen'])) {
                           VALUES ('$judul_dokumen', '$file_dokumen')";
 
                 if ($koneksi->query($query) === TRUE) {
-                    $_SESSION['success_message'] = "Dokumen berhasil ditambahkan!";
+                    $_SESSION['success_message'] = "Dokumen Berhasil Ditambahkan!";
                     header("Location: datadokumen.php");
                     exit();
                 } else {
@@ -77,7 +77,7 @@ if (isset($_POST['EditDokumen'])) {
 
         $query = "UPDATE dokumen SET judul_dokumen = '$judul_dokumen', Dokumen = '$file_dokumen' WHERE id_dokumen = $id_dokumen";
         if ($koneksi->query($query) === TRUE) {
-            $_SESSION['success_message'] = "Dokumen berhasil diubah!";
+            $_SESSION['success_message'] = "Dokumen Berhasil Diubah!";
         } else {
             $_SESSION['error_message'] = "Error: " . $koneksi->error;
         }
@@ -89,7 +89,7 @@ if (isset($_POST['EditDokumen'])) {
             $dataDokumen = $resultCheck->fetch_assoc();
 
             if ($dataDokumen['judul_dokumen'] === $judul_dokumen) {
-                $_SESSION['success_message'] = "Tidak ada perubahan data yang dilakukan.";
+                $_SESSION['error_message'] = "Tidak Ada Perubahan Data yang Dilakukan.";
                 header("Location: datadokumen.php");
                 exit();
             }

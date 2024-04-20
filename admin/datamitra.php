@@ -32,11 +32,11 @@ if (isset($_POST['TambahMitra'])) {
               VALUES ('$nama_perusahaan', '$alamat', '$kontak', '$foto_path')";
 
     if ($koneksi->query($query_insert) === TRUE) {
-        $_SESSION['success_message'] = "Data Mitra berhasil ditambahkan!";
+        $_SESSION['success_mitra'] = "Data Mitra berhasil ditambahkan!";
         header("Location: datamitra.php");
         exit();
     } else {
-        $_SESSION['error_message'] = "Error: " . $koneksi->error;
+        $_SESSION['error_mitra'] = "Error: " . $koneksi->error;
         header("Location: datamitra.php");
         exit();
     }
@@ -49,7 +49,7 @@ if (isset($_POST['EditMitra'])) {
     $kontak = $_POST['kontak'];
 
     // Inisialisasi pesan error
-    $error_message = "";
+    $error_mitra = "";
 
     // Periksa apakah file foto baru diunggah
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
@@ -67,7 +67,7 @@ if (isset($_POST['EditMitra'])) {
                          foto='$foto_path'                                                     
                          WHERE id_mitra='$id_mitra'";
         } else {
-            $error_message = "Gagal mengunggah foto.";
+            $error_mitra = "Gagal mengunggah foto.";
         }
     } else {
         // Update query tanpa foto
@@ -78,22 +78,22 @@ if (isset($_POST['EditMitra'])) {
                          WHERE id_mitra='$id_mitra'";
     }
 
-    if (empty($error_message)) {
+    if (empty($error_mitra)) {
         // Eksekusi query
         $result = mysqli_query($koneksi, $query);
 
         if ($result) {
             $rows_affected = mysqli_affected_rows($koneksi);
             if ($rows_affected > 0) {
-                $_SESSION['success_message'] = "Data Mitra berhasil diubah!";
+                $_SESSION['success_mitra'] = "Data Mitra berhasil diubah!";
             } else {
-                $_SESSION['error_message'] = "Tidak ada perubahan pada Data Mitra!";
+                $_SESSION['error_mitra'] = "Tidak ada perubahan pada Data Mitra!";
             }
         } else {
-            $_SESSION['error_message'] = "Error: " . mysqli_error($koneksi);
+            $_SESSION['error_mitra'] = "Error: " . mysqli_error($koneksi);
         }
     } else {
-        $_SESSION['error_message'] = $error_message;
+        $_SESSION['error_mitra'] = $error_mitra;
     }
 
     header("Location: datamitra.php");
@@ -101,16 +101,20 @@ if (isset($_POST['EditMitra'])) {
 }
 
 if (isset($_GET['id_mitra'])) {
-    $id_mitra = $_GET['id_mitra'];
+    $id_mitra = mysqli_real_escape_string($koneksi, $_GET['id_mitra']);
 
-    mysqli_query($koneksi, "DELETE FROM mitra WHERE id_mitra='$id_mitra'");
+    $result = mysqli_query($koneksi, "DELETE FROM mitra WHERE id_mitra='$id_mitra'");
+
     if ($result) {
-        $_SESSION['success_message'] = "Data mitra Pamong berhasil dihapus!";
-        header("Location: datamitra.php");
-        exit();
+        $_SESSION['success_mitra'] = "Data Mitra berhasil dihapus!";
+    } else {
+        $_SESSION['error_mitra'] = "Gagal menghapus data Mitra yang terdaftar PKL: " . mysqli_error($koneksi);
     }
 
+    header("Location: datamitra.php");
+    exit();
 }
+
 
 ?>
 
@@ -155,14 +159,14 @@ if (isset($_GET['id_mitra'])) {
                         </div>
                         <div class="card-body">
                         <?php
-                        if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
-                            echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
-                            unset($_SESSION['error_message']);
+                        if (isset($_SESSION['error_mitra']) && !empty($_SESSION['error_mitra'])) {
+                            echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_mitra'] . '</div>';
+                            unset($_SESSION['error_mitra']);
                         }
 
-                        if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
-                            echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
-                            unset($_SESSION['success_message']);
+                        if (isset($_SESSION['success_mitra']) && !empty($_SESSION['success_mitra'])) {
+                            echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_mitra'] . '</div>';
+                            unset($_SESSION['success_mitra']);
                         }
                         ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -352,6 +356,9 @@ if (isset($_GET['id_mitra'])) {
         </div>
     </div>
     <?php include 'footer.php'; ?>
+
+
+    
 </body>
 
 </html>

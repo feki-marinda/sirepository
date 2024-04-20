@@ -12,7 +12,7 @@ if (empty($status)) {
 if (!$koneksi) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
-$error_message = $success_message = '';
+$error_siswa = $success_siswa = '';
 
 if (isset($_POST['TambahSiswa'])) {
     $Nama_siswa = $_POST['Nama_siswa'];
@@ -28,14 +28,18 @@ if (isset($_POST['TambahSiswa'])) {
     $query = "INSERT INTO siswa (id_user, Nama_siswa, NIS, kelas, jenis_kelamin, alamat, tanggal_lahir, no_hp, email) 
               VALUES ('$id_user', '$Nama_siswa', '$NIS', '$kelas', '$jenis_kelamin', '$alamat', '$tanggal_lahir', '$no_hp','$email')";
 
-    if ($koneksi->query($_query) === TRUE) {
-        $_SESSION['success_message'] = "Berhasil Menambah Data User!";
-        header("Location: datauser.php");
-        exit();
+    $result = mysqli_query($koneksi, $query);
+
+    if ($result) {
+        $rows_affected = mysqli_affected_rows($koneksi);
+        if ($rows_affected > 0) {
+            $success_siswa = "Berhasil Menambah Data Siswa!";
+        } else {
+            $error_siswa = "Siswa Sudah Terdaftar!";
+        }
     } else {
-        $_SESSION['error_message'] = "Error: Username telah terdaftar" . $koneksi->error;
-        header("Location: datauser.php");
-        exit();
+        $error_siswa = "Tidak dapat Memperbarui Data Siswa!";
+        header("location:datasiswa.php");
     }
 
 }
@@ -68,12 +72,12 @@ if (isset($_POST['EditSiswa'])) {
     if ($result) {
         $rows_affected = mysqli_affected_rows($koneksi);
         if ($rows_affected > 0) {
-            $success_message = "Berhasil Memperbarui Data Siswa!";
+            $success_siswa = "Berhasil Memperbarui Data Siswa!";
         } else {
-            $error_message = "Tidak ada perubahan pada Data Siswa!";
+            $error_siswa = "Tidak ada perubahan pada Data Siswa!";
         }
     } else {
-        $error_message = "Tidak dapat Memperbarui Data Siswa!";
+        $error_siswa = "Tidak dapat Memperbarui Data Siswa!";
         header("location:datasiswa.php");
     }
 }
@@ -90,9 +94,9 @@ if (isset($_GET['id_siswa'])) {
     $affected_rows = mysqli_stmt_affected_rows($stmt);
 
     if ($affected_rows > 0) {
-        $success_message = "Berhasil Menghapus data siswa!";
+        $success_siswa = "Berhasil Menghapus data siswa!";
     } else {
-        $error_message = "Tidak Dapat Menghapus Data Siswa yang Terdaftar PKL !";
+        $error_siswa = "Tidak Dapat Menghapus Data Siswa yang Terdaftar PKL !";
     }
 
     mysqli_stmt_close($stmt);
@@ -124,7 +128,8 @@ if (isset($_GET['id_siswa'])) {
                                     data-bs-target="#tambahsiswa" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data siswa PKL</button>
                                 <button id="printButton">
-                                    <a href="cetak/datasiswa.php" style="text-decoration: none; color: inherit;" target="_blank">
+                                    <a href="cetak/datasiswa.php" style="text-decoration: none; color: inherit;"
+                                        target="_blank">
                                         <i class="fas fa-print"></i> Cetak
                                     </a>
                                 </button>
@@ -139,11 +144,11 @@ if (isset($_GET['id_siswa'])) {
                         </div>
                         <div class="card-body">
                             <?php
-                            if (!empty($error_message)) {
-                                echo '<div class="alert alert-danger" role="alert">' . $error_message . '</div>';
+                            if (!empty($error_siswa)) {
+                                echo '<div class="alert alert-danger" role="alert">' . $error_siswa . '</div>';
                             }
-                            if (!empty($success_message)) {
-                                echo '<div class="alert alert-success" role="alert">' . $success_message . '</div>';
+                            if (!empty($success_siswa)) {
+                                echo '<div class="alert alert-success" role="alert">' . $success_siswa . '</div>';
                             }
                             ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -226,7 +231,7 @@ if (isset($_GET['id_siswa'])) {
                                             <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
+                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Siswa
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -331,9 +336,8 @@ if (isset($_GET['id_siswa'])) {
                                 <div class="mb-2">
                                     <label for="id_user" class="col-form-label">Pilih User:</label>
                                     <select class="form-select" id="id_user" name="id_user" required>
-                                        <!-- Option dari data user -->
                                         <?php
-                                        $queryUser = "SELECT id_user, username FROM user";
+                                        $queryUser = "SELECT id_user, username FROM user WHERE status = 'siswa'";
                                         $resultUser = mysqli_query($koneksi, $queryUser);
 
                                         while ($rowUser = mysqli_fetch_assoc($resultUser)) {
@@ -366,7 +370,6 @@ if (isset($_GET['id_siswa'])) {
                                         <option value="" disabled selected>Pilih Jenis Kelamin</option>
                                         <option value="Laki-laki">Laki-laki</option>
                                         <option value="Perempuan">Perempuan</option>
-                                        <!-- Tambahkan opsi jenis kelamin lain sesuai kebutuhan -->
                                     </select>
                                 </div>
 

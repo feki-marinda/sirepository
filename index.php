@@ -16,9 +16,8 @@ if (isset($_POST["login"])) {
         if ($password === $row["password"]) {
             $_SESSION['username'] = $username;
             $_SESSION['id_user'] = $row['id_user'];  
-            $_SESSION['status'] = $status; // Simpan peran pengguna di sesi
+            $_SESSION['status'] = $status; 
 
-            // Arahkan pengguna ke halaman sesuai dengan peran mereka
             if ($status == 'admin') {
                 header("Location: admin/index.php");
             } elseif ($status == 'siswa') {

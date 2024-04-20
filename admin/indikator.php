@@ -1,20 +1,40 @@
 <?php
+session_start(); // Memulai sesi
+
 include 'conn.php';
 
 if (isset($_POST['Simpanindikator'])) {
     $indikator = $_POST['indikator'];
-    mysqli_query($koneksi, "INSERT INTO indikator (indikator) VALUES ('$indikator')");
+    $result = mysqli_query($koneksi, "INSERT INTO indikator (indikator) VALUES ('$indikator')");
+
+    if ($result) {
+        $_SESSION['success_indikator'] = "Data Indikator berhasil ditambahkan!";
+    } else {
+        $_SESSION['error_indikator'] = "Gagal menambahkan data Indikator: " . mysqli_error($koneksi);
+    }
 }
 
 if (isset($_POST['Editindikator'])) {
     $id_indikator = $_POST['id_indikator'];
     $indikator = $_POST['indikator'];
-    mysqli_query($koneksi, "UPDATE indikator SET indikator='$indikator' WHERE id_indikator='$id_indikator'");
+    $result = mysqli_query($koneksi, "UPDATE indikator SET indikator='$indikator' WHERE id_indikator='$id_indikator'");
+
+    if ($result) {
+        $_SESSION['success_indikator'] = "Data Indikator Berhasil Diubah!";
+    } else {
+        $_SESSION['error_indikator'] = "Gagal mengubah data Indikator: " . mysqli_error($koneksi);
+    }
 }
 
 if (isset($_GET['id_indikator'])) {
     $id_indikator = $_GET['id_indikator'];
-    mysqli_query($koneksi, "DELETE FROM indikator WHERE id_indikator='$id_indikator'");
+    $result = mysqli_query($koneksi, "DELETE FROM indikator WHERE id_indikator='$id_indikator'");
+
+    if ($result) {
+        $_SESSION['success_indikator'] = "Data Indikator berhasil dihapus!";
+    } else {
+        $_SESSION['error_indikator'] = "Gagal menghapus data Indikator: " . mysqli_error($koneksi);
+    }
 }
 ?>
 
@@ -47,6 +67,19 @@ if (isset($_GET['id_indikator'])) {
     <div class="">
         <h2 style="text-align: center;">Indikator Penilaian Praktik Kerja Lapangan</h2>
         <table class="table table-bordered table-striped mt-3">
+
+        <?php
+                        if (isset($_SESSION['error_indikator']) && !empty($_SESSION['error_indikator'])) {
+                            echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_indikator'] . '</div>';
+                            unset($_SESSION['error_indikator']);
+                        }
+
+                        if (isset($_SESSION['success_indikator']) && !empty($_SESSION['success_indikator'])) {
+                            echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_indikator'] . '</div>';
+                            unset($_SESSION['success_indikator']);
+                        }
+                        ?>
+
             <thead>
                 <tr>
                     <th>No</th>
@@ -89,6 +122,7 @@ if (isset($_GET['id_indikator'])) {
                         </button>
                     </div>
                     <div class="modal-body">
+                       
                         <form method="post" action="">
                             <div class="card-body">
                                 <div class="form-group">
@@ -122,9 +156,9 @@ if (isset($_GET['id_indikator'])) {
                         </button>
                     </div>
                     <div class="modal-body">
-                        <h4 align="center">Apakah anda yakin ingin menghapus indikator <strong>
+                        <p align="center">Apakah anda yakin ingin menghapus indikator <strong>
                                 <?= $row['indikator']; ?>
-                            </strong>?</h4>
+                            </strong>?</p>
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>

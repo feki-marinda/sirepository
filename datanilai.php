@@ -30,6 +30,7 @@ if ($row_siswa) {
 
 
 $nama = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+
 $query = "SELECT indikator.indikator, nilai_pkl.nilai
 FROM indikator 
 INNER JOIN nilai_pkl ON nilai_pkl.id_indikator = indikator.id_indikator

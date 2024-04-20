@@ -38,11 +38,11 @@ if (isset($_POST['TambahBerita'])) {
                 $rows_affected = $koneksi->affected_rows;
 
                 if ($rows_affected > 0) {
-                    $_SESSION['success_message'] = "Berhasil Menambah Data User!";
+                    $_SESSION['success_message'] = "Berhasil Menambah Data Berita!";
                     header("Location: databerita.php");
                     exit();
                 } else {
-                    $_SESSION['error_message'] = "Tidak ada perubahan pada Data User!";
+                    $_SESSION['error_message'] = "Tidak ada perubahan pada Data Berita!";
                     header("Location: databerita.php");
                     exit();
                 }
@@ -98,9 +98,9 @@ if (isset($_POST['EditBerita'])) {
         if ($result) {
             $rows_affected = mysqli_stmt_affected_rows($stmt);
             if ($rows_affected > 0) {
-                $_SESSION['success_message'] = "Data Berita berhasil diubah!";
+                $_SESSION['success_message'] = "Data Berita Berhasil Diubah!";
             } else {
-                $_SESSION['error_message'] = "Tidak ada perubahan pada Data Berita!";
+                $_SESSION['error_message'] = "Tidak Ada Perubahan Pada Data Berita!";
             }
         } else {
             $_SESSION['error_message'] = "Error: " . mysqli_stmt_error($stmt);

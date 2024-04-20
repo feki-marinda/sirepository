@@ -9,7 +9,7 @@ if (empty($status)) {
     exit;
 }
 
-$query = "SELECT * FROM guru_pamong";
+$query = "SELECT * FROM guru_pamong INNER JOIN user ON user.id_user=guru_pamong.id_user";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
@@ -22,6 +22,7 @@ if (isset($_POST['TambahGP'])) {
     $Email = $_POST['Email'];
     $Alamat = $_POST['Alamat'];
     $no_telp = $_POST['no_telp'];
+    $id_user = $_POST['id_user'];
 
     $rand = rand();
     $ekstensi = array('png', 'jpg', 'jpeg', 'gif', 'webp');
@@ -36,8 +37,8 @@ if (isset($_POST['TambahGP'])) {
             $xx = $rand . '_' . $filename;
             move_uploaded_file($_FILES['Foto']['tmp_name'], 'gambar/' . $xx);
 
-            $query = "INSERT INTO guru_pamong (nama, NIP, Email, Alamat, Foto, no_telp) 
-                      VALUES ('$nama', '$NIP', '$Email', '$Alamat', '$xx', '$no_telp')";
+            $query = "INSERT INTO guru_pamong (id_user, nama, NIP, Email, Alamat, Foto, no_telp) 
+                      VALUES ('$id_user','$nama', '$NIP', '$Email', '$Alamat', '$xx', '$no_telp')";
 
             if ($koneksi->query($query) === TRUE) {
                 $_SESSION['success_message'] = "Data Guru Pamong berhasil ditambahkan!";
@@ -146,8 +147,9 @@ if (isset($_GET['id_guru'])) {
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Guru Pamong</button>
-                                    <button id="printButton">
-                                    <a href="cetak/dataguru.php" style="text-decoration: none; color: inherit;" target="_blank">
+                                <button id="printButton">
+                                    <a href="cetak/dataguru.php" style="text-decoration: none; color: inherit;"
+                                        target="_blank">
                                         <i class="fas fa-print"></i> Cetak
                                     </a>
                                 </button>
@@ -255,6 +257,21 @@ if (isset($_GET['id_guru'])) {
                                                                         value="<?= $row['id_guru']; ?>" name="id_guru"
                                                                         hidden>
                                                                 </div>
+                                                                <div class="form-group">
+                                                                    <label for="id_indikator<?= $i ?>"
+                                                                        class="col-form-label">Indikator
+                                                                        Penilaian</label>
+                                                                    <select name="id_indikator<?= $i ?>"
+                                                                        id="id_indikator<?= $i ?>" class="form-control"
+                                                                        required>
+                                                                        <?php
+                                                                        $query_siswa = "SELECT * FROM indikator";
+                                                                        $result_siswa = $koneksi->query($query_siswa);
+                                                                        while ($row_siswa = mysqli_fetch_assoc($result_siswa))
+                                                                            echo "<option value='" . $row_siswa['id_indikator'] . "'>" . $row_siswa['indikator'] . "</option>";
+                                                                        ?>
+                                                                    </select>
+                                                                </div>
                                                                 <div class="form-group ">
                                                                     <label for="nama">Nama Lengkap</label>
                                                                     <input type="text" class="form-control" id="nama"
@@ -332,6 +349,26 @@ if (isset($_GET['id_guru'])) {
                         </div>
                         <div class="modal-body ">
                             <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
+                                <div class="form-group">
+                                    <label for="id_user" class="col-form-label">Username :</label>
+                                    <select name="id_user" id="id_user" class="form-control" required>
+                                        <?php
+                                        $query_siswa = "SELECT id_user, username FROM user WHERE status = 'guru'";
+                                        $result_siswa = mysqli_query($koneksi, $query_siswa); // Menggunakan mysqli_query dengan koneksi yang benar
+                                        if ($result_siswa) { // Periksa apakah kueri berhasil dijalankan
+                                            while ($row_siswa = mysqli_fetch_assoc($result_siswa)) {
+                                                // Tampilkan opsi select
+                                                echo "<option value='" . $row_siswa['id_user'] . "'>" . $row_siswa['username'] . "</option>";
+                                            }
+                                            mysqli_free_result($result_siswa); // Bebaskan hasil kueri setelah digunakan
+                                        } else {
+                                            // Handle kesalahan kueri jika diperlukan
+                                            echo "<option value=''>Error fetching data</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
                                 <div class="form-group">
                                     <label for="nama" class="col-form-label">Nama Lengkap:</label>
                                     <input type="text" class="form-control" id="nama" name="nama" required>

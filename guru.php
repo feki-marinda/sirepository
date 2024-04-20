@@ -1,5 +1,14 @@
 <?php
-include 'conn.php';
+session_start();
+include('conn.php');
+
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+
+if (empty($username)) {
+    header("Location: index.php");
+    exit;
+}
+
 
 function registrasi_guru($data){
     global $koneksi;
@@ -19,7 +28,6 @@ function registrasi_guru($data){
     if (mysqli_query($koneksi, $query_user)) {
         $user_id = mysqli_insert_id($koneksi);
 
-        // Query untuk insert data ke tabel 'guru_pamong'
         $query_guru = "INSERT INTO guru_pamong (id_user, nama, NIP, Email, Alamat, no_telp) 
         VALUES ('$user_id', '$nama', '$nip', '$email', '$alamat', '$no_telp')";
 

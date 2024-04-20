@@ -48,17 +48,18 @@ if (empty($status)) {
                     include 'conn.php';
 
                     $sql = "SELECT
-                    COUNT(*) AS jumlah_siswa,
-                    pkl.tahun_pelajaran
+                    laporan_pkl.*,
+                    siswa.*,
+                    pkl.*
                 FROM
                     laporan_pkl
-                LEFT JOIN siswa ON laporan_pkl.id_siswa = siswa.id_siswa
-                LEFT JOIN pkl ON pkl.id_siswa = siswa.id_siswa
+                LEFT JOIN
+                    siswa ON laporan_pkl.id_siswa = siswa.id_siswa
+                LEFT JOIN
+                    pkl ON pkl.id_siswa = siswa.id_siswa
                 WHERE
-                    pkl.tahun_pelajaran BETWEEN YEAR(CURDATE()) - 2 AND YEAR(CURDATE())
-                GROUP BY
-                    pkl.tahun_pelajaran
-                LIMIT 3"; 
+                    pkl.tahun_pelajaran BETWEEN YEAR(CURDATE()) - 2 AND YEAR(CURDATE());
+                "; 
                     
                     $colors = ['bg-primary', 'bg-secondary', 'bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-dark'];
 
