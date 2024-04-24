@@ -7,7 +7,7 @@ require 'scriptedit.php';
 use Google\Client;
 use Google\Service\Drive;
 
-$username = $_SESSION['username'];
+$id_user = $_SESSION['id_user'];
 
 $query = "SELECT
             laporan_pkl.id_laporan,
@@ -26,14 +26,14 @@ $query = "SELECT
           INNER JOIN
             user ON siswa.id_user = user.id_user
           WHERE
-            user.username = ?";
+            user.id_user = ?";
 
 $stmt = $koneksi->prepare($query);
 if (!$stmt) {
     die("Query failed: " . $koneksi->error); 
 }
 
-$stmt->bind_param("s", $username);
+$stmt->bind_param("s", $id_user);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -180,7 +180,10 @@ if (isset($_POST['EditLaporan'])) {
                                             Edit</button>
                                         <?php
                                     }                                    
-                                    echo "<button class='btn btn-sm btn-info' type='button' data-bs-toggle='modal' onclick=\"window.location.href='detailsiswa.php?id_siswa={$row['id_siswa']}'\"><i class='fa-solid fa-eye'></i> Detail</button>";
+                                    echo "
+                                    <button class='btn btn-sm btn-info' type='button' data-bs-toggle='modal' onclick=\"window.location.href='detailsiswa.php?id_siswa={$row['id_siswa']}'\"><i class='fa-solid fa-eye'></i> Detail</button>
+                                ";
+                                
                                     echo "</td>";
                                     echo "</tr>";
 

@@ -49,9 +49,7 @@ if (!$result_data) {
         <main>
             <div class="container-fluid px-4">
                 <h1 class="mt-4">Dashboard</h1>
-                <ol class="breadcrumb mb-4">
-                    <li class="breadcrumb-item active">Dashboard</li>
-                </ol>
+                
                 <div class="row">
                     <?php
                     include 'conn.php';
@@ -100,78 +98,25 @@ if (!$result_data) {
                 </div>
 
                 <div class="row text-center">
-                        <h2 class=""><strong>Selamat Datang Di <br> Sistem Informasi Repository Laporan PKL
-                                Siswa</strong></h2>
-                        <h2><strong>SMK Al - Muhajirin</strong></h2>
+                    <h2 class=""><strong>Selamat Datang Di <br> Sistem Informasi Repository Laporan PKL
+                            Siswa</strong></h2>
+                    <h2><strong>SMK Al - Muhajirin</strong></h2>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-md-6 text-center">
+                        <img src="assets/img/smk.png" alt=""
+                            style="width: 50%; height: 100%; display: block; margin: 0 auto;">
                     </div>
-                    <div class="row justify-content-center">
-                        <div class="col-md-6 text-center">
-                            <img src="assets/img/smk.png" alt=""
-                                style="width: 50%; height: 100%; display: block; margin: 0 auto;">
-                        </div>
-                    </div>
-
-                <div class="text-center">
-                    <h1>Data Guru Pamong</h1>
                 </div>
 
-                <div class="container">
-                    <?php $row = mysqli_fetch_assoc($result_data);
-
-                    if ($row) {
-                        $nama = $row['nama'];
-                        $NIP = $row['NIP'];
-                        $Alamat = $row['Alamat'];
-                        $Email = $row['Email'];
-                        $no_telp = $row['no_telp']; ?>
-
-                        <table class="table table-striped">
-                            <tr>
-                                <td>Nama</td>
-                                <td>
-                                    <?= $nama ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>NIP</td>
-                                <td>
-                                    <?= $NIP ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Alamat</td>
-                                <td>
-                                    <?= $Alamat ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Email</td>
-                                <td>
-                                    <?= $Email ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>No Telepon</td>
-                                <td>
-                                    <?= $no_telp ?>
-                                </td>
-                            </tr>
-                        </table>
-
-
-                    <?php } else {
-                        echo "Data guru pamong tidak ditemukan.";
-                    }
-                    ?>
-                </div>
-
+                
             </div>
         </main>
         <footer class="py-4 bg-light mt-auto">
             <div class="container-fluid px-4">
                 <div class="d-flex align-items-center justify-content-between small">
                     <div class="text-muted">Sirepository</div>
-                    
+
                 </div>
             </div>
         </footer>

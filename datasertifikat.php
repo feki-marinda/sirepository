@@ -1,11 +1,11 @@
 <?php
-include 'conn.php';
+include('conn.php');
 
 $id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
 
 if (empty($id_user)) {
-    header("Location: index.php");
-    exit;
+  header("Location: index.php");
+  exit;
 }
 
 $query = "SELECT sertifikat.file_sertifikat 
@@ -26,10 +26,9 @@ while ($row = mysqli_fetch_assoc($result)) { ?>
   <div class="ratio ratio-16x9 mt-3">
     <img src="admin/Sertifikat/<?php echo $row["file_sertifikat"]; ?>" width="150" height="130">
   </div>
-<div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3 mb-3">
+  <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3 mb-3">
     <a href="admin/Sertifikat/<?php echo $row['file_sertifikat']; ?>" class="btn btn-primary me-md-2" download>
       Download <i class="fas fa-download"></i>
     </a>
   <?php } ?>
 </div>
-

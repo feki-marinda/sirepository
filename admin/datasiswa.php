@@ -12,7 +12,7 @@ if (empty($status)) {
 if (!$koneksi) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
-$error_siswa = $success_siswa = '';
+$admin_success_siswa = $admin_error_siswa = '';
 
 if (isset($_POST['TambahSiswa'])) {
     $Nama_siswa = $_POST['Nama_siswa'];
@@ -33,12 +33,12 @@ if (isset($_POST['TambahSiswa'])) {
     if ($result) {
         $rows_affected = mysqli_affected_rows($koneksi);
         if ($rows_affected > 0) {
-            $success_siswa = "Berhasil Menambah Data Siswa!";
+            $admin_success_siswa = "Berhasil Menambah Data Siswa!";
         } else {
-            $error_siswa = "Siswa Sudah Terdaftar!";
+            $admin_error_siswa = "Siswa Sudah Terdaftar!";
         }
     } else {
-        $error_siswa = "Tidak dapat Memperbarui Data Siswa!";
+        $admin_error_siswa = "Tidak dapat Memperbarui Data Siswa!";
         header("location:datasiswa.php");
     }
 
@@ -72,12 +72,12 @@ if (isset($_POST['EditSiswa'])) {
     if ($result) {
         $rows_affected = mysqli_affected_rows($koneksi);
         if ($rows_affected > 0) {
-            $success_siswa = "Berhasil Memperbarui Data Siswa!";
+            $admin_success_siswa = "Berhasil Memperbarui Data Siswa!";
         } else {
-            $error_siswa = "Tidak ada perubahan pada Data Siswa!";
+            $admin_error_siswa = "Tidak ada perubahan pada Data Siswa!";
         }
     } else {
-        $error_siswa = "Tidak dapat Memperbarui Data Siswa!";
+        $admin_error_siswa = "Tidak dapat Memperbarui Data Siswa!";
         header("location:datasiswa.php");
     }
 }
@@ -94,9 +94,9 @@ if (isset($_GET['id_siswa'])) {
     $affected_rows = mysqli_stmt_affected_rows($stmt);
 
     if ($affected_rows > 0) {
-        $success_siswa = "Berhasil Menghapus data siswa!";
+        $admin_success_siswa = "Berhasil Menghapus data siswa!";
     } else {
-        $error_siswa = "Tidak Dapat Menghapus Data Siswa yang Terdaftar PKL !";
+        $admin_error_siswa = "Tidak Dapat Menghapus Data Siswa yang Terdaftar PKL !";
     }
 
     mysqli_stmt_close($stmt);
@@ -144,11 +144,11 @@ if (isset($_GET['id_siswa'])) {
                         </div>
                         <div class="card-body">
                             <?php
-                            if (!empty($error_siswa)) {
-                                echo '<div class="alert alert-danger" role="alert">' . $error_siswa . '</div>';
+                            if (!empty($admin_error_siswa)) {
+                                echo '<div class="alert alert-danger" role="alert">' . $admin_error_siswa . '</div>';
                             }
-                            if (!empty($success_siswa)) {
-                                echo '<div class="alert alert-success" role="alert">' . $success_siswa . '</div>';
+                            if (!empty($admin_success_siswa)) {
+                                echo '<div class="alert alert-success" role="alert">' . $admin_success_siswa . '</div>';
                             }
                             ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -220,7 +220,7 @@ if (isset($_GET['id_siswa'])) {
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">Tidak</button>
                                                         <a href="datasiswa.php?id_siswa=<?= $row['id_siswa'] ?>"
-                                                            class="btn btn-danger">Delete</a>
+                                                            class="btn btn-danger">Hapus</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -403,19 +403,7 @@ if (isset($_GET['id_siswa'])) {
             </div>
 
 
-
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+           
         </div>
     </div>
     <?php include 'footer.php'; ?>

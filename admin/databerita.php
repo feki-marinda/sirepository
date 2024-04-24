@@ -38,16 +38,16 @@ if (isset($_POST['TambahBerita'])) {
                 $rows_affected = $koneksi->affected_rows;
 
                 if ($rows_affected > 0) {
-                    $_SESSION['success_message'] = "Berhasil Menambah Data Berita!";
+                    $_SESSION['admin_berita_success'] = "Berhasil Menambah Data Berita!";
                     header("Location: databerita.php");
                     exit();
                 } else {
-                    $_SESSION['error_message'] = "Tidak ada perubahan pada Data Berita!";
+                    $_SESSION['admin_error_berita'] = "Tidak ada perubahan pada Data Berita!";
                     header("Location: databerita.php");
                     exit();
                 }
             } else {
-                $_SESSION['error_message'] = "Error: " . $koneksi->error;
+                $_SESSION['admin_error_berita'] = "Error: " . $koneksi->error;
                 header("Location: databerita.php");
                 exit();
             }
@@ -84,7 +84,7 @@ if (isset($_POST['EditBerita'])) {
             $stmt = mysqli_prepare($koneksi, $query);
             mysqli_stmt_bind_param($stmt, 'ssssi', $judul, $isi_berita, $tanggal, $nama_gambar_baru, $id_berita);
         } else {
-            $_SESSION['error_message'] = "Ekstensi file gambar tidak valid. Gunakan png, jpg, jpeg, webp, atau gif.";
+            $_SESSION['admin_error_berita'] = "Ekstensi file gambar tidak valid. Gunakan png, jpg, jpeg, webp, atau gif.";
         }
     } else {
         $query = "UPDATE berita SET judul=?, isi_berita=?, tanggal=? WHERE id_berita=?";
@@ -98,12 +98,12 @@ if (isset($_POST['EditBerita'])) {
         if ($result) {
             $rows_affected = mysqli_stmt_affected_rows($stmt);
             if ($rows_affected > 0) {
-                $_SESSION['success_message'] = "Data Berita Berhasil Diubah!";
+                $_SESSION['admin_berita_success'] = "Data Berita Berhasil Diubah!";
             } else {
-                $_SESSION['error_message'] = "Tidak Ada Perubahan Pada Data Berita!";
+                $_SESSION['admin_error_berita'] = "Tidak Ada Perubahan Pada Data Berita!";
             }
         } else {
-            $_SESSION['error_message'] = "Error: " . mysqli_stmt_error($stmt);
+            $_SESSION['admin_error_berita'] = "Error: " . mysqli_stmt_error($stmt);
         }
 
         mysqli_stmt_close($stmt);
@@ -118,7 +118,7 @@ if (isset($_GET['id_berita'])) {
 
     mysqli_query($koneksi, "DELETE FROM berita WHERE id_berita='$id_berita'");
     if ($result) {
-        $_SESSION['success_message'] = "Data Berita Berhasil Dihapus!";
+        $_SESSION['admin_berita_success'] = "Data Berita Berhasil Dihapus!";
         header("Location: databerita.php");
         exit();
     }
@@ -163,14 +163,14 @@ if (isset($_GET['id_berita'])) {
                         </div>
                         <div class="card-body">
                             <?php
-                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
-                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
-                                unset($_SESSION['error_message']);
+                            if (isset($_SESSION['admin_error_berita']) && !empty($_SESSION['admin_error_berita'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['admin_error_berita'] . '</div>';
+                                unset($_SESSION['admin_error_berita']);
                             }
 
-                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
-                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
-                                unset($_SESSION['success_message']);
+                            if (isset($_SESSION['admin_berita_success']) && !empty($_SESSION['admin_berita_success'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['admin_berita_success'] . '</div>';
+                                unset($_SESSION['admin_berita_success']);
                             }
                             ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -360,18 +360,7 @@ if (isset($_GET['id_berita'])) {
                 </div>
             </div>
 
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
 

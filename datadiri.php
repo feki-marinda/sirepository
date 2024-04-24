@@ -8,9 +8,8 @@ if (empty($id_user)) {
     header("Location: index.php");
     exit;
 }
-$nama = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
-$query = "SELECT * FROM siswa INNER JOIN user ON siswa.id_user = user.id_user WHERE user.username = '$nama'";
+$query = "SELECT * FROM siswa INNER JOIN user ON siswa.id_user = user.id_user WHERE user.id_user = '$id_user'";
 $result = mysqli_query($koneksi, $query);
 ?>
 <!DOCTYPE html>
@@ -37,14 +36,7 @@ $result = mysqli_query($koneksi, $query);
           <li><a href="datadiri.php">Data Siswa</a></li>
         </ol>
         <h2>
-          <?php
-          if (isset($_SESSION['username'])) {
-            $nama_siswa = $_SESSION['username'];
-            echo '<h2>Hallo ' . $nama_siswa . '</h2>';
-          } else {
-            echo '<h2>Hallo</h2>';
-          }
-          ?>
+          SMK Al-Muhajirin
         </h2>
       </div>
     </section>

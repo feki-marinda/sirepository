@@ -9,15 +9,13 @@ if (empty($id_user)) {
     exit;
 }
 
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
-
 $query_get_id = "SELECT siswa.id_siswa, pkl.id_pkl FROM siswa 
     INNER JOIN user ON siswa.id_user = user.id_user
     INNER JOIN pkl ON siswa.id_siswa = pkl.id_siswa
-    WHERE user.username = ? LIMIT 1;"; 
+    WHERE user.id_user = ? LIMIT 1;"; 
 
 $id_result = $koneksi->prepare($query_get_id);
-$id_result->bind_param("s", $username); 
+$id_result->bind_param("s", $id_user); 
 $id_result->execute();
 $id_result->store_result();
 
@@ -123,20 +121,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="container">
 
                 <ol>
-                    <li><a href="index.php">Home</a></li>
+                    <li><a href="home.php">Home</a></li>
                     <li><a href="logbook.php">Logbook</a></li>
-                    <li>Ungah Logbook</li>
+                    <li>Unggah Logbook</li>
                 </ol>
                 <h2>
-                    <?php
-                    // Periksa session nama sudah ada
-                    if (isset($_SESSION['username'])) {
-                        $Nama_siswa = $_SESSION['username'];
-                        echo '<h2>Hallo ' . $Nama_siswa . '</h2>';
-                    } else {
-                        echo '<h2>Hallo</h2>';
-                    }
-                    ?>
+                    SMK Al-Muhajirin
                 </h2>
 
             </div>

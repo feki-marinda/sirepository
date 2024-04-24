@@ -50,11 +50,11 @@ if (isset($_POST['TambahSertifikat'])) {
     $stmt_insert->bind_param("sss", $id_siswa, $file_sertifikat_path, $googleDriveFileId);
 
     if ($stmt_insert->execute()) {
-        $_SESSION['success_message'] = "Sertifikat Berhasil Ditambahkan!";
+        $_SESSION['admin_seccess_sertif'] = "Sertifikat Berhasil Ditambahkan!";
         header("Location: datasertifikat.php");
         exit();
     } else {
-        $_SESSION['error_message'] = "Error: " . $koneksi->error;
+        $_SESSION['admin_error_sertif'] = "Error: " . $koneksi->error;
         header("Location: datasertifikat.php");
         exit();
     }
@@ -82,7 +82,7 @@ if (isset($_POST['EditSertifikat'])) {
                                  google_drive='$googleDriveFileId'                                                                             
                                  WHERE id_sertifikat='$id_sertifikat'");
         if ($result) {
-            $_SESSION['success_message'] = "Data Sertifikat Berhasil Diubah!";
+            $_SESSION['admin_seccess_sertif'] = "Data Sertifikat Berhasil Diubah!";
             header("Location: datasertifikat.php");
             exit();
         }
@@ -100,7 +100,7 @@ if (isset($_GET['id_sertifikat'])) {
 
     mysqli_query($koneksi, "DELETE FROM sertifikat WHERE id_sertifikat='$id_sertifikat'");
     if ($result) {
-        $_SESSION['success_message'] = "Data Sertifikat Berhasil Dihapus!";
+        $_SESSION['admin_seccess_sertif'] = "Data Sertifikat Berhasil Dihapus!";
         header("Location: datasertifikat.php");
         exit();
     }
@@ -143,14 +143,14 @@ if (isset($_GET['id_sertifikat'])) {
                         </div>
                         <div class="card-body">
                             <?php
-                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
-                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
-                                unset($_SESSION['error_message']);
+                            if (isset($_SESSION['admin_error_sertif']) && !empty($_SESSION['admin_error_sertif'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['admin_error_sertif'] . '</div>';
+                                unset($_SESSION['admin_error_sertif']);
                             }
 
-                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
-                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
-                                unset($_SESSION['success_message']);
+                            if (isset($_SESSION['admin_seccess_sertif']) && !empty($_SESSION['admin_seccess_sertif'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['admin_seccess_sertif'] . '</div>';
+                                unset($_SESSION['admin_seccess_sertif']);
                             }
                             ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -313,18 +313,7 @@ if (isset($_GET['id_sertifikat'])) {
                 </div>
             </div>
 
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
     <?php include 'footer.php'; ?>

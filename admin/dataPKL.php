@@ -15,7 +15,7 @@ function escapeString($koneksi, $string)
 }
 
 $query = "SELECT siswa.Nama_siswa, pkl.id_pkl, pkl.id_siswa, pkl.tgl_mulai, pkl.tgl_selesai, pkl.kelas, 
-pkl.nama_perusahaan, pkl.tahun_pelajaran , mitra.id_mitra, mitra.id_mitra FROM pkl 
+pkl.tahun_pelajaran , mitra.id_mitra, mitra.id_mitra FROM pkl 
 INNER JOIN siswa ON siswa.id_siswa = pkl.id_siswa
 INNER JOIN mitra ON mitra.id_mitra = pkl.id_mitra";
 $result = mysqli_query($koneksi, $query);
@@ -30,22 +30,21 @@ if (isset($_POST['Tambahpkl'])) {
     $tgl_mulai = escapeString($koneksi, $_POST['tgl_mulai']);
     $tgl_selesai = escapeString($koneksi, $_POST['tgl_selesai']);
     $kelas = escapeString($koneksi, $_POST['kelas']);
-    $nama_perusahaan = escapeString($koneksi, $_POST['nama_perusahaan']);
     $tahun_pelajaran = escapeString($koneksi, $_POST['tahun_pelajaran']);
 
-    $query = "INSERT INTO pkl (id_siswa, id_mitra, tgl_mulai, tgl_selesai, kelas, nama_perusahaan, tahun_pelajaran) 
-              VALUES ('$id_siswa','$id_mitra', '$tgl_mulai', '$tgl_selesai', '$kelas', '$nama_perusahaan', '$tahun_pelajaran')";
+    $query = "INSERT INTO pkl (id_siswa, id_mitra, tgl_mulai, tgl_selesai, kelas, tahun_pelajaran) 
+              VALUES ('$id_siswa','$id_mitra', '$tgl_mulai', '$tgl_selesai', '$kelas', '$tahun_pelajaran')";
 
 
     // Eksekusi query dan cek hasilnya
     $result = $koneksi->query($query);
 
     if ($result) {
-        $_SESSION['sucess_pkl'] = "Data PKL berhasil ditambahkan!";
+        $_SESSION['admin_success_pkl'] = "Data PKL berhasil ditambahkan!";
         header("Location: dataPKL.php");
         exit();
     } else {
-        $_SESSION['error_pkl'] = "Error: Data Siswa Sudah Terdaftar !";
+        $_SESSION['admin_error_pkl'] = "Error: Data Siswa Sudah Terdaftar !";
         header("Location: dataPKL.php");
         exit();
     }
@@ -58,7 +57,6 @@ if (isset($_POST['Editpkl'])) {
     $tgl_mulai = escapeString($koneksi, $_POST['tgl_mulai']);
     $tgl_selesai = escapeString($koneksi, $_POST['tgl_selesai']);
     $kelas = escapeString($koneksi, $_POST['kelas']);
-    $nama_perusahaan = escapeString($koneksi, $_POST['nama_perusahaan']);
     $tahun_pelajaran = escapeString($koneksi, $_POST['tahun_pelajaran']);
 
     $result = mysqli_query($koneksi, "UPDATE pkl SET 
@@ -66,19 +64,18 @@ if (isset($_POST['Editpkl'])) {
                          tgl_selesai='$tgl_selesai',
                          kelas='$kelas',
                          id_mitra='$id_mitra',
-                         nama_perusahaan='$nama_perusahaan',
                          tahun_pelajaran='$tahun_pelajaran'                            
                          WHERE id_pkl='$id_pkl'");
 
     if ($result) {
         $rows_affected = mysqli_affected_rows($koneksi);
         if ($rows_affected > 0) {
-            $_SESSION['sucess_pkl'] = "Data PKL berhasil diubah!";
+            $_SESSION['admin_success_pkl'] = "Data PKL berhasil diubah!";
         } else {
-            $_SESSION['error_pkl'] = "Tidak ada perubahan pada Data PKL!";
+            $_SESSION['admin_error_pkl'] = "Tidak ada perubahan pada Data PKL!";
         }
     } else {
-        $_SESSION['error_pkl'] = "Error: " . $koneksi->error;
+        $_SESSION['admin_error_pkl'] = "Error: " . $koneksi->error;
     }
 
     header("Location: dataPKL.php");
@@ -91,9 +88,9 @@ if (isset($_GET['id_pkl'])) {
 
     $result = mysqli_query($koneksi, "DELETE FROM pkl WHERE id_pkl='$id_pkl'");
     if ($result) {
-        $_SESSION['sucess_pkl'] = "Data PKL berhasil dihapus!";
+        $_SESSION['admin_success_pkl'] = "Data PKL berhasil dihapus!";
     } else {
-        $_SESSION['error_pkl'] = "Gagal menghapus data PKL: " . mysqli_error($koneksi);
+        $_SESSION['admin_error_pkl'] = "Gagal menghapus data PKL: " . mysqli_error($koneksi);
     }
     header("Location: dataPKL.php");
     exit();
@@ -144,14 +141,14 @@ if (isset($_GET['id_pkl'])) {
                         <div class="card-body">
                             <table id="datatablesSimple" class="table table-striped table-hover">
                                 <?php
-                                if (isset($_SESSION['error_pkl']) && !empty($_SESSION['error_pkl'])) {
-                                    echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_pkl'] . '</div>';
-                                    unset($_SESSION['error_pkl']);
+                                if (isset($_SESSION['admin_error_pkl']) && !empty($_SESSION['admin_error_pkl'])) {
+                                    echo '<div class="alert alert-danger" role="alert">' . $_SESSION['admin_error_pkl'] . '</div>';
+                                    unset($_SESSION['admin_error_pkl']);
                                 }
 
-                                if (isset($_SESSION['sucess_pkl']) && !empty($_SESSION['sucess_pkl'])) {
-                                    echo '<div class="alert alert-success" role="alert">' . $_SESSION['sucess_pkl'] . '</div>';
-                                    unset($_SESSION['sucess_pkl']);
+                                if (isset($_SESSION['admin_success_pkl']) && !empty($_SESSION['admin_success_pkl'])) {
+                                    echo '<div class="alert alert-success" role="alert">' . $_SESSION['admin_success_pkl'] . '</div>';
+                                    unset($_SESSION['admin_success_pkl']);
                                 }
                                 ?>
                                 <thead>
@@ -221,7 +218,7 @@ if (isset($_GET['id_pkl'])) {
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">Tidak</button>
                                                         <a href="dataPKL.php?id_pkl=<?= $row['id_pkl'] ?>"
-                                                            class="btn btn-danger">Delete</a>
+                                                            class="btn btn-danger">Hapus</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -233,7 +230,7 @@ if (isset($_GET['id_pkl'])) {
                                             <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
+                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Praktik Kerja Lapangan
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -244,16 +241,16 @@ if (isset($_GET['id_pkl'])) {
                                                     <div class="modal-body">
                                                         <form method="post" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
-                                                                <div class="form-group">
-                                                                    <input type="text" class="form-control" id="id_pkl"
-                                                                        value="<?= $row['id_pkl']; ?>" name="id_pkl" hidden>
-                                                                </div>
-                                                                <div class="form-group">
+                                                            <div class="form-group">
                                                                     <label for="Nama_siswa">Nama siswa</label>
                                                                     <input type="text" class="form-control" id="Nama_siswa"
                                                                         value="<?= $row['Nama_siswa']; ?>" name="Nama_siswa"
                                                                         required>
-                                                                </div>
+                                                                </div> 
+                                                                <div class="form-group">
+                                                                    <input type="text" class="form-control" id="id_pkl"
+                                                                        value="<?= $row['id_pkl']; ?>" name="id_pkl" hidden>
+                                                                </div>                                                                                                                               
                                                                 <div class="form-group">
                                                                     <label for="tgl_mulai">Tanggal Mulai PKL :</label>
                                                                     <input type="date" class="form-control" id="tgl_mulai"
@@ -327,6 +324,19 @@ if (isset($_GET['id_pkl'])) {
                         </div>
                         <div class="modal-body">
                             <form action="#" method="post" enctype="multipart/form-data" id="formTambahData">
+                            <div class="form-group">
+                                    <label for="id_siswa">Nama siswa</label>
+                                    <select class="form-control" id="id_siswa" name="id_siswa" required>
+                                        <?php
+                                        $siswaQuery = "SELECT id_siswa, Nama_siswa FROM siswa";
+                                        $siswaResult = mysqli_query($koneksi, $siswaQuery);
+
+                                        while ($siswa = mysqli_fetch_assoc($siswaResult)) {
+                                            echo "<option value='{$siswa['id_siswa']}'>{$siswa['Nama_siswa']}</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
                                 <div class="form-group">
                                     <label for="id_mitra">Tempat PKL</label>
                                     <select class="form-control" id="id_mitra" name="id_mitra" required>
@@ -356,19 +366,7 @@ if (isset($_GET['id_pkl'])) {
                                         <option value="XI B">XI B</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label for="id_siswa">Nama siswa</label>
-                                    <select class="form-control" id="id_siswa" name="id_siswa" required>
-                                        <?php
-                                        $siswaQuery = "SELECT id_siswa, Nama_siswa FROM siswa";
-                                        $siswaResult = mysqli_query($koneksi, $siswaQuery);
-
-                                        while ($siswa = mysqli_fetch_assoc($siswaResult)) {
-                                            echo "<option value='{$siswa['id_siswa']}'>{$siswa['Nama_siswa']}</option>";
-                                        }
-                                        ?>
-                                    </select>
-                                </div>
+                                
                                 <div class="form-group">
                                     <label for="tahun_pelajaran">Tahun Pelajaran:</label>
                                     <input type="number" class="form-control" id="tahun_pelajaran"
@@ -386,20 +384,7 @@ if (isset($_GET['id_pkl'])) {
                 </div>
             </div>
 
-
-
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
     <?php include 'footer.php'; ?>

@@ -2,9 +2,12 @@
 session_start();
 include('conn.php');
 
-$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+session_start();
+include('conn.php');
 
-if (empty($id_user)) {
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
+
+if (empty($status)) {
     header("Location: ../index.php");
     exit;
 }
@@ -97,18 +100,7 @@ if (isset($_GET['tahun_pelajaran'])) {
 
 
 
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
     <?php include 'footer.php'; ?>

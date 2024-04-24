@@ -8,7 +8,6 @@ if (empty($id_user)) {
     header("Location: index.php");
     exit;
 }
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
 ?>
 
@@ -41,14 +40,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
                 <li><a href="mitra.php">Mitra</a></li>
             </ol>
             <h2>
-                <?php
-                if (isset($_SESSION['username'])) {
-                    $nama_siswa = $_SESSION['username'];
-                    echo '<h2>Hallo ' . $nama_siswa . '</h2>';
-                } else {
-                    echo '<h2>Hallo</h2>';
-                }
-                ?>
+               SMK Al-Muhajirin
             </h2>
         </div>
     </section>

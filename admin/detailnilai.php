@@ -1,11 +1,19 @@
 <?php
 session_start();
-include 'conn.php';
+include('conn.php');
+
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
+
+if (empty($status)) {
+    header("Location: ../index.php");
+    exit;
+}
 
 $id_siswa = isset($_GET['id_siswa']) ? $_GET['id_siswa'] : '';
 
-$query_siswa = "SELECT siswa.Nama_siswa, pkl.nama_perusahaan, siswa.NIS FROM siswa 
-INNER JOIN pkl ON siswa.id_siswa=pkl.id_siswa WHERE siswa.id_siswa = '$id_siswa'";
+$query_siswa = "SELECT siswa.Nama_siswa, pkl.id_mitra, siswa.NIS, mitra.nama FROM siswa 
+INNER JOIN pkl ON siswa.id_siswa=pkl.id_siswa 
+INNER JOIN mitra ON mitra.id_mitra = pkl.id_mitra WHERE siswa.id_siswa = '$id_siswa'";
 $result_siswa = mysqli_query($koneksi, $query_siswa);
 
 if (!$result_siswa) {
@@ -14,7 +22,7 @@ if (!$result_siswa) {
 
 $row_siswa = mysqli_fetch_assoc($result_siswa);
 $nama_siswa = $row_siswa['Nama_siswa'];
-$tempat_pkl = $row_siswa['nama_perusahaan'];
+$tempat_pkl = $row_siswa['nama'];
 $nis = $row_siswa['NIS'];
 
 
@@ -38,12 +46,12 @@ if (isset($_POST['EditNilai'])) {
     if ($result_update) {
         $rows_affected = mysqli_affected_rows($koneksi);
         if ($rows_affected > 0) {
-            $success_message = "Berhasil Memperbarui Data Nilai!";
+            $admin_dtlnilai_success = "Berhasil Memperbarui Data Nilai!";
         } else {
-            $error_message = "Tidak ada perubahan pada Data Nilai!";
+            $admin_dtlnilai_error = "Tidak ada perubahan pada Data Nilai!";
         }
     } else {
-        $error_message = "Tidak dapat Memperbarui Data Nilai!";
+        $admin_dtlnilai_error = "Tidak dapat Memperbarui Data Nilai!";
     }
 
     header("Location: detailnilai.php?id_siswa=$id_siswa");
@@ -86,7 +94,6 @@ if (isset($_POST['EditNilai'])) {
 <body>
     <div class="container">
         <div class="row">
-            <div class="col-12">
                 <div class="text-center">
                     <h5>YAYASAN HIDAYATULLOH AL-MUHAJIRIN</h5>
                     <h3>SMKS AL-MUHAJIRIN</h3>
@@ -94,7 +101,6 @@ if (isset($_POST['EditNilai'])) {
                     <p>Dsn. Paserean Bawah , Ds. Buduran, Kec. Arosbaya, Kab. Bangkalan.</p>
                     <p>Kodepos : 69151 | Telp : 081 737 5464 / 0823 3508 1945</p>
                     <p>G-mail : smksalmuhajirin.arosbaya@gmail.com | Website : www.smkalmuhajirin.sch.id</p>
-                </div>
                 <hr>
             </div>
 
@@ -173,7 +179,7 @@ if (isset($_POST['EditNilai'])) {
                                                 <div class="form-group">
                                                     <label for="indikator">indikator</label>
                                                     <input type="text" class="form-control" id="indikator"
-                                                        value="<?= $row['indikator']; ?>" name="indikator" required>
+                                                        value="<?= $row['indikator']; ?>" name="indikator" readonly>
                                                 </div>
                                             </div>
                                             <div class="col-6">
@@ -216,7 +222,7 @@ if (isset($_POST['EditNilai'])) {
                     </strong>
 
                     <div class="d-grid gap-2 mx-auto mt-5 ms-2">
-                        <button class="btn btn-primary" type="button" onclick="printPage()">Cetak</button>
+                        <button class="btn btn-primary aksi" type="button" onclick="printPage()">Cetak</button>
                     </div>
 
                 </div>

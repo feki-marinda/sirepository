@@ -1,11 +1,11 @@
 <?php
 include '../conn.php';
 
-// Mengambil parameter id_siswa dari URL
 $id_siswa = $_GET['id_siswa'];
 
-// Menyiapkan kueri SQL untuk mengambil data PKL yang sesuai dengan id_siswa
-$query = "SELECT * FROM pkl INNER JOIN siswa ON siswa.id_siswa = pkl.id_siswa WHERE siswa.id_siswa = '$id_siswa'";
+$query = "SELECT * FROM pkl INNER JOIN siswa ON siswa.id_siswa = pkl.id_siswa
+INNER JOIN mitra ON mitra.id_mitra = pkl.id_mitra 
+WHERE siswa.id_siswa = '$id_siswa'";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
@@ -23,8 +23,8 @@ if (!$result) {
 <body>
     <div class="container mt-5">
         <h2>Data PKL</h2>
-        <table class="table table-striped">
-            <thead>
+        <table class="table">
+            <thead class="table-primary">
                 <tr>
                     <th>No.</th>
                     <th>Nama Lengkap</th>
@@ -45,7 +45,7 @@ if (!$result) {
                     echo "<td>" . $row['Nama_siswa'] . "</td>";
                     echo "<td>" . $row['tgl_mulai'] . "</td>";
                     echo "<td>" . $row['tgl_selesai'] . "</td>";
-                    echo "<td>" . $row['nama_perusahaan'] . "</td>";
+                    echo "<td>" . $row['nama'] . "</td>";
                     echo "<td>" . $row['tahun_pelajaran'] . "</td>";
                     echo "<td>" . $row['no_hp'] . "</td>";
                     echo "<td>" . $row['email'] . "</td>";

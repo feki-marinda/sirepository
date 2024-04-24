@@ -17,13 +17,11 @@ function registrasi_siswa($data){
     $email = mysqli_real_escape_string($koneksi, $data["email"]);
     $status = mysqli_real_escape_string($koneksi, $data["status"]);
 
-    // Query untuk insert data ke tabel 'user'
     $query_user = "INSERT INTO user (username, password, status) VALUES ('$username', '$password','$status')";
 
     if (mysqli_query($koneksi, $query_user)) {
         $user_id = mysqli_insert_id($koneksi);
 
-        // Query untuk insert data ke tabel 'siswa'
         $query_siswa = "INSERT INTO siswa (id_user, Nama_siswa, NIS, tanggal_lahir, jenis_kelamin, alamat, kelas, no_hp, email) 
         VALUES ('$user_id', '$nama', '$NIS', '$tanggal_lahir', '$jenis_kelamin', '$alamat', '$kelas','$no_hp','$email')";
 

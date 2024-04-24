@@ -1,5 +1,13 @@
 <?php
-session_start(); // Memulai sesi
+session_start();
+include('conn.php');
+
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
+
+if (empty($status)) {
+    header("Location: ../index.php");
+    exit;
+}
 
 include 'conn.php';
 
@@ -8,9 +16,9 @@ if (isset($_POST['Simpanindikator'])) {
     $result = mysqli_query($koneksi, "INSERT INTO indikator (indikator) VALUES ('$indikator')");
 
     if ($result) {
-        $_SESSION['success_indikator'] = "Data Indikator berhasil ditambahkan!";
+        $_SESSION['admin_success_indikator'] = "Data Indikator berhasil ditambahkan!";
     } else {
-        $_SESSION['error_indikator'] = "Gagal menambahkan data Indikator: " . mysqli_error($koneksi);
+        $_SESSION['admin_error_indikator'] = "Gagal menambahkan data Indikator: " . mysqli_error($koneksi);
     }
 }
 
@@ -20,9 +28,9 @@ if (isset($_POST['Editindikator'])) {
     $result = mysqli_query($koneksi, "UPDATE indikator SET indikator='$indikator' WHERE id_indikator='$id_indikator'");
 
     if ($result) {
-        $_SESSION['success_indikator'] = "Data Indikator Berhasil Diubah!";
+        $_SESSION['admin_success_indikator'] = "Data Indikator Berhasil Diubah!";
     } else {
-        $_SESSION['error_indikator'] = "Gagal mengubah data Indikator: " . mysqli_error($koneksi);
+        $_SESSION['admin_error_indikator'] = "Gagal mengubah data Indikator: " . mysqli_error($koneksi);
     }
 }
 
@@ -31,9 +39,9 @@ if (isset($_GET['id_indikator'])) {
     $result = mysqli_query($koneksi, "DELETE FROM indikator WHERE id_indikator='$id_indikator'");
 
     if ($result) {
-        $_SESSION['success_indikator'] = "Data Indikator berhasil dihapus!";
+        $_SESSION['admin_success_indikator'] = "Data Indikator berhasil dihapus!";
     } else {
-        $_SESSION['error_indikator'] = "Gagal menghapus data Indikator: " . mysqli_error($koneksi);
+        $_SESSION['admin_error_indikator'] = "Gagal menghapus data Indikator: " . mysqli_error($koneksi);
     }
 }
 ?>
@@ -69,14 +77,14 @@ if (isset($_GET['id_indikator'])) {
         <table class="table table-bordered table-striped mt-3">
 
         <?php
-                        if (isset($_SESSION['error_indikator']) && !empty($_SESSION['error_indikator'])) {
-                            echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_indikator'] . '</div>';
-                            unset($_SESSION['error_indikator']);
+                        if (isset($_SESSION['admin_error_indikator']) && !empty($_SESSION['admin_error_indikator'])) {
+                            echo '<div class="alert alert-danger" role="alert">' . $_SESSION['admin_error_indikator'] . '</div>';
+                            unset($_SESSION['admin_error_indikator']);
                         }
 
-                        if (isset($_SESSION['success_indikator']) && !empty($_SESSION['success_indikator'])) {
-                            echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_indikator'] . '</div>';
-                            unset($_SESSION['success_indikator']);
+                        if (isset($_SESSION['admin_success_indikator']) && !empty($_SESSION['admin_success_indikator'])) {
+                            echo '<div class="alert alert-success" role="alert">' . $_SESSION['admin_success_indikator'] . '</div>';
+                            unset($_SESSION['admin_success_indikator']);
                         }
                         ?>
 
@@ -169,18 +177,7 @@ if (isset($_GET['id_indikator'])) {
             </div>
         </div>
     <?php } ?>
-    <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+    
 </div>
 </div>
 </div>

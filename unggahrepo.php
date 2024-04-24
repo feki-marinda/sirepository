@@ -150,16 +150,7 @@ $koneksi->close();
                     <li><a href="repository.php">Repository</a></li>
                     <li>Unggah Repository</li>
                 </ol>
-                <h2>
-                    <?php
-                    if (isset($_SESSION['username'])) {
-                        $nama_siswa = $_SESSION['username'];
-                        echo '<h2>Hallo ' . $nama_siswa . '</h2>';
-                    } else {
-                        echo '<h2>Hallo</h2>';
-                    }
-                    ?>
-                </h2>
+                <h2>SMK Al-Muhajirin</h2>
             </div>
         </section>
 

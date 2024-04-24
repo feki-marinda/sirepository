@@ -1,5 +1,5 @@
 <?php
-include 'conn.php';
+include('conn.php');
 
 $id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
 
@@ -7,9 +7,11 @@ if (empty($id_user)) {
     header("Location: index.php");
     exit;
 }
-$query_siswa = "SELECT siswa.Nama_siswa, pkl.nama_perusahaan, siswa.NIS FROM siswa 
+
+$query_siswa = "SELECT siswa.Nama_siswa, siswa.NIS, mitra.nama FROM siswa 
 INNER JOIN user ON user.id_user=siswa.id_user
-INNER JOIN pkl ON siswa.id_siswa=pkl.id_siswa WHERE user.id_user = '$id_user'";
+INNER JOIN pkl ON siswa.id_siswa=pkl.id_siswa 
+INNER JOIN mitra ON mitra.id_mitra=pkl.id_mitra WHERE user.id_user = '$id_user'";
 $result_siswa = mysqli_query($koneksi, $query_siswa);
 
 if (!$result_siswa) {
@@ -20,16 +22,13 @@ $row_siswa = mysqli_fetch_assoc($result_siswa);
 
 if ($row_siswa) {
     $nama_siswa = $row_siswa['Nama_siswa'];
-    $tempat_pkl = $row_siswa['nama_perusahaan'];
+    $tempat_pkl = $row_siswa['nama'];
     $nis = $row_siswa['NIS'];
 } else {
     $nama_siswa = '';
     $tempat_pkl = '';
     $nis = '';
 }
-
-
-$nama = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
 $query = "SELECT indikator.indikator, nilai_pkl.nilai
 FROM indikator 
@@ -121,7 +120,7 @@ if (!$result) {
 
 <script>
     function printPage() {
-        window.location.href = 'admin/cetak/datanilai.php'; // Mengarahkan ke file yang tepat
+        window.location.href = 'cetak/datanilai.php';
     }
 </script>
 <br><br><br>

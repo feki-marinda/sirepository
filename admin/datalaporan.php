@@ -78,22 +78,17 @@ if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
     $file_error = $_FILES['berkas']['error'];
 
     if ($file_error === 0) {
-        // Menyiapkan direktori tujuan dan nama file baru
         $upload_dir = __DIR__ . '/Laporan PKL/';
         $file_destination = $upload_dir . $file_name;
 
-        // Memeriksa ukuran file
         if ($file_size < 100 * 1024 * 1024) {
-            // Pindahkan file yang diunggah ke direktori tujuan
             if (move_uploaded_file($file_tmp, $file_destination)) {
-                // Menghapus file lama jika ada
                 $old_file_query = mysqli_query($koneksi, "SELECT berkas FROM laporan_pkl WHERE id_laporan='$id_laporan'");
                 $old_file = mysqli_fetch_array($old_file_query);
                 if ($old_file && is_file($old_file['berkas'])) {
                     unlink($old_file['berkas']);
                 }
 
-                // Menggunakan prepared statements untuk mencegah SQL injection
                 $query = "UPDATE laporan_pkl 
                           SET id_siswa=?, 
                               tanggal_kumpul=?,
@@ -104,7 +99,6 @@ if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
                 mysqli_stmt_bind_param($stmt, "issss", $id_siswa, $tanggal_kumpul, $judul_laporan, $file_name, $id_laporan);
                 $result = mysqli_stmt_execute($stmt);
 
-                // Memeriksa keberhasilan eksekusi query
                 if ($result) {
                     $rows_affected = mysqli_stmt_affected_rows($stmt);
                     if ($rows_affected > 0) {
@@ -142,16 +136,13 @@ if (isset($_POST['EditLaporan']) && $_SERVER["REQUEST_METHOD"] == "POST") {
 if (isset($_GET['id_laporan'])) {
     $id_laporan = $_GET['id_laporan'];
 
-    // Coba hapus laporan
     $hapus_query = mysqli_query($koneksi, "DELETE FROM laporan_pkl WHERE id_laporan='$id_laporan'");
     if ($hapus_query) {
-        // Set pesan kesalahan jika ada masalah dalam penghapusan laporan
         $_SESSION['success_laporan'] = "Laporan berhasil dihapus!";
     } else {
         $_SESSION['error_laporan'] = "Gagal menghapus laporan: " . mysqli_error($koneksi);
     }
 
-    // Alihkan kembali ke halaman datalaporan.php
     header("location:datalaporan.php");
     exit();
 }
@@ -186,9 +177,9 @@ if (isset($_GET['id_laporan'])) {
 
                             </div>
                             <div class="buttons-right">
-                            <button id="printButton" onclick="window.open('cetak/datalaporan.php', '_blank')">
-    <i class="fas fa-print"></i> Cetak
-</button>
+                                <button id="printButton" onclick="window.open('cetak/datalaporan.php', '_blank')">
+                                    <i class="fas fa-print"></i> Cetak
+                                </button>
 
                             </div>
                         </div>
@@ -214,7 +205,7 @@ if (isset($_GET['id_laporan'])) {
                                         <th>No.</th>
                                         <th>Nama Lengkap</th>
                                         <th>Judul Laporan</th>
-                                        <th>Tanggal Pengupulan</th>
+                                        <th>Tanggal Pengumpulan</th>
                                         <th>file</th>
                                         <th>Keterangan</th>
                                     </tr>
@@ -263,7 +254,7 @@ if (isset($_GET['id_laporan'])) {
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">Tidak</button>
                                                         <a href="datalaporan.php?id_laporan=<?= $row['id_laporan'] ?>"
-                                                            class="btn btn-danger">Delete</a>
+                                                            class="btn btn-danger">Hapus</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -319,7 +310,7 @@ if (isset($_GET['id_laporan'])) {
                                                                 echo "<p>Dokumen Saat Ini: {$row['berkas']}</p>";
                                                                 ?>
                                                                 <input type="file" class="form-control" id="berkas"
-                                                                    name="berkas" accept=".doc, .docx, .pdf">                                                    
+                                                                    name="berkas" accept=".doc, .docx, .pdf">
                                                             </div>
 
                                                             <div class="modal-footer">
@@ -394,18 +385,7 @@ if (isset($_GET['id_laporan'])) {
                 </div>
             </div>
 
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
     <?php include 'footer.php'; ?>

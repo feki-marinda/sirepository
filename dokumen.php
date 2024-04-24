@@ -33,15 +33,9 @@ if (empty($id_user)) {
                     <li><a href="dokumen.php">Dokumen</a></li>
                     
                 </ol>
-                <h2><?php
-    // Periksa apakah session nama sudah ada
-    if (isset($_SESSION['username'])) {
-        $nama_siswa = $_SESSION['username'];
-        echo '<h2>Hallo ' . $nama_siswa . '</h2>';
-    } else {
-        echo '<h2>Hallo</h2>';
-    }
-    ?></h2>
+                <h2>
+                    SMK Al-Muhajirin
+                </h2>
 
             </div>
         </section>
@@ -69,37 +63,43 @@ if (empty($id_user)) {
             </div>
             <br>
             <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
-                <table id="example" class="display">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Judul Dokumen</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $no = 1;
-                        $query = "SELECT * FROM dokumen";
-                        $result = mysqli_query($koneksi, $query);
+            <table id="example" class="display">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>Judul Dokumen</th>
+            <th>Keterangan</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        $no = 1;
+        $query = "SELECT * FROM dokumen";
+        $result = mysqli_query($koneksi, $query);
 
-                        if (!$result) {
-                            die("Query failed: " . mysqli_error($koneksi));
-                        }
+        if (!$result) {
+            die("Query failed: " . mysqli_error($koneksi));
+        }
 
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<tr>";
-                            echo "<td>" . $no++ . "</td>";
-                            echo "<td>" . $row['judul_dokumen'] . "</td>";
-                            echo "<td><a href='" . $row['Dokumen'] . "' download>Unduh</a></td>";
-                            echo "</tr>";
-                        }
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "<tr>";
+            echo "<td>" . $no++ . "</td>";
+            echo "<td>" . $row['judul_dokumen'] . "</td>";
+            echo "<td><a href='admin/Dokumen/{$row['Dokumen']}' target = _blank>
+            Detail
+          </a></td>";
+            echo "<td><a href='admin/Dokumen/{$row['Dokumen']}' class='btn btn-primary me-md-2' download>
+            Download <i class='fas fa-download'></i>
+          </a></td>";           
+            echo "</tr>";
+        }
 
-                        mysqli_free_result($result);
-                        ?>
+        mysqli_free_result($result);
+        ?>
+    </tbody>
+</table>
 
-                    </tbody>
-                </table>
 
                 <script>
                     $(document).ready(function () {

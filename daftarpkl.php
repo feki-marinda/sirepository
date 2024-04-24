@@ -21,9 +21,10 @@ if (isset($_SESSION['id_user'])) {
         if ($row_siswa) {
             $_SESSION['id_siswa'] = $row_siswa['id_siswa'];
 
-            $query = "SELECT siswa.Nama_siswa, siswa.id_siswa, pkl.*
+            $query = "SELECT siswa.Nama_siswa, siswa.id_siswa, pkl.*, mitra.id_mitra, mitra.nama
                       FROM pkl
                       INNER JOIN siswa ON siswa.id_siswa = pkl.id_siswa
+                      INNER JOIN mitra ON mitra.id_mitra = pkl.id_mitra
                       WHERE siswa.id_siswa = " . $_SESSION['id_siswa'];
             $result = mysqli_query($koneksi, $query);
 
@@ -37,30 +38,30 @@ if (isset($_SESSION['id_user'])) {
     echo "Tidak ada user yang login.";
 }
 
-if (isset($_POST['daftar'])) {
-    $id_siswa = $_SESSION['id_siswa'];
-    $tgl_mulai = $_POST['tgl_mulai'];
-    $tgl_selesai = $_POST['tgl_selesai'];
-    $kelas = $_POST['kelas'];
-    $nama_perusahaan = $_POST['nama_perusahaan'];
-    $tahun_pelajaran = $_POST['tahun_pelajaran'];
+if (isset($_POST['Tambahpkl'])) {
+    $id_siswa = mysqli_real_escape_string($koneksi, $_POST['id_siswa']);
+    $id_mitra = mysqli_real_escape_string($koneksi, $_POST['id_mitra']);
+    $tgl_mulai = mysqli_real_escape_string($koneksi, $_POST['tgl_mulai']);
+    $tgl_selesai = mysqli_real_escape_string($koneksi, $_POST['tgl_selesai']);
+    $kelas = mysqli_real_escape_string($koneksi, $_POST['kelas']);
+    $tahun_pelajaran = mysqli_real_escape_string($koneksi, $_POST['tahun_pelajaran']);
 
-    $query_daftar = "INSERT INTO pkl (id_siswa, tgl_mulai, tgl_selesai, nama_perusahaan, tahun_pelajaran, kelas)
-                     VALUES ('$id_siswa', '$tgl_mulai', '$tgl_selesai', '$nama_perusahaan', '$tahun_pelajaran', '$kelas')";
+    $query = "INSERT INTO pkl (id_siswa, id_mitra, tgl_mulai, tgl_selesai, kelas, tahun_pelajaran) 
+              VALUES ('$id_siswa','$id_mitra', '$tgl_mulai', '$tgl_selesai', '$kelas', '$tahun_pelajaran')";
 
-    $result_daftar = mysqli_query($koneksi, $query_daftar);
 
-    if ($result_daftar) {
-        $_SESSION['success_message'] = "Pendaftaran Berhasil. Cek di bagian riwayat.";
+    // Eksekusi query dan cek hasilnya
+    $result = $koneksi->query($query);
+
+    if ($result) {
+        $_SESSION['sucess_pkl'] = "Data PKL berhasil ditambahkan!";
         header("Location: daftarpkl.php");
-    exit();
-
+        exit();
     } else {
-        $_SESSION['error_message'] = "Pendaftaran Gagal. Anda Sudah Mendaftar Praktik Kerja Lapangan, Cek Riwayat Pendaftar !";
+        $_SESSION['error_pkl'] = "Error: Data Siswa Sudah Terdaftar !";
         header("Location: daftarpkl.php");
         exit();
     }
-    
 }
 
 ?>
@@ -116,7 +117,7 @@ if (isset($_POST['daftar'])) {
                                     echo "<td>" . $row['kelas'] . "</td>";
                                     echo "<td>" . date('d F Y', strtotime($row['tgl_mulai'])) . "</td>";
                                     echo "<td>" . date('d F Y', strtotime($row['tgl_selesai'])) . "</td>";
-                                    echo "<td>" . $row['nama_perusahaan'] . "</td>";
+                                    echo "<td>" . $row['nama'] . "</td>";
                                     echo "<td>" . $row['tahun_pelajaran'] . "</td>";
                                     echo "</tr>";
                                 }
@@ -145,24 +146,20 @@ if (isset($_POST['daftar'])) {
                                 }
                                 ?>
                                 <form method="post" action="">
-                                    <div class="mb-3">
-                                        <input type="text" class="form-control"
-                                            value="<?php echo isset($_SESSION['id_siswa']) ? $_SESSION['id_siswa'] : ''; ?>"
-                                            hidden>
-                                    </div>
+                                    <input type="hidden" name="id_siswa"
+                                        value="<?php echo isset($_SESSION['id_siswa']) ? $_SESSION['id_siswa'] : ''; ?>">
                                     <div class="mb-3">
                                         <label for="Nama_Siswa" class="form-label"><strong>Nama Siswa :</strong></label>
-                                        <input type="text" class="form-control">
+                                        <input type="text" class="form-control" name="nama_siswa">
                                     </div>
                                     <div class="mb-3">
                                         <label for="kelas" class="form-label"><strong>Kelas :</strong></label>
                                         <select class="form-select" id="kelas" name="kelas">
-                                            <option value="" require selected disabled>Pilih Kelas</option>
+                                            <option value="" disabled selected>Pilih Kelas</option>
                                             <option value="XI A">XI A</option>
                                             <option value="XI B">XI B</option>
                                         </select>
                                     </div>
-
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label for="tgl_mulai" class="form-label"><strong>Tanggal Mulai
@@ -176,10 +173,18 @@ if (isset($_POST['daftar'])) {
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="nama_perusahaan" class="form-label"><strong>Tempat PKL
-                                                :</strong></label>
-                                        <input type="text" class="form-control" id="nama_perusahaan"
-                                            name="nama_perusahaan">
+                                        <label for="id_mitra"><strong>Tempat PKL</strong></label>
+                                        <select class="form-control" id="id_mitra" name="id_mitra" required>
+                                            <option value="" disabled selected hidden>Pilih Tempat PKL</option>
+                                            <?php
+                                            $siswaQuery = "SELECT id_mitra, nama FROM mitra";
+                                            $siswaResult = mysqli_query($koneksi, $siswaQuery);
+
+                                            while ($siswa = mysqli_fetch_assoc($siswaResult)) {
+                                                echo "<option value='{$siswa['id_mitra']}'>{$siswa['nama']}</option>";
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                     <div class="mb-3">
                                         <label for="tahun_pelajaran" class="form-label"><strong>Tahun Pelajaran
@@ -188,11 +193,12 @@ if (isset($_POST['daftar'])) {
                                             name="tahun_pelajaran">
                                     </div>
                                     <div class="row">
-                                        <button type="submit" name="daftar" class="btn btn-primary">
+                                        <button type="submit" name="Tambahpkl" class="btn btn-primary">
                                             <h5>Submit</h5>
                                         </button>
                                     </div>
                                 </form>
+
                             </div>
                         </article>
     </main>

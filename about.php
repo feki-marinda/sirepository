@@ -2,11 +2,11 @@
 session_start();
 include('conn.php');
 
-$password = isset($_SESSION['password']) ? $_SESSION['password'] : '';
+$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
 
-if (empty($password)) {
-  header("Location: index.php");
-  exit;
+if (empty($id_user)) {
+    header("Location: index.php");
+    exit;
 }
 ?>
 
@@ -37,7 +37,7 @@ if (empty($password)) {
     <section class="breadcrumbs">
       <div class="container">
         <ol>
-          <li><a href="index.php">Home</a></li>
+          <li><a href="home.php">Home</a></li>
           <li><a href="about.php">About</a></li>
           <li>About SiRepository</li>
         </ol>

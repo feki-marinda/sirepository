@@ -20,7 +20,7 @@
       <nav id="navbar" class="navbar">
         <ul>
           <li><a class="nav-link scrollto <?php echo isActivePage('home.php'); ?>" href="home.php">Home</a></li>
-          <li class="dropdown"><a href="#"><span>Profil</span> <i class="bi bi-chevron-down"></i></a>
+          <li class="dropdown"><a href="#"><span>Profil Sekolah</span> <i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="sejarah.php" class="<?php echo isActivePage('sejarah.php'); ?>">Sejarah</a></li>
               <li><a href="visi.php" class="<?php echo isActivePage('visi.php'); ?>">Visi Misi Tujuan</a></li>
@@ -45,7 +45,7 @@
           </li>
           <li class="dropdown">
             <a href="datadiri.php" class="nav-link">
-              <span>Profil</span>
+              <span>Profil Siswa</span>
               <i class="fas fa-chevron-down"></i>
             </a>
             <ul>

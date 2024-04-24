@@ -9,7 +9,7 @@ if (empty($status)) {
     exit;
 }
 
-$error_message = $success_message = '';
+$admin_success_dokumen = $admin_error_dokumen = '';
 
 $query = "SELECT * FROM dokumen";
 $result = $koneksi->query($query);
@@ -17,7 +17,7 @@ $result = $koneksi->query($query);
 if (!$result) {
     die("Error: " . $koneksi->error);
 }
-$ekstensi_dokumen = array('pdf', 'doc', 'docx', 'xls', 'xlsx');
+$ekstensi_dokumen = array('pdf', 'doc', 'docx');
 
 
 if (isset($_POST['TambahDokumen'])) {
@@ -39,11 +39,11 @@ if (isset($_POST['TambahDokumen'])) {
                           VALUES ('$judul_dokumen', '$file_dokumen')";
 
                 if ($koneksi->query($query) === TRUE) {
-                    $_SESSION['success_message'] = "Dokumen Berhasil Ditambahkan!";
+                    $_SESSION['admin_success_dokumen'] = "Dokumen Berhasil Ditambahkan!";
                     header("Location: datadokumen.php");
                     exit();
                 } else {
-                    $_SESSION['error_message'] = "Error: " . $koneksi->error;
+                    $_SESSION['admin_error_dokumen'] = "Error: " . $koneksi->error;
                     header("Location: datadokumen.php");
                     exit();
                 }
@@ -70,16 +70,16 @@ if (isset($_POST['EditDokumen'])) {
             !in_array($ext_dokumen, $ekstensi_dokumen) || $ukuran_dokumen >= 208815000 ||
             !move_uploaded_file($_FILES['Dokumen']['tmp_name'], 'Dokumen/' . ($file_dokumen = $rand . '_' . $filename_dokumen))
         ) {
-            $_SESSION['error_message'] = "Error: Gagal mengunggah file.";
+            $_SESSION['admin_error_dokumen'] = "Error: Gagal mengunggah file.";
             header("Location: datadokumen.php");
             exit();
         }
 
         $query = "UPDATE dokumen SET judul_dokumen = '$judul_dokumen', Dokumen = '$file_dokumen' WHERE id_dokumen = $id_dokumen";
         if ($koneksi->query($query) === TRUE) {
-            $_SESSION['success_message'] = "Dokumen Berhasil Diubah!";
+            $_SESSION['admin_success_dokumen'] = "Dokumen Berhasil Diubah!";
         } else {
-            $_SESSION['error_message'] = "Error: " . $koneksi->error;
+            $_SESSION['admin_error_dokumen'] = "Error: " . $koneksi->error;
         }
     } else {
         $queryCheck = "SELECT judul_dokumen FROM dokumen WHERE id_dokumen = $id_dokumen";
@@ -89,19 +89,19 @@ if (isset($_POST['EditDokumen'])) {
             $dataDokumen = $resultCheck->fetch_assoc();
 
             if ($dataDokumen['judul_dokumen'] === $judul_dokumen) {
-                $_SESSION['error_message'] = "Tidak Ada Perubahan Data yang Dilakukan.";
+                $_SESSION['admin_error_dokumen'] = "Tidak Ada Perubahan Data yang Dilakukan.";
                 header("Location: datadokumen.php");
                 exit();
             }
 
             $query = "UPDATE dokumen SET judul_dokumen = '$judul_dokumen' WHERE id_dokumen = $id_dokumen";
             if ($koneksi->query($query) === TRUE) {
-                $_SESSION['success_message'] = "Judul dokumen berhasil diubah!";
+                $_SESSION['admin_success_dokumen'] = "Judul dokumen berhasil diubah!";
             } else {
-                $_SESSION['error_message'] = "Error: " . $koneksi->error;
+                $_SESSION['admin_error_dokumen'] = "Error: " . $koneksi->error;
             }
         } else {
-            $_SESSION['error_message'] = "Error: Dokumen tidak ditemukan.";
+            $_SESSION['admin_error_dokumen'] = "Error: Dokumen tidak ditemukan.";
         }
     }
 
@@ -115,7 +115,7 @@ if (isset($_GET['id_dokumen'])) {
 
     mysqli_query($koneksi, "DELETE FROM dokumen WHERE id_dokumen='$id_dokumen'");
     if ($result) {
-        $_SESSION['success_message'] = "Dokumen berhasil dihapus!";
+        $_SESSION['admin_success_dokumen'] = "Dokumen berhasil dihapus!";
         header("Location: datadokumen.php");
         exit();
     }
@@ -162,14 +162,14 @@ if (isset($_GET['id_dokumen'])) {
                         </div>
                         <div class="card-body">
                             <?php
-                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
-                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
-                                unset($_SESSION['error_message']);
+                            if (isset($_SESSION['admin_error_dokumen']) && !empty($_SESSION['admin_error_dokumen'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['admin_error_dokumen'] . '</div>';
+                                unset($_SESSION['admin_error_dokumen']);
                             }
 
-                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
-                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
-                                unset($_SESSION['success_message']);
+                            if (isset($_SESSION['admin_success_dokumen']) && !empty($_SESSION['admin_success_dokumen'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['admin_success_dokumen'] . '</div>';
+                                unset($_SESSION['admin_success_dokumen']);
                             }
                             ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -191,7 +191,7 @@ if (isset($_GET['id_dokumen'])) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['judul_dokumen'] . "</td>";
-                                        echo "<td><a href='Dokumen/" . $row['Dokumen'] . "' target='_blank'>" . $row['Dokumen'] . "</a></td>";
+                                        echo "<td><a href='" . 'Dokumen' . '/' . $row['Dokumen'] . "' target='_blank'>" . $row['Dokumen'] . "</a></td>";
                                         echo "<td>";
                                         echo "<div class='d-flex'>";
                                         echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_dokumen'] . "' data-bs-whatever='@mdo'>";
@@ -331,18 +331,7 @@ if (isset($_GET['id_dokumen'])) {
 
 
 
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+           
         </div>
     </div>
     <?php include 'footer.php'; ?>

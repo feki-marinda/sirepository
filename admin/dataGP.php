@@ -41,11 +41,11 @@ if (isset($_POST['TambahGP'])) {
                       VALUES ('$id_user','$nama', '$NIP', '$Email', '$Alamat', '$xx', '$no_telp')";
 
             if ($koneksi->query($query) === TRUE) {
-                $_SESSION['success_message'] = "Data Guru Pamong berhasil ditambahkan!";
+                $_SESSION['admin_success_gp'] = "Data Guru Pamong berhasil ditambahkan!";
                 header("Location: dataGP.php");
                 exit();
             } else {
-                $_SESSION['error_message'] = "Error: " . $koneksi->error;
+                $_SESSION['admin_error_gp'] = "Error: " . $koneksi->error;
                 header("Location: dataGP.php");
                 exit();
             }
@@ -81,7 +81,7 @@ if (isset($_POST['EditGP'])) {
             move_uploaded_file($_FILES['gambarnew']['tmp_name'], 'gambar/' . $nama_gambar_baru);
             $query = "UPDATE guru_pamong SET nama='$nama', NIP='$NIP', Email='$Email', Alamat='$Alamat', Foto='$nama_gambar_baru', no_telp='$no_telp' WHERE id_guru='$id_guru'";
         } else {
-            $_SESSION['error_message'] = "Ekstensi gambar yang diizinkan hanya jpg, png, atau jpeg.";
+            $_SESSION['admin_error_gp'] = "Ekstensi gambar yang diizinkan hanya jpg, png, atau jpeg.";
             header("Location: dataGP.php");
             exit();
         }
@@ -94,12 +94,12 @@ if (isset($_POST['EditGP'])) {
     if ($result) {
         $rows_affected = mysqli_affected_rows($koneksi);
         if ($rows_affected > 0) {
-            $_SESSION['success_message'] = "Data Guru Pamong berhasil diubah!";
+            $_SESSION['admin_success_gp'] = "Data Guru Pamong berhasil diubah!";
         } else {
-            $_SESSION['error_message'] = "Tidak ada perubahan pada Data Pamong!";
+            $_SESSION['admin_error_gp'] = "Tidak ada perubahan pada Data Pamong!";
         }
     } else {
-        $_SESSION['error_message'] = "Error: " . $koneksi->error;
+        $_SESSION['admin_error_gp'] = "Error: " . $koneksi->error;
     }
 
     header("Location: dataGP.php");
@@ -112,7 +112,7 @@ if (isset($_GET['id_guru'])) {
 
     mysqli_query($koneksi, "DELETE FROM guru_pamong WHERE id_guru='$id_guru'");
     if ($result) {
-        $_SESSION['success_message'] = "Data Guru Pamong berhasil dihapus!";
+        $_SESSION['admin_success_gp'] = "Data Guru Pamong berhasil dihapus!";
         header("Location: dataGP.php");
         exit();
     }
@@ -164,14 +164,14 @@ if (isset($_GET['id_guru'])) {
                         </div>
                         <div class="card-body">
                             <?php
-                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
-                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
-                                unset($_SESSION['error_message']);
+                            if (isset($_SESSION['admin_error_gp']) && !empty($_SESSION['admin_error_gp'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['admin_error_gp'] . '</div>';
+                                unset($_SESSION['admin_error_gp']);
                             }
 
-                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
-                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
-                                unset($_SESSION['success_message']);
+                            if (isset($_SESSION['admin_success_gp']) && !empty($_SESSION['admin_success_gp'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['admin_success_gp'] . '</div>';
+                                unset($_SESSION['admin_success_gp']);
                             }
                             ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -407,18 +407,7 @@ if (isset($_GET['id_guru'])) {
 
 
 
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
     <?php include 'footer.php'; ?>

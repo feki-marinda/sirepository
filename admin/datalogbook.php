@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["TambahLogbook"])) {
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
         if (!in_array($ext, $ekstensi)) {
-            $_SESSION['error_message'] = "Error: Ekstensi file tidak sesuai!";
+            $_SESSION['admin_error_logbook'] = "Error: Ekstensi file tidak sesuai!";
         } else {
             if ($ukuran < 208815000) {
                 $xx = $rand . '_' . $filename;
@@ -44,16 +44,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["TambahLogbook"])) {
                 $insert_result = mysqli_query($koneksi, $insert_query);
 
                 if ($insert_result) {
-                    $_SESSION['success_message'] = "Data Logbook Berhasil Ditambahkan!";
+                    $_SESSION['admin_success_logbook'] = "Data Logbook Berhasil Ditambahkan!";
                 } else {
-                    $_SESSION['error_message'] = "Error: " . mysqli_error($koneksi);
+                    $_SESSION['admin_error_logbook'] = "Error: " . mysqli_error($koneksi);
                 }
             } else {
-                $_SESSION['error_message'] = "Error: Ukuran file terlalu besar!";
+                $_SESSION['admin_error_logbook'] = "Error: Ukuran file terlalu besar!";
             }
         }
     } else {
-        $_SESSION['error_message'] = "Error: File belum dipilih!";
+        $_SESSION['admin_error_logbook'] = "Error: File belum dipilih!";
     }
 
     header("Location: datalogbook.php");
@@ -87,7 +87,7 @@ if (isset($_POST['EditLogbook'])) {
             $query = "UPDATE logbook SET id_siswa = '$id_siswa', id_pkl = '$id_pkl', tanggal='$tanggal', aktivitas='$aktivitas', dokumentasi='$nama_gambar_baru' 
             WHERE id_logbook='$id_logbook'";
         } else {
-            $_SESSION['error_message'] = "Ekstensi gambar yang diizinkan hanya jpg, png, atau jpeg.";
+            $_SESSION['admin_error_logbook'] = "Ekstensi gambar yang diizinkan hanya jpg, png, atau jpeg.";
             header("Location: datalogbook.php");
             exit();
         }
@@ -100,12 +100,12 @@ if (isset($_POST['EditLogbook'])) {
     if ($result) {
         $rows_affected = mysqli_affected_rows($koneksi);
         if ($rows_affected > 0) {
-            $_SESSION['success_message'] = "Data Berhasil Diubah!";
+            $_SESSION['admin_success_logbook'] = "Data Berhasil Diubah!";
         } else {
-            $_SESSION['error_message'] = "Tidak ada perubahan pada data!";
+            $_SESSION['admin_error_logbook'] = "Tidak ada perubahan pada data!";
         }
     } else {
-        $_SESSION['error_message'] = "Error: " . mysqli_error($koneksi);
+        $_SESSION['admin_error_logbook'] = "Error: " . mysqli_error($koneksi);
     }
 
     header("Location: datalogbook.php");
@@ -118,7 +118,7 @@ if (isset($_GET['id_logbook'])) {
 
     mysqli_query($koneksi, "DELETE FROM logbook WHERE id_logbook='$id_logbook'");
     if ($result) {
-        $_SESSION['success_message'] = "Data Logbook Berhasil Dihapus!";
+        $_SESSION['admin_success_logbook'] = "Data Logbook Berhasil Dihapus!";
         header("Location: datalogbook.php");
         exit();
     }
@@ -164,14 +164,14 @@ $koneksi->close();
                         </div>
                         <div class="card-body">
                             <?php
-                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
-                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
-                                unset($_SESSION['error_message']);
+                            if (isset($_SESSION['admin_error_logbook']) && !empty($_SESSION['admin_error_logbook'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['admin_error_logbook'] . '</div>';
+                                unset($_SESSION['admin_error_logbook']);
                             }
 
-                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
-                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
-                                unset($_SESSION['success_message']);
+                            if (isset($_SESSION['admin_success_logbook']) && !empty($_SESSION['admin_success_logbook'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['admin_success_logbook'] . '</div>';
+                                unset($_SESSION['admin_success_logbook']);
                             }
                             ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -385,18 +385,7 @@ $koneksi->close();
                     </div>
                 </div>
             </div>
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
     <?php include 'footer.php'; ?>

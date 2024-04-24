@@ -9,27 +9,25 @@ if (empty($id_user)) {
     exit;
 }
 
-$nama = isset($_SESSION['username']) ? $_SESSION['username'] : '';
+$id_siswa = isset($_GET['id_siswa']) ? $_GET['id_siswa'] : '';
 
-$query = "SELECT laporan_pkl.*, siswa.*, user.username, user.id_user, pkl.*
+$query = "SELECT laporan_pkl.*, siswa.*, user.username, user.id_user, pkl.*, mitra.nama
 FROM laporan_pkl
 INNER JOIN siswa ON laporan_pkl.id_siswa = siswa.id_siswa
 INNER JOIN user ON siswa.id_user = user.id_user
 INNER JOIN pkl ON pkl.id_siswa = siswa.id_siswa
-WHERE user.username = ?
-";
+INNER JOIN mitra ON mitra.id_mitra = pkl.id_mitra
+WHERE siswa.id_siswa = ?";
 
 $stmt = $koneksi->prepare($query);
 if (!$stmt) {
-    die("Query failed: " . $koneksi->error); // Menampilkan pesan kesalahan jika query gagal
+    die("Query failed: " . $koneksi->error); 
 }
 
-// Binding parameter
-$stmt->bind_param("s", $nama);
-// Eksekusi statement
+$stmt->bind_param("i", $id_siswa);
 $stmt->execute();
-// Menyimpan hasil query
 $result = $stmt->get_result();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -79,14 +77,7 @@ $result = $stmt->get_result();
                     <li><a href="detailsiswa.php">Detail Aktivitas</a></li>
                 </ol>
                 <h2>
-                    <?php
-                    if (isset($_SESSION['username'])) {
-                        $nama_siswa = $_SESSION['username'];
-                        echo '<h2>Hallo ' . $nama_siswa . '</h2>';
-                    } else {
-                        echo '<h2>Hallo</h2>';
-                    }
-                    ?>
+                    SMK Al-Muhajirin
                 </h2>
             </div>
         </section>
@@ -170,7 +161,7 @@ $result = $stmt->get_result();
                                         <tr>
                                             <td><label for="">Tempat Praktik Kerja Lapangan</label></td>
                                             <td>
-                                                <?php echo $row['nama_perusahaan'] ?>
+                                                <?php echo $row['nama'] ?>
                                             </td>
                                         </tr>
                                         <tr>

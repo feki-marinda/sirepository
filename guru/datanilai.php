@@ -2,14 +2,14 @@
 session_start();
 include('conn.php');
 
-$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
+$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 
-if (empty($status)) {
+if (empty($username)) {
     header("Location: ../index.php");
     exit;
 }
 
-$success_message = '';
+$guru_nilai_success = '';
 $query = "SELECT nilai_pkl.id_nilai, nilai_pkl.nilai, siswa.id_siswa, siswa.Nama_siswa, indikator.id_indikator, indikator.indikator 
 FROM nilai_PKL 
 INNER JOIN siswa ON nilai_pkl.id_siswa = siswa.id_siswa 
@@ -24,12 +24,10 @@ if (!$result) {
 if (isset($_POST['TambahNilai'])) {
     $id_siswa = $_POST['id_siswa'];
 
-    // Looping untuk menangkap nilai dari setiap indikator
     for ($i = 0; $i < 10; $i++) {
         $id_indikator = $_POST['id_indikator' . $i];
         $nilai = $_POST['nilai' . $i];
 
-        // Query untuk menyimpan nilai siswa ke dalam tabel nilai_pkl
         $query_insert = "INSERT INTO nilai_pkl (id_siswa, id_indikator, nilai) VALUES ('$id_siswa', '$id_indikator', '$nilai')";
         $result_insert = mysqli_query($koneksi, $query_insert);
 
@@ -38,13 +36,11 @@ if (isset($_POST['TambahNilai'])) {
         }
     }
 
-    // Jika berhasil menambahkan nilai, arahkan pengguna ke halaman yang sesuai
-    header("Location: datatanilai.php");
+    header("Location: datanilai.php");
     exit();
 }
 
 if (isset($_POST['EditNilai'])) {
-    // Ambil data dari formulir edit
     $id_nilai = $_POST['id_nilai'];
     $id_siswa = $_POST['id_siswa'];
 
@@ -55,7 +51,7 @@ if (isset($_POST['EditNilai'])) {
         mysqli_query($koneksi, "UPDATE nilai_pkl SET id_siswa = '$id_siswa', id_indikator = '$id_indikator', nilai = '$nilai' WHERE id_nilai = '$id_nilai'");
     }
 
-    $_SESSION['success_message'] = "Data nilai telah berhasil diperbarui.";
+    $_SESSION['guru_nilai_success'] = "Data nilai telah berhasil diperbarui.";
     header("Location: datanilai.php");
     exit();
 }
@@ -65,11 +61,11 @@ if (isset($_GET['id_siswa'])) {
     $delete_query = "DELETE FROM nilai_pkl WHERE id_siswa='$id_siswa'";
 
     if (mysqli_query($koneksi, $delete_query)) {
-        $_SESSION['success_message'] = "Berhasil Menghapus Data Nilai!";
+        $_SESSION['guru_nilai_success'] = "Berhasil Menghapus Data Nilai!";
         header("Location: datanilai.php");
         exit();
     } else {
-        $_SESSION['error_message'] = "Error: Tidak Dapat Menghapus Data Nilai !";
+        $_SESSION['guru_nilai_error'] = "Error: Tidak Dapat Menghapus Data Nilai !";
         header("Location: datanilai.php");
         exit();
     }
@@ -116,14 +112,14 @@ if (isset($_GET['id_siswa'])) {
                         </div>
                         <div class="card-body">
                             <?php
-                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
-                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
-                                unset($_SESSION['error_message']);
+                            if (isset($_SESSION['guru_nilai_error']) && !empty($_SESSION['guru_nilai_error'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['guru_nilai_error'] . '</div>';
+                                unset($_SESSION['guru_nilai_error']);
                             }
 
-                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
-                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
-                                unset($_SESSION['success_message']);
+                            if (isset($_SESSION['guru_nilai_success']) && !empty($_SESSION['guru_nilai_success'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['guru_nilai_success'] . '</div>';
+                                unset($_SESSION['guru_nilai_success']);
                             }
                             ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -248,18 +244,7 @@ if (isset($_GET['id_siswa'])) {
             </div>
 
 
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

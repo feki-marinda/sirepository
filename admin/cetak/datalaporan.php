@@ -41,7 +41,7 @@ $html = '
 <th>No.</th>
 <th>Nama Lengkap</th>
 <th>Judul Laporan</th>
-<th>Tanggal Pengupulan</th>
+<th>Tanggal Pengumpulan</th>
 <th>status</th>
 </tr>
     </thead>';

@@ -4,7 +4,9 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 
 include '../conn.php';
-$query = "SELECT siswa.Nama_siswa, pkl.id_pkl, pkl.id_siswa, pkl.tgl_mulai, pkl.tgl_selesai, pkl.kelas, pkl.nama_perusahaan, pkl.tahun_pelajaran FROM pkl INNER JOIN siswa ON siswa.id_siswa = pkl.id_siswa";
+$query = "SELECT siswa.Nama_siswa, pkl.id_pkl, pkl.id_siswa, pkl.tgl_mulai, pkl.tgl_selesai, pkl.kelas, pkl.tahun_pelajaran, mitra.nama
+FROM pkl INNER JOIN siswa ON siswa.id_siswa = pkl.id_siswa
+INNER JOIN mitra ON mitra.id_mitra = pkl.id_mitra";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {
@@ -55,7 +57,7 @@ $html = '
             <td>' . $row['tgl_mulai'] . '</td>
         <td>' . $row['tgl_selesai'] . '</td>
         <td>' . $row['kelas'] . '</td>
-        <td>' . $row['nama_perusahaan'] . '</td>
+        <td>' . $row['nama'] . '</td>
         <td>' . $row['tahun_pelajaran'] . '</td>
         </tr>';
     }

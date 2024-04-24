@@ -35,7 +35,7 @@ if (isset($_GET['tahun_pelajaran'])) {
                     </ol>
 
                     <div class="card mb-4 text-center">
-                        <h3><strong>Data Laporan PKL Siwsa SMK Al-Muhajirin <br> Tahun
+                        <h3><strong>Data Laporan PKL Siswa SMK Al-Muhajirin <br> Tahun
                                 <?php echo $tahun_pelajaran; ?>
                             </strong></h3>
                     </div>
@@ -95,20 +95,7 @@ if (isset($_GET['tahun_pelajaran'])) {
                 </div>
             </main>
 
-
-
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
     <?php include 'footer.php'; ?>

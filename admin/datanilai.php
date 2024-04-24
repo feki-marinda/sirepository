@@ -9,7 +9,7 @@ if (empty($status)) {
     exit;
 }
 
-$success_message = '';
+$admin_seccess_nilai = '';
 $query = "SELECT nilai_pkl.id_nilai, nilai_pkl.nilai, siswa.id_siswa, siswa.Nama_siswa, indikator.id_indikator, indikator.indikator 
 FROM nilai_PKL 
 INNER JOIN siswa ON nilai_pkl.id_siswa = siswa.id_siswa 
@@ -31,14 +31,18 @@ if (isset($_POST['TambahNilai'])) {
         $query_insert = "INSERT INTO nilai_pkl (id_siswa, id_indikator, nilai) VALUES ('$id_siswa', '$id_indikator', '$nilai')";
         $result_insert = mysqli_query($koneksi, $query_insert);
 
-        if (!$result_insert) {
-            die('Error: ' . mysqli_error($koneksi));
+        if ($result_insert) {
+            $_SESSION['admin_success_nilai'] = "Data Nilai berhasil ditambahkan!";
+        } else {
+            $_SESSION['admin_error_nilai'] = "Error: " . mysqli_error($koneksi);
+            break; 
         }
     }
 
-    header("Location: datatanilai.php");
+    header("Location: datanilai.php");
     exit();
 }
+
 
 if (isset($_POST['EditNilai'])) {
     $id_nilai = $_POST['id_nilai'];
@@ -51,7 +55,7 @@ if (isset($_POST['EditNilai'])) {
         mysqli_query($koneksi, "UPDATE nilai_pkl SET id_siswa = '$id_siswa', id_indikator = '$id_indikator', nilai = '$nilai' WHERE id_nilai = '$id_nilai'");
     }
 
-    $_SESSION['success_message'] = "Data nilai telah berhasil diperbarui.";
+    $_SESSION['admin_seccess_nilai'] = "Data nilai telah berhasil diperbarui.";
     header("Location: datanilai.php");
     exit();
 }
@@ -61,11 +65,11 @@ if (isset($_GET['id_siswa'])) {
     $delete_query = "DELETE FROM nilai_pkl WHERE id_siswa='$id_siswa'";
 
     if (mysqli_query($koneksi, $delete_query)) {
-        $_SESSION['success_message'] = "Berhasil Menghapus Data Nilai!";
+        $_SESSION['admin_seccess_nilai'] = "Berhasil Menghapus Data Nilai!";
         header("Location: datanilai.php");
         exit();
     } else {
-        $_SESSION['error_message'] = "Error: Tidak Dapat Menghapus Data Nilai !";
+        $_SESSION['admin_error_nilai'] = "Error: Tidak Dapat Menghapus Data Nilai !";
         header("Location: datanilai.php");
         exit();
     }
@@ -99,13 +103,7 @@ if (isset($_GET['id_siswa'])) {
                             <div class="buttons-right">
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
-                                    Tambah Data Nilai PKL</button>
-                                <button id="printButton">
-                                    <a href="cetak/datanilai.php" style="text-decoration: none; color: inherit;"
-                                        target="_blank">
-                                        <i class="fas fa-print"></i> Cetak
-                                    </a>
-                                </button>
+                                    Tambah Data Nilai PKL</button>                                
                             </div>
                         </div>
                     </div>
@@ -117,14 +115,14 @@ if (isset($_GET['id_siswa'])) {
                         </div>
                         <div class="card-body">
                             <?php
-                            if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
-                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
-                                unset($_SESSION['error_message']);
+                            if (isset($_SESSION['admin_error_nilai']) && !empty($_SESSION['admin_error_nilai'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['admin_error_nilai'] . '</div>';
+                                unset($_SESSION['admin_error_nilai']);
                             }
 
-                            if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
-                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
-                                unset($_SESSION['success_message']);
+                            if (isset($_SESSION['admin_seccess_nilai']) && !empty($_SESSION['admin_seccess_nilai'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['admin_seccess_nilai'] . '</div>';
+                                unset($_SESSION['admin_seccess_nilai']);
                             }
                             ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
@@ -201,7 +199,7 @@ if (isset($_GET['id_siswa'])) {
                                     <label for="id_siswa" class="col-form-label">Nama Siswa :</label>
                                     <select name="id_siswa" id="id_siswa" class="form-control" required>
                                         <?php
-                                        $query_siswa = "SELECT * FROM siswa";
+                                        $query_siswa = "SELECT * FROM siswa INNER JOIN PKL ON siswa.id_siswa=PKL.id_siswa";
                                         $result_siswa = $koneksi->query($query_siswa);
                                         while ($row_siswa = mysqli_fetch_assoc($result_siswa))
                                             echo "<option value='" . $row_siswa['id_siswa'] . "'>" . $row_siswa['Nama_siswa'] . "</option>";
@@ -247,20 +245,7 @@ if (isset($_GET['id_siswa'])) {
                     </div>
                 </div>
             </div>
-
-
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

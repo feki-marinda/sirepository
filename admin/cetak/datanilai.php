@@ -9,9 +9,10 @@ if (empty($id_user)) {
     header("Location: index.php");
     exit;
 }
-$query_siswa = "SELECT siswa.Nama_siswa, pkl.nama_perusahaan, siswa.NIS FROM siswa 
+$query_siswa = "SELECT siswa.Nama_siswa, siswa.NIS, mitra.nama FROM siswa 
 INNER JOIN user ON user.id_user=siswa.id_user
-INNER JOIN pkl ON siswa.id_siswa=pkl.id_siswa WHERE user.id_user = '$id_user'";
+INNER JOIN pkl ON siswa.id_siswa=pkl.id_siswa
+INNER JOIN mitra ON pkl.id_mitra=mitra.id_mitra WHERE user.id_user = '$id_user'";
 $result_siswa = mysqli_query($koneksi, $query_siswa);
 
 if (!$result_siswa) {
@@ -20,10 +21,9 @@ if (!$result_siswa) {
 
 $row_siswa = mysqli_fetch_assoc($result_siswa);
 $nama_siswa = $row_siswa['Nama_siswa'];
-$tempat_pkl = $row_siswa['nama_perusahaan'];
+$tempat_pkl = $row_siswa['nama'];
 $nis = $row_siswa['NIS'];
 
-$nama = isset($_SESSION['username']) ? $_SESSION['username'] : '';
 $query = "SELECT indikator.indikator, nilai_pkl.nilai
 FROM indikator 
 INNER JOIN nilai_pkl ON nilai_pkl.id_indikator = indikator.id_indikator

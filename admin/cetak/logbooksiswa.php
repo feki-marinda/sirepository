@@ -3,31 +3,17 @@ session_start();
 require_once __DIR__ . '/../../vendor/autoload.php';
 include '../conn.php';
 
-$id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
 
-if (empty($id_user)) {
-    header("Location: index.php");
+if (empty($status)) {
+    header("Location: ../index.php");
     exit;
 }
 
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
-
-$query = "SELECT
-            siswa.Nama_siswa,
-            siswa.NIS,
-            siswa.kelas,
-            pkl.nama_perusahaan,
-            logbook.tanggal,
-            logbook.aktivitas,
-            logbook.dokumentasi,
-            logbook.status_logbook
-        FROM
-            user
-        JOIN siswa ON user.id_user = siswa.id_user
-        JOIN pkl ON siswa.id_siswa = pkl.id_siswa
-        JOIN logbook ON siswa.id_siswa = logbook.id_siswa
-        WHERE user.username = '$username';";
-
+$query = "SELECT logbook.*, pkl.*, siswa.*
+FROM logbook
+INNER JOIN pkl ON logbook.id_pkl = pkl.id_pkl
+INNER JOIN siswa ON pkl.id_siswa = siswa.id_siswa;";
 $result = mysqli_query($koneksi, $query);
 
 if (!$result) {

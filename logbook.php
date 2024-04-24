@@ -9,8 +9,6 @@ if (empty($id_user)) {
     exit;
 }
 
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
-
 include 'conn.php';
 
 ?>
@@ -44,14 +42,7 @@ include 'conn.php';
                 </ol>
 
                 <h2>
-                    <?php
-                    if (isset($_SESSION['username'])) {
-                        $nama_siswa = $_SESSION['username'];
-                        echo '<h2>Hallo ' . $nama_siswa . '</h2>';
-                    } else {
-                        echo '<h2>Hallo</h2>';
-                    }
-                    ?>
+                    SMK Al-Muhajirin
                 </h2>
 
             </div>
@@ -76,7 +67,7 @@ include 'conn.php';
                             <i class="fal fa-plus"></i> Isi Logbook
                         </a>
                         <button id="printButton" class="btn btn-lg btn-success">
-                            <a href="admin/cetak/logbooksiswa.php" style="text-decoration: none; color: inherit;"
+                            <a href="cetak/logbook.php" style="text-decoration: none; color: inherit;"
                                 target="_blank">
                                 <i class="fas fa-print"></i> Cetak
                             </a>
@@ -97,6 +88,7 @@ include 'conn.php';
                         <tbody>
                             <?php
                             $query = "SELECT
+                            user.id_user,
                     siswa.Nama_siswa,
                     logbook.tanggal,
                     logbook.aktivitas,
@@ -106,7 +98,7 @@ include 'conn.php';
                     user
                 JOIN siswa ON user.id_user = siswa.id_user
                 JOIN logbook ON siswa.id_siswa = logbook.id_siswa
-                WHERE user.username = '$username';";
+                WHERE user.id_user = '$id_user';";
 
                             $result = $koneksi->query($query);
 

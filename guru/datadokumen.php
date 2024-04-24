@@ -9,13 +9,17 @@ if (empty($username)) {
     exit;
 }
 
+$success_dokumen = $error_dokumen = '';
+
 $query = "SELECT * FROM dokumen";
 $result = $koneksi->query($query);
 
 if (!$result) {
     die("Error: " . $koneksi->error);
 }
-$ekstensi_dokumen = array('pdf', 'doc', 'docx', 'xls', 'xlsx');
+$ekstensi_dokumen = array('pdf', 'doc', 'docx');
+
+
 if (isset($_POST['TambahDokumen'])) {
     $judul_dokumen = $_POST['judul_dokumen'];
     $rand = rand();
@@ -24,21 +28,24 @@ if (isset($_POST['TambahDokumen'])) {
     $ext_dokumen = pathinfo($filename_dokumen, PATHINFO_EXTENSION);
 
     if (!in_array($ext_dokumen, $ekstensi_dokumen)) {
-        echo "error: ekstensi dokumen tidak diizinkan";
+        echo "Error: Ekstensi dokumen tidak diizinkan";
     } else {
         if ($ukuran_dokumen < 208815000) {
             $file_dokumen = $rand . '_' . $filename_dokumen;
-            $upload_dir = 'Dokumen/';
+            $upload_dir = '../admin/Dokumen/';
 
             if (move_uploaded_file($_FILES['Dokumen']['tmp_name'], $upload_dir . $file_dokumen)) {
                 $query = "INSERT INTO dokumen (judul_dokumen, Dokumen) 
                           VALUES ('$judul_dokumen', '$file_dokumen')";
 
                 if ($koneksi->query($query) === TRUE) {
-                    header('Location: datadokumen.php');
-                    exit;
+                    $_SESSION['success_dokumen'] = "Dokumen Berhasil Ditambahkan!";
+                    header("Location: datadokumen.php");
+                    exit();
                 } else {
-                    echo 'Error: ' . $koneksi->error;
+                    $_SESSION['error_dokumen'] = "Error: " . $koneksi->error;
+                    header("Location: datadokumen.php");
+                    exit();
                 }
             } else {
                 echo 'Error saat mengunggah file.';
@@ -53,69 +60,69 @@ if (isset($_POST['EditDokumen'])) {
     $id_dokumen = $_POST['id_dokumen'];
     $judul_dokumen = $_POST['judul_dokumen'];
 
-    if ($_FILES['Dokumen']['name'] != "") {
-        $file_name = $_FILES['Dokumen']['name'];
-        $file_tmp = $_FILES['Dokumen']['tmp_name'];
+    if (!empty($_FILES['Dokumen']['name'])) {
+        $rand = rand();
+        $filename_dokumen = $_FILES['Dokumen']['name'];
+        $ukuran_dokumen = $_FILES['Dokumen']['size'];
+        $ext_dokumen = pathinfo($filename_dokumen, PATHINFO_EXTENSION);
 
-        $file_destination = 'Dokumen/' . $file_name;
-        move_uploaded_file($file_tmp, $file_destination);
+        if (
+            !in_array($ext_dokumen, $ekstensi_dokumen) || $ukuran_dokumen >= 208815000 ||
+            !move_uploaded_file($_FILES['Dokumen']['tmp_name'], '../admin/Dokumen/' . ($file_dokumen = $rand . '_' . $filename_dokumen))
+        ) {
+            $_SESSION['error_dokumen'] = "Error: Gagal mengunggah file.";
+            header("Location: datadokumen.php");
+            exit();
+        }
 
-        $old_file = mysqli_fetch_array(mysqli_query($koneksi, "SELECT Dokumen FROM dokumen WHERE id_dokumen='$id_dokumen'"));
-        if (is_file($old_file['Dokumen'])) {
-            unlink($old_file['Dokumen']);
+        $query = "UPDATE dokumen SET judul_dokumen = '$judul_dokumen', Dokumen = '$file_dokumen' WHERE id_dokumen = $id_dokumen";
+        if ($koneksi->query($query) === TRUE) {
+            $_SESSION['success_dokumen'] = "Dokumen Berhasil Diubah!";
+        } else {
+            $_SESSION['error_dokumen'] = "Error: " . $koneksi->error;
         }
     } else {
-        $link = 'Dokumen/' . $_POST['Dokumen'];
+        $queryCheck = "SELECT judul_dokumen FROM dokumen WHERE id_dokumen = $id_dokumen";
+        $resultCheck = $koneksi->query($queryCheck);
+
+        if ($resultCheck->num_rows > 0) {
+            $dataDokumen = $resultCheck->fetch_assoc();
+
+            if ($dataDokumen['judul_dokumen'] === $judul_dokumen) {
+                $_SESSION['error_dokumen'] = "Tidak Ada Perubahan Data yang Dilakukan.";
+                header("Location: datadokumen.php");
+                exit();
+            }
+
+            $query = "UPDATE dokumen SET judul_dokumen = '$judul_dokumen' WHERE id_dokumen = $id_dokumen";
+            if ($koneksi->query($query) === TRUE) {
+                $_SESSION['success_dokumen'] = "Judul dokumen berhasil diubah!";
+            } else {
+                $_SESSION['error_dokumen'] = "Error: " . $koneksi->error;
+            }
+        } else {
+            $_SESSION['error_dokumen'] = "Error: Dokumen tidak ditemukan.";
+        }
     }
 
-    $queryEdit = "UPDATE dokumen SET judul_dokumen='$judul_dokumen', Dokumen='$file_name' WHERE id_dokumen='$id_dokumen'";
-    if ($koneksi->query($queryEdit) === TRUE) {
-        header("location: datadokumen.php");
-        exit;
-    } else {
-        echo 'Error: ' . $koneksi->error;
-    }
+    header("Location: datadokumen.php");
+    exit();
 }
-
 
 
 if (isset($_GET['id_dokumen'])) {
     $id_dokumen = $_GET['id_dokumen'];
 
-    $query_select = "SELECT * FROM dokumen WHERE id_dokumen='$id_dokumen'";
-    $result_select = $koneksi->query($query_select);
-
-    if ($result_select->num_rows > 0) {
-        $row_select = $result_select->fetch_assoc();
-        $file_to_delete = $row_select['Dokumen'];
-
-        $file_path = 'Dokumen/' . $file_to_delete;
-        if (file_exists($file_path)) {
-            unlink($file_path);
-        }
-
-        $query_delete = "DELETE FROM dokumen WHERE id_dokumen='$id_dokumen'";
-        if ($koneksi->query($query_delete) === TRUE) {
-            header("location: datadokumen.php");
-            exit;
-        } else {
-            echo 'Error: ' . $koneksi->error;
-        }
-    } else {
-        echo 'Dokumen tidak ditemukan.';
+    mysqli_query($koneksi, "DELETE FROM dokumen WHERE id_dokumen='$id_dokumen'");
+    if ($result) {
+        $_SESSION['success_dokumen'] = "Dokumen berhasil dihapus!";
+        header("Location: datadokumen.php");
+        exit();
     }
+
 }
 
-
 ?>
-
-<style>
-    body, table{
-        font-family: "Poppins", sans-serif;
-    }
-    .form,label,input{
-        font-family: "Poppins", sans-serif;
-    }
 </style>
 
 <!DOCTYPE html>
@@ -143,9 +150,7 @@ if (isset($_GET['id_dokumen'])) {
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                                     data-bs-target="#tambah" data-bs-whatever="@mdo"> <i class="fas fa-plus"></i>
                                     Tambah Data Dokumen</button>
-                                <button id="printButton">
-                                    <i class="fas fa-print"></i> Cetak
-                                </button>
+                                
                             </div>
                         </div>
                     </div>
@@ -153,9 +158,20 @@ if (isset($_GET['id_dokumen'])) {
                     <div class="card mb-4">
                         <div class="card-header">
                             <i class="fas fa-table me-1"></i>
-                            Data Dokumen PKL
+                            Data Dokumen Praktek Kerja Lapangan
                         </div>
                         <div class="card-body">
+                            <?php
+                            if (isset($_SESSION['error_dokumen']) && !empty($_SESSION['error_dokumen'])) {
+                                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_dokumen'] . '</div>';
+                                unset($_SESSION['error_dokumen']);
+                            }
+
+                            if (isset($_SESSION['success_dokumen']) && !empty($_SESSION['success_dokumen'])) {
+                                echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_dokumen'] . '</div>';
+                                unset($_SESSION['success_dokumen']);
+                            }
+                            ?>
                             <table id="datatablesSimple" class="table table-striped table-hover">
                                 <thead>
                                     <tr>
@@ -171,16 +187,19 @@ if (isset($_GET['id_dokumen'])) {
                                     $no = 1;
                                     $query = "SELECT * FROM dokumen";
                                     $result = mysqli_query($koneksi, $query);
-
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         echo "<tr>";
                                         echo "<td>" . $no++ . "</td>";
                                         echo "<td>" . $row['judul_dokumen'] . "</td>";
-                                        echo "<td><a href='Dokumen/" . $row['Dokumen'] . "' target='_blank'>" . $row['judul_dokumen'] . "</a></td>";
+                                        echo "<td><a href='" . '../admin/Dokumen' . '/' . $row['Dokumen'] . "' target='_blank'>" . $row['Dokumen'] . "</a></td>";
                                         echo "<td>";
-                                        echo "<div class='btn-group'>";
-                                        echo "<button type='button' class='btn btn-primary' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_dokumen'] . "' data-bs-whatever='@mdo'><i class='nav-icon fas fa-edit'></i> Edit</button>";
-                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_dokumen'] . "'><i class='nav-icon fas fa-trash-alt'></i> Hapus</button>";
+                                        echo "<div class='d-flex'>";
+                                        echo "<button type='button' class='btn btn-primary me-2' data-bs-toggle='modal' data-bs-target='#edit" . $row['id_dokumen'] . "' data-bs-whatever='@mdo'>";
+                                        echo "<i class='fas fa-pencil-alt'></i> Edit";
+                                        echo "</button>";
+                                        echo "<button type='button' class='btn btn-danger' data-bs-toggle='modal' data-bs-target='#hapus" . $row['id_dokumen'] . "'>";
+                                        echo "<i class='fas fa-trash'></i> Hapus";
+                                        echo "</button>";
                                         echo "</div>";
                                         echo "</td>";
                                         echo "</tr>";
@@ -193,7 +212,7 @@ if (isset($_GET['id_dokumen'])) {
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data dokumen
+                                                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data Dokumen
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -213,10 +232,10 @@ if (isset($_GET['id_dokumen'])) {
 
                                         <div class='modal fade' id='edit<?= $row['id_dokumen'] ?>' tabindex='-1'
                                             aria-labelledby='exampleModalLabel' aria-hidden='true'>
-                                            <div class="modal-dialog">
+                                            <div class="modal-dialog modal-lg">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data dokumen
+                                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Dokumen
                                                         </h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                             aria-label="Close"></button>
@@ -225,10 +244,9 @@ if (isset($_GET['id_dokumen'])) {
                                                         <form method="post" action="#" enctype="multipart/form-data">
                                                             <div class="form-group">
                                                                 <div class="form-group">
-                                                                    <label for="id_dokumen">ID</label>
                                                                     <input type="text" class="form-control" id="id_dokumen"
                                                                         value="<?= $row['id_dokumen']; ?>" name="id_dokumen"
-                                                                        readonly>
+                                                                        hidden>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="judul_dokumen">Judul</label>
@@ -238,12 +256,22 @@ if (isset($_GET['id_dokumen'])) {
                                                                         name="judul_dokumen" required>
                                                                 </div>
                                                                 <div class="mb-3">
-                                                                    <label for="Dokumen" class="col-form-label">Dokumen :</label>
-                                                                    <input type="file" class="form-control" id="Dokumen"
-                                                                        name="Dokumen" accept=".doc, .docx, .pdf" required>
-                                                                    <small class="form-text text-muted">Pilih file Word
-                                                                        (doc/docx) atau PDF.</small>
+                                                                    <label for="Dokumen" class="col-form-label">Dokumen
+                                                                        : <small>(Abaikan Jika Tidak Merubah Dokumen.)</small></label>
+                                                                        <input type="file" class="form-control" id="Dokumen"
+                                                                        name="Dokumen" accept=".doc, .docx, .pdf">
+                                                                        <small>
+                                                                        <?php
+                                                                    $currentDocument = $row['Dokumen'];
+                                                                    if (!empty($currentDocument)) {
+                                                                        echo '<p>Dokumen Saat Ini: <a href="Dokumen/' . $currentDocument . '" target="_blank">' . $currentDocument . '</a></p>';
+                                                                    }
+                                                                    ?>
+                                                                        </small>
+                                                                    
+                                                                    
                                                                 </div>
+
                                                                 <div class="modal-footer">
                                                                     <button type="button" class="btn btn-secondary"
                                                                         data-bs-dismiss="modal">Close</button>
@@ -269,12 +297,12 @@ if (isset($_GET['id_dokumen'])) {
 
 
             <!-- Modal tambah data-->
-            <div class="modal modal-fullscreen-xxl-down fade" id="tambah" tabindex="-1"
+            <div class="modal fade" id="tambah" tabindex="-1"
                 aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-fullscreen-xxl-down">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Tambah Data nilai</h5>
+                            <h5 class="modal-title" id="exampleModalLabel">Tambah Data Dokumen</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body ">
@@ -303,21 +331,10 @@ if (isset($_GET['id_dokumen'])) {
 
 
 
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+           
         </div>
     </div>
-    <?php include 'footer.php';?>
+    <?php include 'footer.php'; ?>
 </body>
 
 </html>

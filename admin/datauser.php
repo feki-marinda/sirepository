@@ -16,7 +16,7 @@ if (!$result) {
     die("Error in query: " . mysqli_error($koneksi));
 }
 
-$error_message = $success_message = '';
+$admin_error_user = $admin_success_user = '';
 
 if (isset($_POST['tambahuser'])) {
     $id_user = $_POST['id_user'];
@@ -27,11 +27,11 @@ if (isset($_POST['tambahuser'])) {
     $insert_query = "INSERT INTO user (id_user, username, password, status) VALUES ('$id_user','$username', '$password','$status')";
 
     if ($koneksi->query($insert_query) === TRUE) {
-        $_SESSION['success_message'] = "Berhasil Menambah Data User!";
+        $_SESSION['admin_success_user'] = "Berhasil Menambah Data User!";
         header("Location: datauser.php");
         exit();
     } else {
-        $_SESSION['error_message'] = "Error: " . $koneksi->error;
+        $_SESSION['admin_error_user'] = "Error: " . $koneksi->error;
         header("Location: datauser.php");
         exit();
     }
@@ -49,16 +49,16 @@ if (isset($_POST['edituser'])) {
         $rows_affected = $koneksi->affected_rows;
 
         if ($rows_affected > 0) {
-            $_SESSION['success_message'] = "Berhasil Memperbarui Data User!";
+            $_SESSION['admin_success_user'] = "Berhasil Memperbarui Data User!";
             header("Location: datauser.php");
             exit();
         } else {
-            $_SESSION['error_message'] = "Tidak ada perubahan pada Data User!";
+            $_SESSION['admin_error_user'] = "Tidak ada perubahan pada Data User!";
             header("Location: datauser.php");
             exit();
         }
     } else {
-        $_SESSION['error_message'] = "Error: " . $koneksi->error;
+        $_SESSION['admin_error_user'] = "Error: " . $koneksi->error;
         header("Location: datauser.php");
         exit();
     }
@@ -69,11 +69,11 @@ if (isset($_GET['id_user'])) {
     $delete_query = "DELETE FROM user WHERE id_user='$id_user'";
 
     if (mysqli_query($koneksi, $delete_query)) {
-        $_SESSION['success_message'] = "Berhasil Menghapus Data User!";
+        $_SESSION['admin_success_user'] = "Berhasil Menghapus Data User!";
         header("Location: datauser.php");
         exit();
     } else {
-        $_SESSION['error_message'] = "Error: Tidak Dapat Menghapus Data User yang terdaftar PKL !";
+        $_SESSION['admin_error_user'] = "Error: Tidak Dapat Menghapus Data User yang terdaftar PKL !";
         header("Location: datauser.php");
         exit();
     }
@@ -112,14 +112,14 @@ $koneksi->close();
                         </div>
                     </div>
                     <?php
-                    if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
-                        echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
-                        unset($_SESSION['error_message']);
+                    if (isset($_SESSION['admin_error_user']) && !empty($_SESSION['admin_error_user'])) {
+                        echo '<div class="alert alert-danger" role="alert">' . $_SESSION['admin_error_user'] . '</div>';
+                        unset($_SESSION['admin_error_user']);
                     }
 
-                    if (isset($_SESSION['success_message']) && !empty($_SESSION['success_message'])) {
-                        echo '<div class="alert alert-success" role="alert">' . $_SESSION['success_message'] . '</div>';
-                        unset($_SESSION['success_message']);
+                    if (isset($_SESSION['admin_success_user']) && !empty($_SESSION['admin_success_user'])) {
+                        echo '<div class="alert alert-success" role="alert">' . $_SESSION['admin_success_user'] . '</div>';
+                        unset($_SESSION['admin_success_user']);
                     }
                     ?>
                     <div class="card mb-4">
@@ -178,7 +178,7 @@ $koneksi->close();
                                                         <button type="button" class="btn btn-secondary"
                                                             data-bs-dismiss="modal">Tidak</button>
                                                         <a href="datauser.php?id_user=<?= $row['id_user'] ?>"
-                                                            class="btn btn-danger">Delete</a>
+                                                            class="btn btn-danger">Hapus</a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -283,18 +283,7 @@ $koneksi->close();
             </div>
 
 
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

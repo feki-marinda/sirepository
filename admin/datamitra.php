@@ -2,7 +2,7 @@
 session_start();
 include('conn.php');
 
-$status = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
+$status = isset($_SESSION['status']) ? $_SESSION['status'] : '';
 
 if (empty($status)) {
     header("Location: ../index.php");
@@ -21,7 +21,6 @@ if (isset($_POST['TambahMitra'])) {
     $alamat = $_POST['alamat'];
     $kontak = $_POST['kontak'];
 
-    // File upload handling
     $foto_nama = $_FILES['foto']['name'];
     $foto_tmp = $_FILES['foto']['tmp_name'];
     $foto_path = "../gambar/" . $foto_nama;
@@ -57,7 +56,6 @@ if (isset($_POST['EditMitra'])) {
         $foto_tmp = $_FILES['foto']['tmp_name'];
         $foto_path = "../gambar/" . $foto_nama;
 
-        // Pindahkan file ke direktori yang diinginkan
         if (move_uploaded_file($foto_tmp, $foto_path)) {
             // Update query dengan foto
             $query = "UPDATE mitra SET 
@@ -340,19 +338,7 @@ if (isset($_GET['id_mitra'])) {
                 </div>
             </div>
 
-
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            
         </div>
     </div>
     <?php include 'footer.php'; ?>

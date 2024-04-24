@@ -27,16 +27,7 @@ if (empty($id_user)) {
           <li><a href="index.php">Home</a></li>
           <li><a href="about.php">Logbook</a></li>
         </ol>
-        <h2>
-          <?php
-          if (isset($_SESSION['username'])) {
-            $nama_siswa = $_SESSION['username'];
-            echo '<h2>Hallo ' . $nama_siswa . '</h2>';
-          } else {
-            echo '<h2>Hallo</h2>';
-          }
-          ?>
-        </h2>
+          
 
       </div>
     </section>
