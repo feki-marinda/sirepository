@@ -116,7 +116,7 @@ if (isset($_POST['EditLaporan'])) {
         <section id="blog" class="blog">
             <div class="container">
                 <div class="row">
-                    <div class="entries">
+                    <div class="entries table-responsive">
                         <?php
                         if (isset($_SESSION['error_message']) && !empty($_SESSION['error_message'])) {
                             echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error_message'] . '</div>';
@@ -128,7 +128,7 @@ if (isset($_POST['EditLaporan'])) {
                             unset($_SESSION['success_message']);
                         }
                         ?>
-                        <table class="table table-bordered">
+                        <table class="table table-responsive table-bordered">
                             <thead class="table-primary">
                                 <tr>
                                     <th>No.</th>
@@ -163,10 +163,8 @@ if (isset($_POST['EditLaporan'])) {
                                     echo "</td>";
                                     echo "<td>";
                                     if ($row['status'] == 'Terkirim' || $row['status'] == 'Diterima') {
-                                        // Jika status terkirim atau diterima, sembunyikan kolom catatan
                                         echo "<span style='display: none;'>" . $row['catatan'] . "</span>";
                                     } else {
-                                        // Jika tidak, tampilkan kolom catatan
                                         echo $row['catatan'];
                                     }
                                     echo "</td>";

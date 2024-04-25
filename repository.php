@@ -44,7 +44,7 @@ if (empty($id_user)) {
         </style>
 
         <div class="container">
-            <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
+            <div class="row ms-3 pb-5 me-3 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
                 <div class="col-md-9">
                     <h1 class="font-weight-bold text-left" style="font-size: 1.5 rem; color: #333;">
                         Berikut <span style="color: #FFD700;">Laporan</span> Praktik Kerja Lapangan
@@ -56,7 +56,7 @@ if (empty($id_user)) {
                 </div>
             </div>
             <br>
-            <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
+            <div class="row table-responsive ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
                 <table id="example" class="display">
                     <thead>
                         <tr class="table-primary">

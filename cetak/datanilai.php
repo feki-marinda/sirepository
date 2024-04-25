@@ -146,5 +146,5 @@ $html .= '
 
 $mpdf = new \Mpdf\Mpdf();
 $mpdf->WriteHTML($html);
-$mpdf->Output($nama_siswa . '-logbook.pdf', 'I');
+$mpdf->Output($nama_siswa . '-logbook.pdf', 'D');
 ?>

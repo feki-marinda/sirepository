@@ -8,7 +8,6 @@ if (empty($id_user)) {
     exit;
 }
 
-// Pastikan variabel $koneksi telah didefinisikan dengan benar
 if (!$koneksi) {
     die("Koneksi database gagal: " . mysqli_connect_error());
 }
@@ -40,7 +39,7 @@ if (!$result) {
     <div class="container">
         <div class="tab-content" id="v-pills-tabContent">
             <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
-                <div class="card-body">
+                <div class="card-body table-responsive">
                     <h3 class="card-title text-center">Informasi Data Siswa</h3>
                     <table class="table table-sm">
                         <?php

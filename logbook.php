@@ -59,84 +59,75 @@ include 'conn.php';
                 </h1>
             </div>
             <br>
+            
             <div class="ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow">
-                <div class="ms-2 pt-2 me-2 mb-3">
-                    <h2 class="text-center">Logbook Harian</h2>
-                    <div class="d-flex justify-content-end">
-                        <a class="btn btn-primary btn-lg me-3" href="isilogbook.php" role="button">
-                            <i class="fal fa-plus"></i> Isi Logbook
-                        </a>
-                        <button id="printButton" class="btn btn-lg btn-success">
-                            <a href="cetak/logbook.php" style="text-decoration: none; color: inherit;"
-                                target="_blank">
-                                <i class="fas fa-print"></i> Cetak
-                            </a>
-                        </button>
-                    </div>
-                    <br>
+    <div class="ms-2 pt-2 me-2 mb-3">
+        <h2 class="text-center">Logbook Harian</h2>
+        <div class="d-flex justify-content-center flex-wrap mb-3">
+            <a class="btn btn-primary btn-lg me-3 mb-2" href="isilogbook.php" role="button">
+                <i class="fal fa-plus"></i> Isi Logbook
+            </a>
+            <button id="printButton" class="btn btn-lg btn-success mb-2">
+                <a href="cetak/logbook.php" style="text-decoration: none; color: inherit;" target="_blank">
+                    <i class="fas fa-print"></i> Cetak
+                </a>
+            </button>
+        </div>
+        
+        <div class="table-responsive">
+            <table id="example" class="table table-bordered">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Nama</th>
+                        <th>Tanggal</th>
+                        <th>Aktivitas</th>
+                        <th>Dokumentasi</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $query = "SELECT
+                        user.id_user,
+                        siswa.Nama_siswa,
+                        logbook.tanggal,
+                        logbook.aktivitas,
+                        logbook.dokumentasi,
+                        logbook.status_logbook
+                    FROM
+                        user
+                    JOIN siswa ON user.id_user = siswa.id_user
+                    JOIN logbook ON siswa.id_siswa = logbook.id_siswa
+                    WHERE user.id_user = '$id_user';";
 
-                    <table id="example" class="display" style="table-layout: fixed; width: 100%;">
-                        <thead class="table-primary">
-                            <tr>
-                                <th style="width: 25%;">Nama</th>
-                                <th style="width: 15%;">Tanggal</th>
-                                <th style="width: 25%;">Aktivitas</th>
-                                <th style="width: 25%;">Dokumentasi</th>
-                                <th style="width: 10%;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $query = "SELECT
-                            user.id_user,
-                    siswa.Nama_siswa,
-                    logbook.tanggal,
-                    logbook.aktivitas,
-                    logbook.dokumentasi,
-                    logbook.status_logbook
-                FROM
-                    user
-                JOIN siswa ON user.id_user = siswa.id_user
-                JOIN logbook ON siswa.id_siswa = logbook.id_siswa
-                WHERE user.id_user = '$id_user';";
+                    $result = $koneksi->query($query);
 
-                            $result = $koneksi->query($query);
-
-                            if ($result) {
-                                while ($row = $result->fetch_assoc()) {
-                                    ?>
-                                    <tr>
-                                        <td style="width: 25%;">
-                                            <?php echo $row['Nama_siswa']; ?>
-                                        </td>
-                                        <td style="width: 15%;">
-                                            <?php echo date('d F Y', strtotime($row['tanggal'])); ?>
-                                        </td>
-                                        <td style="width: 25%; text-align: justify;">
-                                            <?php echo $row['aktivitas']; ?>
-                                        </td>
-                                        <td style="width: 25%;">
-                                            <?php echo "<img src='Logbook/" . $row['dokumentasi'] . "' style='max-width: 30%; height: auto;' class='img-responsive'>"; ?>
-                                        </td>
-                                        <td style="width: 10%;">
-                                            <?php echo $row['status_logbook']; ?>
-                                        </td>
-                                    </tr>
-                                    <?php
-                                }
-                            } else {
-                                echo "Error executing query: " . $koneksi->error;
-                            }
-
-                            $koneksi->close();
+                    if ($result) {
+                        while ($row = $result->fetch_assoc()) {
                             ?>
-                        </tbody>
-                    </table>
+                            <tr>
+                                <td><?php echo $row['Nama_siswa']; ?></td>
+                                <td><?php echo date('d F Y', strtotime($row['tanggal'])); ?></td>
+                                <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?php echo $row['aktivitas']; ?></td>
+                                <td>
+                                    <?php echo "<img src='Logbook/" . $row['dokumentasi'] . "' style='max-width: 100px; height: auto;' class='img-fluid'>"; ?>
+                                </td>
+                                <td><?php echo $row['status_logbook']; ?></td>
+                            </tr>
+                            <?php
+                        }
+                    } else {
+                        echo "Error executing query: " . $koneksi->error;
+                    }
 
+                    $koneksi->close();
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-
-                </div>
-            </div>
         </div>
         <script>
             $(document).ready(function () {

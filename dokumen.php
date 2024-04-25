@@ -62,7 +62,7 @@ if (empty($id_user)) {
                 </div>
             </div>
             <br>
-            <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
+            <div class="row ms-3 responsive-table pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
             <table id="example" class="display">
     <thead>
         <tr>
@@ -89,9 +89,10 @@ if (empty($id_user)) {
             echo "<td><a href='admin/Dokumen/{$row['Dokumen']}' target = _blank>
             Detail
           </a></td>";
-            echo "<td><a href='admin/Dokumen/{$row['Dokumen']}' class='btn btn-primary me-md-2' download>
-            Download <i class='fas fa-download'></i>
-          </a></td>";           
+          echo "<td><a href='admin/Dokumen/{$row['Dokumen']}' class='btn btn-primary me-md-2' download style='font-size: 0.8rem;'>
+          Download <i class='fas fa-download'></i>
+        </a></td>";
+         
             echo "</tr>";
         }
 

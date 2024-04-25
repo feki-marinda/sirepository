@@ -61,21 +61,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $status = $_POST['status_logbook'];
 
     $rand = rand();
-    $ekstensi = array('png', 'jpg', 'jpeg', 'gif', 'webp');
+    $ekstensi = array('png', 'jpg', 'jpeg');
     $ukuran = $_FILES['dokumentasi']['size'];
     $ext = pathinfo($dokumentasi, PATHINFO_EXTENSION);
 
-    $check_query = $koneksi->prepare("SELECT * FROM logbook WHERE tanggal = ? AND id_siswa = ? AND id_pkl = ? AND dokumentasi = ?");
-    $check_query->bind_param("ssss", $tanggal, $id_siswa, $id_pkl, $dokumentasi);
+    $check_query = $koneksi->prepare("SELECT * FROM logbook WHERE tanggal = ? AND id_siswa = ? AND id_pkl = ?");
+    $check_query->bind_param("sss", $tanggal, $id_siswa, $id_pkl);
     $check_query->execute();
     $result = $check_query->get_result();
 
     if ($result !== false) {
         if ($result->num_rows > 0) {
-            $show_modal = true;
+            // Menampilkan pesan kesalahan jika logbook sudah diisi untuk tanggal yang sama
+            $_SESSION['error'] = "Logbook sudah diisi untuk tanggal yang sama !";
+            header("Location: isilogbook.php");
+            exit();
         } else {
             if (!in_array($ext, $ekstensi)) {
-                echo "Error: Jenis file tidak didukung.";
+                $_SESSION['error'] = "Error: Jenis file tidak didukung ! Unggah Dokumentasi PNG/JPG/JPEG";
+                header("Location: isilogbook.php");
+                exit();
             } else {
                 if ($ukuran < 208815000) {
                     $xx = $rand . '_' . $dokumentasi;
@@ -88,22 +93,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         header("Location: logbook.php");
                         exit();
                     } else {
-                        echo "Error: Gagal menambahkan entri logbook.";
+                        $_SESSION['error'] = "Error: Gagal menambahkan entri logbook.";
+                        header("Location: isilogbook.php");
                         exit();
                     }
                 } else {
-                    echo "Error: Ukuran file terlalu besar.";
+                    $_SESSION['error'] = "Error: Ukuran file terlalu besar.";
+                    header("Location: isilogbook.php");
                     exit();
                 }
             }
         }
     } else {
-        echo "Error executing query: " . $koneksi->error;
+        $_SESSION['error'] = "Error executing query: " . $koneksi->error;
+        header("Location: isilogbook.php");
         exit();
     }
 }
 
 ?>
+
+
 
 
 <!DOCTYPE html>
@@ -138,81 +148,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         </style>
 
-        <div class="container">
-            <div class="row  ms-3 mb-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
-                <div class="col-md-9">
-
-                    <h1 class="font-weight-bold text-left" style="font-size: 2.5rem; color: #333;">
-                        Bagaimana <span style="color: #FFD700;">Kegiatanmu</span> Hari ini ?
-                    </h1><br>
-                </div>
-                </div>
-                
-            <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
-            <form method="post" action="#" enctype="multipart/form-data">
-                    <input type="hidden" name="id_siswa" value="<?php echo $_SESSION['id_siswa']; ?>">
-                    <input type="hidden" name="id_pkl" value="<?php echo $_SESSION['id_pkl']; ?>">
-                    <div class="d-flex">
-                        <div class="col-6 mb-3 me-3">
-                            <label for="tanggal" class="form-label fw-bold">Tanggal Kegiatan</label>
-                            <input type="date" class="form-control" id="tanggal" name="tanggal" required>
-                        </div>
-                        <div class="col-6 mb-3 ">
-                            <label for="dokumentasi" class="form-label fw-bold">Dokumentasi</label>
-                            <input type="file" class="form-control" id="dokumentasi" name="dokumentasi" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="aktivitas" class="form-label fw-bold">Deskripsikan
-                            Aktivitasmu</label>
-                        <textarea class="form-control" id="aktivitas" rows="3" placeholder="Deskripsikan Kegiatanmu"
-                            name="aktivitas" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <input id="status_logbook" name="status_logbook" Value="terkirim" hidden>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-
-            </div>
-
-            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">PERINGATAN !</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Anda sudah mengisi logbook untuk tanggal ini.</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+<div class="container">
+    <div class="row ms-3 mb-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
+        <div class="col-md-9">
+            <h1 class="font-weight-bold text-left" style="font-size: 2.5rem; color: #333;">
+                Bagaimana <span style="color: #FFD700;">Kegiatanmu</span> Hari ini ?
+            </h1><br>
         </div>
+    </div>
+
+    <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex">
+        <div class="col-md-12">
+            <?php
+            if (isset($_SESSION['error']) && !empty($_SESSION['error'])) {
+                echo '<div class="alert alert-danger" role="alert">' . $_SESSION['error'] . '</div>';
+                unset($_SESSION['error']);
+            }
+            ?>
+            <form method="post" action="#" enctype="multipart/form-data">
+                <input type="hidden" name="id_siswa" value="<?php echo $_SESSION['id_siswa']; ?>">
+                <input type="hidden" name="id_pkl" value="<?php echo $_SESSION['id_pkl']; ?>">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="tanggal" class="form-label fw-bold">Tanggal Kegiatan</label>
+                        <input type="date" class="form-control" id="tanggal" name="tanggal" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="dokumentasi" class="form-label fw-bold">Dokumentasi</label>
+                        <input type="file" class="form-control" id="dokumentasi" name="dokumentasi" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="aktivitas" class="form-label fw-bold">Deskripsikan Aktivitasmu</label>
+                    <textarea class="form-control" id="aktivitas" rows="3" placeholder="Deskripsikan Kegiatanmu" name="aktivitas" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <input id="status_logbook" name="status_logbook" Value="terkirim" hidden>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+        
 
         <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
 
-        <script>
-            $(document).ready(function () {
-                <?php if ($show_modal): ?>
-                    $("#myModal").modal("show");
-                <?php endif; ?>
-
-                // Menampilkan modal saat tombol submit diklik
-                $("form").submit(function () {
-                    $("#myModal").modal("show");
-                });
-            });
-        </script>
 
         <script src="assets/js/main.js"></script>
 

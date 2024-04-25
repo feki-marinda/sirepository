@@ -79,10 +79,6 @@ if (empty($id_user)) {
         </div>
     </div>
 
-
-    </div>
-
-
     <?php include 'footer.html'; ?>
     <script src="assets/js/main.js"></script>
 

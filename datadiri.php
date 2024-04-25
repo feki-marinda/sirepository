@@ -32,7 +32,7 @@ $result = mysqli_query($koneksi, $query);
     <section class="breadcrumbs">
       <div class="container">
         <ol>
-          <li><a href="index.php">Home</a></li>
+          <li><a href="home.php">Home</a></li>
           <li><a href="datadiri.php">Data Siswa</a></li>
         </ol>
         <h2>

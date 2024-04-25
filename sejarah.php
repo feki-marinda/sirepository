@@ -49,8 +49,9 @@ if (empty($id_user)) {
                             <div class="entry-content">
                                 <div class="mb-3" style="text-align: center; padding-left: 20px; padding-right: 20px;">
                                     <img src="assets/img/sekolah.jpg" alt="" class="img-fluid rounded"
-                                        style="width: 700px; height: 400px; margin-left: auto; margin-right: auto;">
+                                        style="max-width: 80%; height: auto; margin-left: auto; margin-right: auto;">
                                 </div>
+
 
                                 <div class="" style="text-align:justify">
                                     <h5>

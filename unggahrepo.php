@@ -161,7 +161,7 @@ $koneksi->close();
         </style>
 
         <div class="container">
-            <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
+            <div class="row ms-3 me-3 pb-5 pt-5 ps-5 pe-5 rounded shadow d-flex" style="background-color: #F0F8FF;">
                 <div class="col-12">
                     <h2 class="font-weight-bold text-left" style="font-size: 2.5rem; color: #333;">
                         Simpan <span style="color: #FFD700;">Laporan</span> Praktik Kerja Lapanganmu
@@ -170,7 +170,7 @@ $koneksi->close();
                 </div>
             </div><br>
 
-            <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 rounded d-flex" style="box-shadow: 10px 10px 20px 12px lightblue;">
+            <div class="row ms-3 pb-5 pt-5 ps-5 pe-5 me-3 rounded d-flex" style="box-shadow: 10px 10px 20px 12px lightblue;">
                 <?php if ($showForm) { ?>
                     <form action="#" method="post" enctype="multipart/form-data" id="uploadForm">
                         <input type="hidden" value="Terkirim" name="status">
