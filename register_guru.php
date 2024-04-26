@@ -73,7 +73,7 @@ if (isset($_POST['registrasi'])) {
     <input type="hidden" name="id_user" value="isi_disini"> <!-- Isi dengan nilai id_user yang baru saja dibuat -->
 
     <!-- Tombol Submit -->
-    <div class="d-grid gap-2">
+    <div class="d-grid gap-2 mb-3">
         <button class="btn btn-primary" type="submit" name="registrasi">Submit</button>
     </div>
 </form>

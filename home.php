@@ -5,8 +5,8 @@ include('conn.php');
 $id_user = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : '';
 
 if (empty($id_user)) {
-    header("Location: index.php");
-    exit;
+  header("Location: index.php");
+  exit;
 }
 
 ?>
@@ -102,6 +102,33 @@ if (empty($id_user)) {
   .bi-arrow-right {
     margin-left: 5px;
   }
+
+  .btn-get-started {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    height: 50px;
+    background-color: #FF8C00;
+    padding: 0 20px;
+    /* Tambahkan padding di sekitar teks */
+    border: none;
+    border-radius: 25px;
+    /* Tambahkan border-radius untuk membuat sudut bulat */
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #ffffff;
+  }
+
+  /* Atur lebar tombol relatif terhadap lebar layar */
+  @media (max-width: 768px) {
+    .btn-get-started {
+      width: 100%;
+      max-width: 300px;
+      /* Atur lebar maksimum tombol */
+    }
+  }
 </style>
 
 <body>
@@ -118,7 +145,8 @@ if (empty($id_user)) {
             <span style="font-weight: bold; color: #FF8C00;">menemukan</span> dan <span
               style="font-weight: bold; color: #FF8C00;">menyimpan</span> semua dokumen <span
               style="font-weight: bold; color: #FF8C00;">Praktek Kerja Lapangan</span> dengan Cepat dan Tepat. Untuk
-            memulai silahkan <span style="font-weight: bold; color: #FF8C00;">daftar</span> terlebih dahulu.</h2>
+            memulai silahkan <span style="font-weight: bold; color: #FF8C00;">daftar</span> terlebih dahulu.
+          </h2>
           <div data-aos="fade-up" data-aos-delay="600" data-aos-duration="1000">
             <div class="text-start text-lg-start">
               <a href="daftarpkl.php"
@@ -196,22 +224,15 @@ if (empty($id_user)) {
                 pihak lainnya.
               </h4>
 
-
               <div class="text-start text-lg-start">
                 <a href="about.php"
-                  class="btn-get-started rounded scrollto d-inline-flex align-items-center justify-content-center align-self-center"
-                  style="width: 300px; height:50px; background-color: #FF8C00; ">
-                  <span style="color: #ffffff;">Tentang Sirepository </span>
-                  <i class="bi bi-arrow-right" style="color: #ffffff;"></i>
+                  class="btn-get-started rounded scrollto d-inline-flex align-items-center justify-content-center align-self-center">
+                  <span>Tentang Sirepository </span>
+                  <i class="bi bi-arrow-right"></i>
                 </a>
-
               </div>
-            </div>
 
-            <!-- <div class="col-lg-6 d-flex align-items-center justify-content-center">
-            <img src="assets/img/about.png" class="img-fluid" alt="">
-          </div> -->
-
+            </div> 
 
           </div>
         </div>
@@ -241,7 +262,7 @@ if (empty($id_user)) {
                         <h5 class="card-title">
                           <?php echo $data['judul_dokumen']; ?>
                         </h5>
-                        <a href='../admin/Dokumen/<?php echo $data['Dokumen']; ?>' target='_blank'
+                        <a href='admin/Dokumen/<?php echo $data['Dokumen']; ?>' target='_blank'
                           class="btn btn-primary">Buka Dokumen</a>
                       </div>
                     </div>

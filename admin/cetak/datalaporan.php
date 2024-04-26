@@ -66,5 +66,5 @@ $html .= '</tbody>
 
 
 $mpdf->WriteHTML($html);
-$mpdf->Output($nama . '-laporan.pdf', 'I');
+$mpdf->Output('Laporan.pdf', 'D');
 

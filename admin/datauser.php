@@ -24,6 +24,15 @@ if (isset($_POST['tambahuser'])) {
     $password = $_POST['password'];
     $status = $_POST['status'];
 
+    // Check if the username already exists
+    $check_query = "SELECT * FROM user WHERE username='$username'";
+    $check_result = mysqli_query($koneksi, $check_query);
+    if (mysqli_num_rows($check_result) > 0) {
+        $_SESSION['admin_error_user'] = "Username sudah digunakan. Silakan gunakan username lain.";
+        header("Location: datauser.php");
+        exit();
+    }
+
     $insert_query = "INSERT INTO user (id_user, username, password, status) VALUES ('$id_user','$username', '$password','$status')";
 
     if ($koneksi->query($insert_query) === TRUE) {
@@ -81,6 +90,7 @@ if (isset($_GET['id_user'])) {
 
 $koneksi->close();
 ?>
+
 
 
 <!DOCTYPE html>

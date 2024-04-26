@@ -37,7 +37,7 @@ if (empty($id_user)) {
           <h1 class="font-weight-bold text-left" style="font-size: 2.5rem; color: #333;">
             Data Pengembang
           </h1>
-          <h3>Sistem Informasi Repository Laporan PKL Siswa<span style="color: #FFD700; font-weight: bold;">SMK Al-Muhajirin</span></h3>
+          <h3>Sistem Informasi Repository Laporan PKL Siswa<span style="color: #FFD700; font-weight: bold;"> SMK Al-Muhajirin</span></h3>
           <hr>
         </div>
         <div class="container mt-4">

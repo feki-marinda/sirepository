@@ -49,14 +49,21 @@ if (isset($_POST['register'])) {
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <div class="text-center">
-                    <img src="admin/assets/img/R.png" alt="" class="mx-auto d-block">
-                    <h3>Sistem Informasi Repository Laporan PKL</h3>
-                </div><br>
-                <div style="text-align: center;">
-                    <h2>Selamat Datang</h2>
-                    <p>Jika Belum Memiliki Akun Ayo Buat Akun Sekarang !</p>
-                </div>
+            <div class="container">
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <img src="admin/assets/img/R.png" alt="" class="img-fluid mx-auto d-block" style="max-width: 100%; height: auto;">
+            <h3>Sistem Informasi Repository Laporan PKL</h3>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <h2>Selamat Datang</h2>
+            <p>Jika Belum Memiliki Akun Ayo Buat Akun Sekarang !</p>
+        </div>
+    </div>
+</div>
+
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
                         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab"

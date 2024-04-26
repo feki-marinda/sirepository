@@ -144,8 +144,8 @@ if (isset($_GET['id_indikator'])) {
                                         value="<?= $row['indikator']; ?>" name="indikator" required>
                                 </div>
                                 <div class="modal-footer justify-content-between">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary" name="Editindikator">Simpan</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary" name="Editindikator">Submite</button>
                                 </div>
                             </div>
                         </form>

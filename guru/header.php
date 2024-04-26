@@ -1,5 +1,4 @@
 <?php
-// Mendapatkan nama halaman aktif dari URL
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <style>
@@ -9,30 +8,36 @@ $current_page = basename($_SERVER['PHP_SELF']);
             border-left: 3px solid #0056b3;
         }
 </style>
-<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-    <!-- Navbar Brand-->
-    <a class="navbar-brand ps-3" href="index.php"><img src="../admin/assets/img/r.png" alt="" style="width: 200px; height: 40px;"></a>
-    <!-- Sidebar Toggle-->
-    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i
-            class="fas fa-bars"></i></button>
-    <!-- Navbar Search-->
-    <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-        <div class="input-group">
-            <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..."
-                aria-describedby="btnNavbarSearch" />
-            <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
-        </div>
-    </form>
 
-        <!-- Navbar-->
-    <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+
+<nav class="sb-topnav navbar navbar-expand-lg navbar-dark bg-dark">
+    <!-- Navbar Brand-->
+    <a class="navbar-brand ps-3" href="index.php">
+        <img src="../admin/assets/img/r.png" alt="" style="width: 200px; height: 40px;">
+    </a>
+    <!-- Sidebar Toggle-->
+    <button class="btn btn-link btn-sm order-1 order-lg-0 me-2 me-lg-0" id="sidebarToggle" aria-label="Toggle sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+    <!-- Navbar Search-->
+    <!-- <form class="d-none d-lg-flex form-inline ms-auto me-3 my-2 my-lg-0">
+        <div class="input-group">
+            <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch">
+            <button class="btn btn-primary" id="btnNavbarSearch" type="button">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+    </form> -->
+    <!-- Navbar-->
+    <ul class="navbar-nav ms-auto me-0">
         <li class="nav-item">
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" style="width: 150px;">
+            <button type="button" class="btn btn-danger btn-sm me-3" data-bs-toggle="modal" data-bs-target="#exampleModal">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
         </li>
     </ul>
 </nav>
+
 
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
